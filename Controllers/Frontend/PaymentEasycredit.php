@@ -1,6 +1,7 @@
 <?php
 class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controllers_Frontend_Payment
 {
+    
     /**
      * @var Shopware_Plugins_Frontend_SwagPaymentPaypal_Bootstrap $plugin
      */
@@ -65,15 +66,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     public function indexAction()
     {
-        // PayPal Express > Sale
-        if (!empty($this->session->PaypalResponse['TOKEN'])) {
-            $this->forward('return');
-            // Paypal Basis || PayPal Express
-        } elseif ($this->getPaymentShortName() == 'easycredit') {
-            $this->forward('gateway');
-        } else {
-            $this->redirect(array('controller' => 'checkout'));
-        }
+
+        $this->forward('gateway');
     }
 
     /**
@@ -99,6 +93,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     public function gatewayAction()
     {
+        debugBernd("gatewayAction");
+
         $router = $this->Front()->Router();
         $config = $this->plugin->Config();
 
@@ -111,15 +107,18 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
             if ($url = $checkout->getRedirectUrl()) {
                 $this->redirect($url);
+
                 return;
             }
         } catch (Mage_Core_Exception $e) {
             //$this->_getCheckoutSession()->addError($this->__('Unable to start easyCredit Payment:').' '.$e->getMessage());
+            print_r($e->getMessage());
+            echo "EXCEPTION";
+            exit();
         } catch (Exception $e) {
-            //$this->_getCheckoutSession()->addError($this->__('Unable to start easyCredit Payment.'));
-            //Mage::logException($e);
-            echo $e->getMessage();
-            exit;
+            print_r($e->getMessage());
+            echo "EXCEPTION";
+            exit();
         }
     }
 
@@ -128,6 +127,50 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             'action'    => $action,
         ));
     }
+
+
+    public function addInterestSurcharge() {
+        if (!isset(Shopware()->Session()->EasyCredit["interest_amount"])
+            || empty(Shopware()->Session()->EasyCredit["interest_amount"])
+           ) {
+            return;
+        }
+
+        $interest_order_name = 'sw-payment-ec-interest';
+
+        $interest_amount = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
+
+        debugBernd([
+            'addInterestSurcharge()$interest_amount' => $interest_amount
+        ]);
+
+        $this->get('db')->delete(
+            's_order_basket',
+            array(
+                'sessionID = ?' => $this->session->get('sessionId'),
+                'ordernumber = ?' => $interest_order_name
+            )
+        );
+
+        $this->get('db')->insert(
+            's_order_basket',
+            array(
+                'sessionID' => Shopware()->Session()->offsetGet('sessionId'),
+                'articlename' => 'Zinsen für Ratenzahlung',
+                'articleID' => 0,
+                'ordernumber' => $interest_order_name,
+                'quantity' => 1,
+                'price' => $interest_amount,
+                'netprice' => $interest_amount,
+                'tax_rate' => 0,
+                'datum' => new Zend_Date(),
+                'modus' => 4,
+                'currencyFactor' => 1
+            )
+        );
+
+    }
+ 
 
     public function returnAction() {
         try {
@@ -138,12 +181,15 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 throw new Exception('transaction not approved');
             }
             $checkout->loadFinancingInformation();
+            Shopware()->Session()->EasyCredit["externRedirect"] = false;
 
             /*$quote = $this->_getQuote();
             $quote->getPayment()
                 ->setMethod('easycredit');
             $quote->collectTotals()->save();
             */
+
+            $this->addInterestSurcharge();
 
             $this->redirect(array('controller'=>'checkout'));
             return;
@@ -152,7 +198,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         } catch (Exception $e) {
             //$this->_getCheckoutSession()->addError($this->__('Unable to validate easyCredit Payment.'));
             //Mage::logException($e);
-            echo $e->getMessage(); exit;
+            // echo $e->getMessage(); exit;
         }
         $this->redirect(array('controller' => 'checkout'));
     }
@@ -163,6 +209,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     public function cancelAction()
     {
         // storage->clear
+
+        Shopware()->Session()->EasyCredit["externRedirect"] = false;
+
         $this->redirect(array(
             'controller'=>'checkout',
             'action'=>'shippingPayment'
@@ -171,6 +220,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function rejectAction() {
         // storage->clear
+
+        Shopware()->Session()->EasyCredit["externRedirect"] = false;
+
         $this->redirect(array(
             'controller'=>'checkout',
             'action'=>'shippingPayment'

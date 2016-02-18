@@ -1,7 +1,7 @@
 <?php
 use Netzkollektiv\EasyCredit;
 
-class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap 
+class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     extends Shopware_Components_Plugin_Bootstrap
 {
     public function afterInit()
@@ -10,15 +10,21 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $loader->register();
     }
 
-    public function getLabel() {
+    public function getLabel()
+    {
         return 'Ratenkauf by easyCredit';
     }
- 
+
     public function getVersion()
     {
         return '1.0.0';
     }
- 
+
+    public function getInterestOrderName()
+    {
+        return 'sw-payment-ec-interest';
+    }
+
     public function getInfo()
     {
         return array(
@@ -32,7 +38,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    public function getCapabilties() {
+    public function getCapabilties()
+    {
         return array(
             'install' => true,
             'enable' => true,
@@ -40,7 +47,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'secureUninstall' => true
         );
     }
- 
+
     public function install()
     {
 
@@ -96,6 +103,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     private function createMyEvents()
     {
+        //$e = new Exception();
+        //print($e.getTraceAsString());
+
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit',
             'onGetControllerPathFrontend'
@@ -112,85 +122,333 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
 
         $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch_Checkout_SaveShippingPayment',
-            'afterSaveShippingPayment'
+            'Enlight_Controller_Action_PostDispatch',
+            'onPostDispatch',
+            110
         );
+
+
     }
 
-    public function addInterestSurcharge(Enlight_Event_EventArgs $arguments) {
+
+    public function getUser()
+    {
+        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
+            return Shopware()->Session()->sOrderVariables['sUserData'];
+        } else {
+            return null;
+        }
+    }
+
+    public function getBasket()
+    {
+        if (!empty(Shopware()->Session()->sOrderVariables['sBasket'])) {
+            return Shopware()->Session()->sOrderVariables['sBasket'];
+        } else {
+            return null;
+        }
+    }
 
 
-        // Fixed surcharge
-        if (!empty($payment['surcharge']) && (empty($dispatch) || $dispatch['surcharge_calculation'] == 3)) {
-            $surcharge = round($payment['surcharge'], 2);
-            $payment['surcharge'] = 0;
-            if (empty($this->sSYSTEM->sUSERGROUPDATA["tax"]) && !empty($this->sSYSTEM->sUSERGROUPDATA["id"])) {
-                $surcharge_net = $surcharge;
-                //$tax_rate = 0;
-            } else {
-                $surcharge_net = round($surcharge / (100 + $discount_tax) * 100, 2);
+    public function getAmount()
+    {
+        $user = $this->getUser();
+        $basket = $this->getBasket();
+        if (!empty($user['additional']['charge_vat'])) {
+            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        } else {
+            return $basket['AmountNetNumeric'];
+        }
+    }
+
+    public function registerMyTemplateDir($responsive = false)
+    {
+        if ($responsive) {
+            $this->get('template')->addTemplateDir(__DIR__ . '/Views/responsive/', 'easycredit_responsive');
+        }
+        $this->get('template')->addTemplateDir(__DIR__ . '/Views/', 'easycredit');
+    }
+
+
+    protected function setErrorMessages(\Enlight_View_Default $view, $message)
+    {
+        $errorMessages = $view->getAssign('sErrorMessages');
+        $errorMessages[] = $message;
+
+        $view->assign('sErrorMessages', $errorMessages);
+    }
+
+    /**
+     * Sets the payment method for the current to paymentId
+     * if no ID given the shops default payment method is used
+     *
+     * @param null $paymentId
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\TransactionRequiredException
+     */
+    public function setPaymentId($paymentId = null) {
+        $user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
+
+        if ($paymentId === null)
+            $paymentId = Shopware()->Config()->get('paymentdefault');
+
+        $user->setPaymentId($paymentId);
+        Shopware()->Models()->persist($user);
+        Shopware()->Models()->flush();
+        Shopware()->Models()->refresh($user);
+    }
+
+    public function resetPaymentIdToDefaultId() {
+        $this->setPaymentId();
+    }
+
+
+    /**
+     * remove interest from basket via DB call
+     */
+    public function removeInterest()
+    {
+        $session = Shopware()->Session();
+
+        $this->get('db')->delete(
+            's_order_basket',
+            array(
+                'sessionID = ?' => $session->get('sessionId'),
+                'ordernumber = ?' => $this->getInterestOrderName()
+            )
+        );
+
+        unset(Shopware()->Session()->EasyCredit["interest_amount"]);
+        unset(Shopware()->Session()->EasyCredit["authorized_amount"]);
+    }
+
+
+    /**
+     * checks if the easycredit interest identified by getInterestOrderName() is in the user's basket
+     *
+     * @return bool
+     */
+    public function isInterestInBasket()
+    {
+        $basket = $this->getBasket();
+
+        $content = $basket['content'];
+        foreach ($content as $c) {
+            if (isset($c['ordernumber']) && $c['ordernumber'] == $this->getInterestOrderName()) {
+                return true;
             }
+        }
 
-            $this->db->insert(
-                's_order_basket',
-                array(
-                    'sessionID' => Shopware()->Session()->offsetGet('sessionId'),
-                    'articlename' => 'Zinsen für Ratenzahlung',
-                    'articleID' => 0,
-//                    'ordernumber' => $surcharge_ordernumber,
-                    'quantity' => 1,
-                    'price' => $surcharge,
-                    'netprice' => $surcharge_net,
-                    'tax_rate' => 0,
-                    'datum' => new Zend_Date(),
-                    'modus' => 4,
-                    'currencyFactor' => $currencyFactor
-                )
+        return false;
+    }
+
+
+    public function showInterestRemovedError($view) {
+        if (
+            (isset(Shopware()->Session()->EasyCredit["info_interest_removed"]))
+            && (Shopware()->Session()->EasyCredit["info_interest_removed"])
+        ) {
+            $this->setErrorMessages(
+                $view,
+                "EasyCredit Raten müssen neu berechnet werden" .
+                "Bitte wählen Sie ernaut die Zahlungsart <strong>Ratenkauf by easyCredit</strong>."
             );
+            Shopware()->Session()->EasyCredit["info_interest_removed"] = false;
         }
     }
 
-    public function afterSaveShippingPayment(Enlight_Event_EventArgs $arguments) {
-echo get_class(Shopware()); exit;
-        $controller = $arguments->getSubject();
-        $request = $controller->Request();
-        $response = $controller->Response();
+    public function reloadCheckoutConfirm($action) {
+        $action->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'confirm'
+        ));
+    }
+
+    public function checkInterest($action, $view) {
+
+        $this->showInterestRemovedError($view);
+
+        $user = $this->getUser();
+        $payment = $user['additional']['payment'];
+        $paymentName = $payment['name'];
+
+        $amount_basket = round($this->getAmount(), 2);
+
+        $amount_authorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
+        $amount_interest = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
+        $amount_basket_without_interest = round($amount_basket - $amount_interest, 2);
+
+        $interestInBasket = $this->isInterestInBasket();
+
+        // other payment method but interest still in basket => remove interest
+        if (
+            $paymentName != 'easycredit'
+            && $interestInBasket
+        ) {
+            $this->removeInterest();
+
+            $action->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'confirm'
+            ));
+
+            return;
+        } // still easycredit but amount has changed => remove interest and reset payment method to shop default
+
+        if (
+            $paymentName == 'easycredit'
+            && $interestInBasket
+            && $amount_authorized != $amount_basket_without_interest
+        ) {
+            debugBernd([
+                '$amount_authorized' => $amount_authorized,
+                '$amount_basket' => $amount_basket,
+                '$amount_basket_without_interest' => $amount_basket_without_interest,
+                '$amount_interest' => $amount_interest,
+            ]);
+
+            $this->removeInterest();
+            $this->resetPaymentIdToDefaultId();
+
+            Shopware()->Session()->EasyCredit["info_interest_removed"] = true;
+
+            $action->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'confirm'
+            ));
+
+            return;
+        } // easycredit without interest rates should not be possible => remove it
+        elseif (
+            $paymentName == 'easycredit'
+            && !$interestInBasket
+        ) {
+            $this->resetPaymentIdToDefaultId();
+            $this->reloadCheckoutConfirm($action);
+
+            Shopware()->Session()->EasyCredit["info_interest_removed"] = true;
+
+            $action->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'confirm'
+            ));
+        }
+
+    }
+
+    public function alterChangePaymentTemplate($action, $view) {
+        $checkout = $action->get('easyCreditCheckout');
+
+        $installementValues = $checkout->getInstallementValues(round($this->getAmount(), 2));
+
+        // get the currently selected payment name from the view (not the one saved in the session)
+        $selectedPaymentName = $view->sUserData['additional']['payment']['name'];
+
+        if (!$installementValues['status'] || $selectedPaymentName == 'easycredit') {
+            $this->registerMyTemplateDir();
+            $view->extendsTemplate('frontend/checkout/change_payment.tpl');
+        }
+
+        if (!$installementValues['status']) {
+
+            $view->assign('EasyCreditPaymentDisabled', true);
+
+            $descriptionDisabled = $this->getPaymentLogoDisabled()
+                . '<br />' . $this->getAdditionalDescriptionText()
+                . '<br />' . $installementValues['error'];
+
+            $view->assign('EasyCreditDescriptionDisabled', $descriptionDisabled);
+
+            return;
+
+        }
+
+        if ($selectedPaymentName == 'easycredit') {
+
+            $view->assign('EasyCreditPaymentSelected', true);
+
+            $descriptionSelected = $this->getPaymentLogo()
+                . '<br />' . $this->getAdditionalDescriptionText();
+
+            $view->assign('EasyCreditDescriptionSelected', $descriptionSelected);
+
+            return;
+        }
+    }
+
+    public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
+    {
+        $action = $arguments->getSubject();
+        $request = $action->Request();
+
+        $user = $this->getUser();
+        $payment = $user['additional']['payment'];
+
+//        debugBernd([
+//            '$request->getControllerName()' => $request->getControllerName(),
+//            '$request->getActionName()' => $request->getActionName(),
+//            '$this->getBasket()' => $this->getBasket(),
+//            '$payment' => $payment,
+//        ]);
+
+        if ($request->getControllerName() != 'checkout') {
+            return;
+        }
+
+        $response = $action->Response();
+        $view = $action->View();
+        $config = $this->config;
+
+
+        if ($request->getActionName() == "confirm") {
+            $this->checkInterest($action, $view);
+        } // shippingPayment template adjustments
+        else if ($request->getActionName() == "shippingPayment") {
+            $this->alterChangePaymentTemplate($action, $view);
+        }
+
+    }
+
+    public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
+    {
+        $action = $arguments->getSubject();
+        $request = $action->Request();
+        $response = $action->Response();
+
+        if ($this->isInterestInBasket()) {
+            $this->removeInterest();
+        }
 
         $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
             (int)$request->getPost('payment')
         );
-        if ($payment['name'] != 'easycredit') {
-            return;
-        } 
 
-        $this->handleInterestSurcharge();       
-    }
-
-    public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments) {
-        $checkoutController = $arguments->getSubject();
-        $request = $checkoutController->Request();
-
-        $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
-            (int)$request->getPost('payment')
-        );
         if ($payment['name'] != 'easycredit') {
             return;
         }
 
-        if (false === $this->_handleRedirect($checkoutController, $request)) {
+
+        if (false === $this->_handleRedirect($action, $request, $response)) {
             return false;
         }
+
     }
 
-    protected function _handleRedirect($controller, $request) {
+    protected function _handleRedirect($controller, $request, $response)
+    {
+
         if (!$request->isPost() || $request->getParam('isXHR')) {
             return;
         }
+        Shopware()->Session()->EasyCredit["externRedirect"] = true;
 
         $controller->redirect(array(
-            'module'=>'payment_easycredit',
-            'action'=>'gateway'
+            'module' => 'payment_easycredit',
+            'action' => 'gateway'
         ));
+
+
         return false; // do not save shipping/payment
     }
 
@@ -226,6 +484,11 @@ echo get_class(Shopware()); exit;
     /**
      * Creates and save the payment row.
      */
+
+    private function getAdditionalDescriptionText() {
+        return 'Ratenkauf by easyCredit.';
+    }
+
     private function createMyPayment()
     {
         $this->createPayment(
@@ -235,23 +498,32 @@ echo get_class(Shopware()); exit;
                 'action' => 'payment_easycredit',
                 'active' => 0,
                 'position' => 0,
-                'additionalDescription' => $this->getPaymentLogo() . 'Ratenkauf by easyCredit.'
+                'additionalDescription' => $this->getPaymentLogo() . $this->getAdditionalDescriptionText()
             )
         );
     }
 
     private function getPaymentLogo()
     {
-        return;
         $this->Application()->Template()->addTemplateDir(
             $this->Path() . 'Views/'
         );
 
-        return '<!-- PayPal Logo -->' .
-        '<a onclick="window.open(this.href, \'olcwhatispaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=400, height=500\'); return false;"' .
-        ' href="https://www.paypal.com/de/cgi-bin/webscr?cmd=xpt/cps/popup/OLCWhatIsPayPal-outside" target="_blank">' .
-        '<img src="{link file=\'frontend/_resources/images/paypal_logo.png\' fullPath}" alt="Logo \'PayPal empfohlen\'">' .
-        '</a><br>' . '<!-- PayPal Logo -->';
+        return '<!-- easycredit Logo -->' .
+        '<img id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo\'">' .
+        '</a><br>' .
+        '<!-- easycredit Logo -->';
+    }
+
+    private function getPaymentLogoDisabled() {
+        $this->Application()->Template()->addTemplateDir(
+            $this->Path() . 'Views/'
+        );
+
+        return '<!-- easycredit Logo -->' .
+        '<img style="filter: grayscale(100%); -webkit-filter: grayscale(100%)" id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo\'">' .
+        '</a><br>' .
+        '<!-- easycredit Logo -->';
     }
 
     /**
@@ -316,11 +588,5 @@ echo get_class(Shopware()); exit;
     /**
      * @param bool $responsive
      */
-    public function registerMyTemplateDir($responsive = false)
-    {
-        if ($responsive) {
-            $this->get('template')->addTemplateDir(__DIR__ . '/Views/responsive/', 'easycredit_responsive');
-        }
-        $this->get('template')->addTemplateDir(__DIR__ . '/Views/', 'easycredit');
-    }
+
 }
