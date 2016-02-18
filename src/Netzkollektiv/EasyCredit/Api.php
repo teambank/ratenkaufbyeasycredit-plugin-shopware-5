@@ -1,6 +1,8 @@
 <?php
 namespace Netzkollektiv\EasyCredit;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
+
 class Api
 {
     protected $_apiBaseUrl = 'https://www.easycredit.de/ratenkauf-ws/rest';
@@ -78,7 +80,10 @@ class Api
             'finanzierungsbetrag' => $amount,
         );
 
-        return $this->call('GET','modellrechnung/durchfuehren', $data);
+
+        $result = $this->call('GET', 'modellrechnung/durchfuehren', $data);
+
+        return $result;
     }
 
     public function callDecision($token) {
@@ -166,10 +171,11 @@ $this->_logger->log($result);
         foreach ($result->wsMessages->messages as $message) {
             switch (trim($message->severity)) {
                 case 'ERROR':
-                    echo($message->renderedMessage);
-                    exit;
+                    throw new Exception($message->renderedMessage);
+                    //echo($message->renderedMessage);
+                    //exit;
                 case 'INFO':
-                    echo($message->renderedMessage);
+                    //echo($message->renderedMessage);
                     break;
             }
         }

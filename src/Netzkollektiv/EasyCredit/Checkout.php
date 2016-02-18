@@ -1,6 +1,8 @@
 <?php
 namespace Netzkollektiv\EasyCredit;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
+
 class Checkout {
 
     public function __construct(EasyCredit\Api $client, EasyCredit\StorageInterface $storage) {
@@ -45,7 +47,6 @@ class Checkout {
     }
 
     public function start(EasyCredit\QuoteInterface $quote) {
-
         $result = $this->_getApi()
             ->callProcessInit(
                 $quote,
@@ -58,6 +59,8 @@ class Checkout {
         $storage->setData('token',$result->tbVorgangskennung);
         $storage->setData('transaction_id',$result->fachlicheVorgangskennung);
         $storage->setData('authorized_amount',$quote->getGrandTotal());
+
+        file_put_contents('/tmp/setSession.log', date('Y-m-d H:i:s'), FILE_APPEND);
 
         //$quote->collectTotals()->save();
         return $this;
@@ -117,6 +120,10 @@ class Checkout {
         /* get financing info from api */
         $result = $this->_getApi()->callFinancing($token);
 
+        debugBernd([
+            '$result->ratenplan->zinsen->anfallendeZinsen' => $result->ratenplan->zinsen->anfallendeZinsen
+        ]);
+
         $this->_getStorage()->setData( 
             'interest_amount',
             (float)$result->ratenplan->zinsen->anfallendeZinsen
@@ -130,5 +137,22 @@ class Checkout {
 
         return $this->getApi()
             ->callConfirm($token);
+    }
+
+    public function getInstallementValues($amount) {
+        try {
+            $this->_getApi()->callModelCalculation($amount);
+        } catch (Exception $e) {
+            return array(
+                'status' => false,
+                'error' => $e->getMessage()
+            );
+        }
+
+        return array(
+            'status' => true,
+            'error' => ''
+        );
+
     }
 }
