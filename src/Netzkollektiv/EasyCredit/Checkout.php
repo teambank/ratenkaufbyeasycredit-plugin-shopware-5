@@ -120,10 +120,6 @@ class Checkout {
         /* get financing info from api */
         $result = $this->_getApi()->callFinancing($token);
 
-        debugBernd([
-            '$result->ratenplan->zinsen->anfallendeZinsen' => $result->ratenplan->zinsen->anfallendeZinsen
-        ]);
-
         $this->_getStorage()->setData( 
             'interest_amount',
             (float)$result->ratenplan->zinsen->anfallendeZinsen

@@ -93,8 +93,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     public function gatewayAction()
     {
-        debugBernd("gatewayAction");
-
         $router = $this->Front()->Router();
         $config = $this->plugin->Config();
 
@@ -139,10 +137,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $interest_order_name = 'sw-payment-ec-interest';
 
         $interest_amount = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
-
-        debugBernd([
-            'addInterestSurcharge()$interest_amount' => $interest_amount
-        ]);
 
         $this->get('db')->delete(
             's_order_basket',
