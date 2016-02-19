@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
     }
 
     public function getGrandTotal() {
-        $this->_paymentController->getAmount();
+        return $this->_paymentController->getAmount();
     }
 
     public function getBillingAddress() {
