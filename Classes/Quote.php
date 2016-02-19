@@ -9,6 +9,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         $this->_paymentController = $paymentController;
 
         $this->_basket = $paymentController->get('modules')->Basket()->sGetBasket();
+
+
         $this->_user = $paymentController->getUser();
     }
 
@@ -17,8 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
     }
 
     public function getGrandTotal() {
-        // FIX shipping costs still missing
-        return $this->_basket['AmountNumeric'];
+        $this->_paymentController->getAmount();
     }
 
     public function getBillingAddress() {
