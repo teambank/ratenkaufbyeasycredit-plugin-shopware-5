@@ -59,15 +59,64 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return (isset($this->session->sUserId) && !empty($this->session->sUserId));
     }
 
+    public function getPaymentShortName()
+    {
+        if (($user = $this->getUser()) !== null
+            && !empty($user['additional']['payment']['name'])) {
+            return $user['additional']['payment']['name'];
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Index action method.
      *
      * Forwards to correct the action.
      */
+
+    public function createPaymentUniqueId()
+    {
+        if (class_exists('\Shopware\Components\Random')) {
+            return \Shopware\Components\Random::getAlphanumericString(32);
+        }
+        return parent::createPaymentUniqueId();
+    }
+
+
     public function indexAction()
     {
+        if (
+            isset(Shopware()->Session()->EasyCredit["externRedirect"])
+            && Shopware()->Session()->EasyCredit["externRedirect"]
+        ) {
+            Shopware()->Session()->EasyCredit["externRedirect"] = false;
+            $this->forward('gateway');
+        } else {
+            $checkout = $this->get('easyCreditCheckout');
 
-        $this->forward('gateway');
+            $captureResult = $checkout->capture();
+
+            if (!isset($captureResult->uuid)) {
+                // TODO Error Handling
+                debugBernd('!isset($captureResult->uuid)');
+            }
+
+            $transactionId = $captureResult->uuid;
+            $paymentUniqueId = $this->createPaymentUniqueId();
+
+            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId);
+            
+            Shopware()->Session()->EasyCredit["orderNumber"] = $orderNumber;
+
+            $this->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'finish',
+                'sUniqueID' => $paymentUniqueId
+            ));
+        }
+
+
     }
 
     /**
@@ -75,6 +124,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     public function expressAction()
     {
+        echo 'expressAction';
+        exit();
+
         unset($this->session->sOrderVariables);
 
         $payment = $this->plugin->getPayment();

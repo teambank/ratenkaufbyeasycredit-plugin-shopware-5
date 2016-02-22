@@ -122,9 +122,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
 
         $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch',
-            'onPostDispatch',
-            110
+            //'Enlight_Controller_Action_PostDispatch',
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout',
+            'onPostDispatch'
         );
 
 
@@ -380,8 +380,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
 
     public function redirectToTeamBank($action) {
-        Shopware()->Session()->EasyCredit["externRedirect"] = false;
-
 
         $action->redirect(array(
             'module' => 'payment_easycredit',
@@ -389,7 +387,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         ));
     }
 
-    public function alterConfirmTemplate($action, $view) {
+    public function alterConfirmTemplate($view) {
         $user = $this->getUser();
         $payment = $user['additional']['payment'];
         $paymentName = $payment['name'];
@@ -410,14 +408,32 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     }
 
+    public function captureCheckoutFinish($action, $view) {
+        $user = $this->getUser();
+        $payment = $user['additional']['payment'];
+        $paymentName = $payment['name'];
+
+        if ($paymentName != 'easycredit') {
+            return;
+        }
+
+        $checkout = $action->get('easyCreditCheckout');
+
+        $captureResult = $checkout->capture();
+
+        debugBernd($captureResult);
+    }
+
     public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
     {
 
         $action = $arguments->getSubject();
         $request = $action->Request();
 
-        $user = $this->getUser();
-        $payment = $user['additional']['payment'];
+        debugBernd([
+            '$request->getControllerName()' => $request->getControllerName(),
+            '$request->getActionName()' => $request->getActionName()
+        ]);
 
 
         if (
@@ -428,27 +444,24 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             return;
         }
 
-        if ($request->getControllerName() != 'checkout') {
-            return;
-        }
-
-        $response = $action->Response();
         $view = $action->View();
-        $config = $this->config;
-
 
         if ($request->getActionName() == "confirm") {
             $this->checkInterest($action, $view);
-            $this->alterConfirmTemplate($action, $view);
+            $this->alterConfirmTemplate($view);
         } // shippingPayment template adjustments
-        else if ($request->getActionName() == "shippingPayment") {
+        elseif ($request->getActionName() == "shippingPayment") {
             $this->alterChangePaymentTemplate($action, $view);
+        } elseif($request->getActionName() == "finish") {
+            debugBernd('finish');
+            // $this->captureCheckoutFinish($action, $view);
         }
 
     }
 
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
     {
+
         $action = $arguments->getSubject();
         $request = $action->Request();
         $response = $action->Response();
@@ -466,6 +479,20 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             return;
         }
 
+        $amount_basket = round($this->getAmount(), 2);
+
+        $amount_authorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
+        $amount_interest = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
+        $amount_basket_without_interest = round($amount_basket - $amount_interest, 2);
+
+        if (
+            $this->isInterestInBasket()
+            && $amount_authorized == $amount_basket_without_interest
+        ) {
+            return;
+        }
+
+
         if (false === $this->_handleRedirect($action, $request, $response)) {
             return false;
         }
@@ -481,17 +508,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         Shopware()->Session()->EasyCredit["externRedirect"] = true;
 
-//        $controller->redirect(array(
-//            'module' => 'payment_easycredit',
-//            'action' => 'gateway'
-//        ));
-//
-//
-//        return false; // do not save shipping/payment
     }
 
     public function onInitResourceCheckout()
     {
+
         $logger = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Logger();
 
         $apiClient = new EasyCredit\Api(array(
@@ -617,6 +638,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function onGetControllerPathFrontend()
     {
+        debugBernd('onGetControllerPathFrontend');
+
         $templateVersion = $this->get('shop')->getTemplate()->getVersion();
         $this->registerMyTemplateDir($templateVersion >= 3);
 
