@@ -131,7 +131,7 @@ class Checkout {
             $token = $this->_getToken();
         }
 
-        return $this->getApi()
+        return $this->_getApi()
             ->callConfirm($token);
     }
 
