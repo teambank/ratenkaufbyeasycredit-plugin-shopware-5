@@ -55,8 +55,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->createMyMenu();
         $this->createMyForm();
         $this->createMyPayment();
+        $this->createAdditionalOrderAttributes();
 
         return true;
+    }
+
+    public function createAdditionalOrderAttributes() {
+        Shopware()->Models()->addAttribute('s_order_attributes','easycredit','transaction_uuid','varchar(255)');
+        $metaDataCache = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCache->deleteAll();
+        Shopware()->Models()->generateAttributeModels(
+            array('s_order_attributes')
+        );
     }
 
     /**
@@ -204,6 +214,14 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
 
+    public function unsetStorage() {
+        unset(Shopware()->Session()->EasyCredit["interest_amount"]);
+        unset(Shopware()->Session()->EasyCredit["authorized_amount"]);
+        unset(Shopware()->Session()->EasyCredit["pre_contract_information_url"]);
+        unset(Shopware()->Session()->EasyCredit["redemption_plan"]);
+        unset(Shopware()->Session()->EasyCredit["transaction_id"]);
+    }
+
     /**
      * remove interest from basket via DB call
      */
@@ -219,11 +237,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             )
         );
 
-        unset(Shopware()->Session()->EasyCredit["interest_amount"]);
-        unset(Shopware()->Session()->EasyCredit["authorized_amount"]);
-        unset(Shopware()->Session()->EasyCredit["pre_contract_information_url"]);
-        unset(Shopware()->Session()->EasyCredit["redemption_plan"]);
-
+        $this->unsetStorage();
     }
 
 
@@ -335,52 +349,35 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function alterChangePaymentTemplate($action, $view) {
+        $this->registerMyTemplateDir();
         $checkout = $action->get('easyCreditCheckout');
 
         $installementValues = $checkout->getInstallementValues(round($this->getAmount(), 2));
-
         // get the currently selected payment name from the view (not the one saved in the session)
         $selectedPaymentName = $view->sUserData['additional']['payment']['name'];
 
-        if (
-            !$installementValues['status']
-            || $selectedPaymentName == 'easycredit'
-        ) {
-            $this->registerMyTemplateDir();
-            $view->extendsTemplate('frontend/checkout/change_payment.tpl');
-        }
+        $description = $this->getPaymentLogo() . $this->getAdditionalDescriptionText();
+        $descriptionDisabled = $this->getPaymentLogoDisabled() . $this->getAdditionalDescriptionText()
+            . '<br />' . $installementValues['error'];
 
+        $view->assign('EasyCreditDescription', $description);
+        $view->assign('EasyCreditDescriptionDisabled', $descriptionDisabled);
+        $view->assign('EasyCreditPaymentCompanyName', $this->Config()->get('easycreditCompanyName'));
 
-        if (!$installementValues['status']) {
-
+        if (!$installementValues['status'])
             $view->assign('EasyCreditPaymentDisabled', true);
+        else
+            $view->assign('EasyCreditPaymentDisabled', false);
 
-            $descriptionDisabled = $this->getPaymentLogoDisabled()
-                . '<br />' . $this->getAdditionalDescriptionText()
-                . '<br />' . $installementValues['error'];
-
-            $view->assign('EasyCreditDescriptionDisabled', $descriptionDisabled);
-
-            return;
-
-        }
-
-        if ($selectedPaymentName == 'easycredit') {
-
+        if ($selectedPaymentName == 'easycredit')
             $view->assign('EasyCreditPaymentSelected', true);
+        else
+            $view->assign('EasyCreditPaymentSelected', false);
 
-            $descriptionSelected = $this->getPaymentLogo()
-                . '<br />' . $this->getAdditionalDescriptionText();
-
-            $view->assign('EasyCreditDescriptionSelected', $descriptionSelected);
-
-            return;
-        }
+        $view->extendsTemplate('frontend/checkout/change_payment.tpl');
     }
 
-
     public function redirectToTeamBank($action) {
-
         $action->redirect(array(
             'module' => 'payment_easycredit',
             'action' => 'gateway'
@@ -397,7 +394,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
 
         $this->registerMyTemplateDir();
-        $view->extendsTemplate('frontend/checkout/confirm.tpl');
 
         $view->assign('EasyCreditPaymentShowRedemption', true);
         $view->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"]);
@@ -406,35 +402,14 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             Shopware()->Session()->EasyCredit["pre_contract_information_url"]
         );
 
-    }
-
-    public function captureCheckoutFinish($action, $view) {
-        $user = $this->getUser();
-        $payment = $user['additional']['payment'];
-        $paymentName = $payment['name'];
-
-        if ($paymentName != 'easycredit') {
-            return;
-        }
-
-        $checkout = $action->get('easyCreditCheckout');
-
-        $captureResult = $checkout->capture();
-
-        debugBernd($captureResult);
+        $view->extendsTemplate('frontend/checkout/confirm.tpl');
     }
 
     public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
     {
-
         $action = $arguments->getSubject();
         $request = $action->Request();
-
-        debugBernd([
-            '$request->getControllerName()' => $request->getControllerName(),
-            '$request->getActionName()' => $request->getActionName()
-        ]);
-
+        $view = $action->View();
 
         if (
             isset(Shopware()->Session()->EasyCredit["externRedirect"])
@@ -444,43 +419,32 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             return;
         }
 
-        $view = $action->View();
-
         if ($request->getActionName() == "confirm") {
             $this->checkInterest($action, $view);
             $this->alterConfirmTemplate($view);
-        } // shippingPayment template adjustments
-        elseif ($request->getActionName() == "shippingPayment") {
+        } elseif ($request->getActionName() == "shippingPayment") {
             $this->alterChangePaymentTemplate($action, $view);
-        } elseif($request->getActionName() == "finish") {
-            debugBernd('finish');
-            // $this->captureCheckoutFinish($action, $view);
+        } elseif ($request->getActionName() == "finish") {
+            $this->unsetStorage();
         }
-
     }
 
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
     {
-
         $action = $arguments->getSubject();
         $request = $action->Request();
-        $response = $action->Response();
 
-
-        if ($this->isInterestInBasket()) {
+        if ($this->isInterestInBasket())
             $this->removeInterest();
-        }
 
         $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
             (int)$request->getPost('payment')
         );
 
-        if ($payment['name'] != 'easycredit') {
+        if ($payment['name'] != 'easycredit')
             return;
-        }
 
         $amount_basket = round($this->getAmount(), 2);
-
         $amount_authorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
         $amount_interest = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
         $amount_basket_without_interest = round($amount_basket - $amount_interest, 2);
@@ -488,26 +452,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if (
             $this->isInterestInBasket()
             && $amount_authorized == $amount_basket_without_interest
-        ) {
+        )
             return;
-        }
 
-
-        if (false === $this->_handleRedirect($action, $request, $response)) {
-            return false;
-        }
-
-    }
-
-    protected function _handleRedirect($controller, $request, $response)
-    {
-
-        if (!$request->isPost() || $request->getParam('isXHR')) {
+        if (!$request->isPost()
+            || $request->getParam('isXHR')
+        )
             return;
-        }
 
         Shopware()->Session()->EasyCredit["externRedirect"] = true;
-
     }
 
     public function onInitResourceCheckout()
@@ -516,10 +469,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $logger = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Logger();
 
         $apiClient = new EasyCredit\Api(array(
-//            'api_key' => $this->Config()->get('easycreditApiKey'),
-//            'api_token' => $this->Config()->get('easycreditApiToken')
-            'api_key' => '2.de.9999.10001',
-            'api_token' => '3nx-d5d-vpo'
+            'api_key' => $this->Config()->get('easycreditApiKey'),
+            'api_token' => $this->Config()->get('easycreditApiToken')
+//            'api_key' => '2.de.9999.10001',
+//            'api_token' => '3nx-d5d-vpo'
         ), $logger);
 
         return new EasyCredit\Checkout(
@@ -569,8 +522,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
 
         return '<!-- easycredit Logo -->' .
-        '<img id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo\'">' .
-        '</a><br>' .
+        '<img id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo">' .
+        '<br>' .
         '<!-- easycredit Logo -->';
     }
 
@@ -580,8 +533,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
 
         return '<!-- easycredit Logo -->' .
-        '<img style="filter: grayscale(100%); -webkit-filter: grayscale(100%)" id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo\'">' .
-        '</a><br>' .
+        '<img style="filter: grayscale(100%); -webkit-filter: grayscale(100%)" id="rk_easycredit_logo" src="{link file=\'frontend/_resources/images/ratenkauf_easycredit_logo.png\' fullPath}" alt="easycredit Logo deaktiviert">' .
+        '<br>' .
         '<!-- easycredit Logo -->';
     }
 
@@ -609,6 +562,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     private function createMyForm()
     {
         $form = $this->Form();
+
         $form->setElement(
             'text',
             'easycreditApiKey',
@@ -619,6 +573,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'stripCharsRe' => ' '
             )
         );
+
         $form->setElement(
             'text',
             'easycreditApiToken',
@@ -627,6 +582,16 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' '
+            )
+        );
+
+        $form->setElement(
+            'text',
+            'easycreditCompanyName',
+            array(
+                'label' => 'Rechtlicher Firmenname',
+                'required' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
             )
         );
     }
@@ -638,16 +603,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function onGetControllerPathFrontend()
     {
-        debugBernd('onGetControllerPathFrontend');
-
         $templateVersion = $this->get('shop')->getTemplate()->getVersion();
         $this->registerMyTemplateDir($templateVersion >= 3);
 
         return __DIR__ . '/Controllers/Frontend/PaymentEasycredit.php';
     }
-
-    /**
-     * @param bool $responsive
-     */
 
 }
