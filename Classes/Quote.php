@@ -49,7 +49,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         return $this->_user['additional']['user']['email'];
     }
     public function getCustomerDob() {
-        return '';
+        $dob = $this->_user['billingaddress']['birthday'];
+
+        if ($dob == '0000-00-00') {
+            $dob = null;
+        }
+
+        return $dob;
     }
 
     public function getRiskProducts() {
@@ -57,6 +63,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
     }
 
     public function getAllVisibleItems() {
-//        return $this->_basket['amount'];
+        $basketContent = $this->_basket['content'];
+
+        $items = [];
+
+        foreach($basketContent as $rawItem) {
+            $item = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item($rawItem);
+            array_push($items, $item);
+        }
+
+        return $items;
     }
 }
