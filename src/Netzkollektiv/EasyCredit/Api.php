@@ -13,6 +13,8 @@ class Api
 
     protected $_config = null;
 
+    protected $_communicationErrorMessage = 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
+
     public function __construct($config, EasyCredit\LoggerInterface $logger) {
         $this->_config = $config;
         $this->_logger = $logger;
@@ -64,9 +66,6 @@ class Api
         return 'https://ratenkauf.easycredit.de/ratenkauf/content/intern/einstieg.jsf?vorgangskennung='.$token;
     }
 
-    protected function _getSession() {
-        return Mage::getSingleton('customer/session');
-    }
 
     public function callProcessInit($quote, $cancelUrl, $returnUrl, $rejectUrl) {
         $data = $this->getProcessInitRequest($quote, $cancelUrl, $returnUrl, $rejectUrl);
@@ -80,14 +79,20 @@ class Api
             'finanzierungsbetrag' => $amount,
         );
 
-
-        $result = $this->call('GET', 'modellrechnung/durchfuehren', $data);
-
-        return $result;
+        return $this->call('GET', 'modellrechnung/durchfuehren', $data);
     }
 
     public function callDecision($token) {
-        return $this->call('GET','vorgang/'.$token.'/entscheidung');
+
+        try{
+            $result =  $this->call('GET','vorgang/'.$token.'/entscheidung');
+        } catch(Exception $e) {
+            Shopware()->Session()->EasyCredit["apiError"] = $this->_communicationErrorMessage;
+            return array();
+        }
+
+
+        return $result;
     }
 
     public function callStatus($token) {
@@ -116,7 +121,7 @@ class Api
         $url = $this->_buildUrl($method, $resource);
         $method = strtoupper($method);
 
-$this->_logger->log($data);
+        $this->_logger->log($data);
         $client = new \Zend_Http_Client($url,array(
             'keepalive' => true
         ));
@@ -138,20 +143,25 @@ $this->_logger->log($data);
 
         $response = $client->request($method);
 
+        # TODO catch these exceptions
         if ($response->isError()) {
             $this->_logger->log($response->getBody());
-            throw new \Exception('Received error from api');
+            throw new \Exception('Received error from EasyCredit api');
         }
 
         $result = $response->getBody();
 
         if (empty($result)) {
-            throw new Exception('result is empty');
+
+            $this->_logger->log('EasyCredit result is empty');
+            throw new Exception('EasyCredit result is empty');
         }
+
         $result = json_decode($result);
-$this->_logger->log($result);
+//        $this->_logger->log($result);
 
         if ($result == null) {
+            $this->_logger->log('EasyCredit result is null');
             throw new Exception('result is null');
         }
 
@@ -168,17 +178,17 @@ $this->_logger->log($result);
         }
         $messages = $result->wsMessages->messages;
 
-        foreach ($result->wsMessages->messages as $message) {
+        foreach ($messages as $message) {
             switch (trim($message->severity)) {
                 case 'ERROR':
-                    throw new Exception($message->renderedMessage);
-                    //echo($message->renderedMessage);
-                    //exit;
+                    throw(new Exception($message->renderedMessage));
+                    break;
                 case 'INFO':
                     //echo($message->renderedMessage);
                     break;
             }
         }
+
         unset($result->wsMessages);
     }
 
@@ -216,24 +226,19 @@ $this->_logger->log($result);
 
         $prefix = $this->_guessCustomerPrefix($quote->getCustomerPrefix());
 
-        return array(
+        $person = array(
             'anrede' => $prefix,
             'vorname' => $quote->getCustomerFirstname(),
             'nachname' => $quote->getCustomerLastname(),
-            'geburtsdatum' => $quote->getCustomerDob(),
         );
-    }
 
-    protected function _getDeepestCategoryName($categoryIds) {
-        if (is_array($categoryIds) && count($categoryIds) > 0) {
-            $categoryId = end($categoryIds);
-            return Mage::getResourceModel('catalog/category')->getAttributeRawValue(
-                $categoryId, 
-                'name', 
-                Mage::app()->getStore()->getId()
-            );
-        } 
+        $dob = $quote->getCustomerDob();
 
+        if ($dob) {
+            $person['geburtsdatum'] = $dob;
+        }
+
+        return $person;
     }
 
     public function _convertItems($items) {
@@ -244,14 +249,12 @@ $this->_logger->log($result);
                 'produktbezeichnung'    => $item->getName(),
                 'menge'                 => $item->getQty(),
                 'preis'                 => $item->getPrice(),
-                'hersteller'            => $item->getProduct()->getManufacturer(),
+                'hersteller'            => $item->getManufacturer(),
             );
 
-            $_item['produktkategorie'] = $this->_getDeepestCategoryName(
-                $item->getProduct()->getCategoryIds()
-            );
+            $_item['produktkategorie'] = $item->getCategoryName();
             $_item['artikelnummern'][] = array(
-                'nummerntyp'    => 'magento-sku', 
+                'nummerntyp'    => 'shopware-sku',
                 'nummer'        => $item->getSku()
             );
 
@@ -327,7 +330,7 @@ $this->_logger->log($result);
 //           'risikorelevanteAngaben' => $this->_convertRiskDetails($quote),
            'rechnungsadresse' => $this->_convertAddress($quote->getBillingAddress()),
            'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
-//           'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
+           'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
         ));
     }
 }

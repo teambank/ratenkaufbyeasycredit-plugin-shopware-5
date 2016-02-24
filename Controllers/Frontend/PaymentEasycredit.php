@@ -21,6 +21,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->session = $this->get('session');
     }
 
+    public function getCommunicationError() {
+        return 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -89,11 +93,18 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         } else {
             $checkout = $this->get('easyCreditCheckout');
 
-            $captureResult = $checkout->capture();
+            try{
+                $captureResult = $checkout->capture();
+            } catch (Exception $e) {
+                Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+                $this->redirectCheckoutConfirm();
+                return;
+            }
 
             if (!isset($captureResult->uuid)) {
-                // TODO Error Handling
-                debugBernd('!isset($captureResult->uuid)');
+                Shopware()->Session()->EasyCredit["apiError"] = $this->getCommunicationError();
+                $this->redirectCheckoutConfirm();
+                return;
             }
 
             $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
@@ -136,15 +147,11 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
                 return;
             }
-        } catch (Mage_Core_Exception $e) {
-            //$this->_getCheckoutSession()->addError($this->__('Unable to start easyCredit Payment:').' '.$e->getMessage());
-            print_r($e->getMessage());
-            echo "EXCEPTION";
-            exit();
         } catch (Exception $e) {
-            print_r($e->getMessage());
-            echo "EXCEPTION";
-            exit();
+            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            Shopware()->Session()->EasyCredit["externRedirect"] = false;
+            $this->redirectCheckoutConfirm();
+            return;
         }
     }
 
@@ -193,36 +200,47 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     }
  
+    public function redirectCheckoutConfirm() {
+        $this->redirect(
+            array(
+                'controller' => 'checkout',
+                'action' => 'confirm',
+            )
+        );
+        return;
+    }
 
-    public function returnAction() {
+    public function returnAction()
+    {
+
+        Shopware()->Session()->EasyCredit["externRedirect"] = false;
+        $checkout = $this->get('easyCreditCheckout');
+
         try {
-            //$this->_validateQuote();
-
-            $checkout = $this->get('easyCreditCheckout');
-            if (!$checkout->isApproved()) {
-                throw new Exception('transaction not approved');
-            }
-            $checkout->loadFinancingInformation();
-            Shopware()->Session()->EasyCredit["externRedirect"] = false;
-
-            /*$quote = $this->_getQuote();
-            $quote->getPayment()
-                ->setMethod('easycredit');
-            $quote->collectTotals()->save();
-            */
-
-            $this->addInterestSurcharge();
-
-            $this->redirect(array('controller'=>'checkout'));
-            return;
-        } catch (Mage_Core_Exception $e) {
-            $this->_getCheckoutSession()->addError($e->getMessage());
+            $approved = $checkout->isApproved();
         } catch (Exception $e) {
-            //$this->_getCheckoutSession()->addError($this->__('Unable to validate easyCredit Payment.'));
-            //Mage::logException($e);
-            // echo $e->getMessage(); exit;
+            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->redirectCheckoutConfirm();
+            return;
         }
-        $this->redirect(array('controller' => 'checkout'));
+
+        if (!$approved) {
+            Shopware()->Session()->EasyCredit["apiError"] = 'EasyCredit Ratenkauf wurde nicht genehmigt.';
+            $this->redirectCheckoutConfirm();
+            return;
+        }
+
+        try{
+            $checkout->loadFinancingInformation();
+        } catch (Exception $e) {
+            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->redirectCheckoutConfirm();
+            return;
+        }
+
+        $this->addInterestSurcharge();
+
+        $this->redirectCheckoutConfirm();
     }
 
     /**

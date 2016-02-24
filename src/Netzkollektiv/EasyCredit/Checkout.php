@@ -2,6 +2,8 @@
 namespace Netzkollektiv\EasyCredit;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Netzkollektiv\EasyCredit;
+
 
 class Checkout {
 
@@ -44,6 +46,24 @@ class Checkout {
     public function getRedirectUrl() {
         return $this->_getApi()
             ->getRedirectUrl($this->_getToken());
+    }
+
+    public function getCallErrors($result) {
+        if (!isset($result->wsMessages)) {
+            return array();
+        }
+
+        $errors = array();
+
+        $messages = $result->wsMessages->messages;
+
+        foreach ($messages as $message) {
+            if (trim($message->severity) == 'ERROR') {
+                array_push($errors, $message->renderedMessage);
+            }
+        }
+
+        return $errors;
     }
 
     public function start(EasyCredit\QuoteInterface $quote) {
@@ -135,20 +155,8 @@ class Checkout {
             ->callConfirm($token);
     }
 
-    public function getInstallementValues($amount) {
-        try {
-            $this->_getApi()->callModelCalculation($amount);
-        } catch (Exception $e) {
-            return array(
-                'status' => false,
-                'error' => $e->getMessage()
-            );
-        }
+    public function checkInstallementValues($amount) {
 
-        return array(
-            'status' => true,
-            'error' => ''
-        );
-
+        return $this->_getApi()->callModelCalculation($amount);
     }
 }

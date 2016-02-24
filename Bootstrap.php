@@ -25,6 +25,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return 'sw-payment-ec-interest';
     }
 
+    public function getCommunicationError() {
+        return 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
+    }
+
     public function getInfo()
     {
         return array(
@@ -310,7 +314,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'action' => 'confirm'
             ));
 
-            return;
+            return true;
         } // still easycredit but amount has changed => remove interest and reset payment method to shop default
 
         if (
@@ -329,7 +333,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'action' => 'confirm'
             ));
 
-            return;
+            return true;
         } // easycredit without interest rates should not be possible => remove it
         elseif (
             $paymentName == 'easycredit'
@@ -344,15 +348,29 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'controller' => 'checkout',
                 'action' => 'confirm'
             ));
+            return true;
         }
 
+        return false;
     }
 
     public function alterChangePaymentTemplate($action, $view) {
         $this->registerMyTemplateDir();
         $checkout = $action->get('easyCreditCheckout');
 
-        $installementValues = $checkout->getInstallementValues(round($this->getAmount(), 2));
+        try {
+            $installementValues = array(
+                'status' => true,
+                'error' => ''
+            );
+            $checkout->checkInstallementValues(round($this->getAmount(), 2));
+        } catch(Exception $e) {
+            $installementValues = array(
+                'status' => false,
+                'error' => $e->getMessage()
+            );
+        }
+
         // get the currently selected payment name from the view (not the one saved in the session)
         $selectedPaymentName = $view->sUserData['additional']['payment']['name'];
 
@@ -384,8 +402,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         ));
     }
 
+    public function checkExternRediret($action) {
+        if (
+            isset(Shopware()->Session()->EasyCredit["externRedirect"])
+            && Shopware()->Session()->EasyCredit["externRedirect"]
+        ) {
+            $this->redirectToTeamBank($action);
+        }
+    }
+
     public function alterConfirmTemplate($view) {
         $user = $this->getUser();
+
         $payment = $user['additional']['payment'];
         $paymentName = $payment['name'];
 
@@ -405,28 +433,33 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $view->extendsTemplate('frontend/checkout/confirm.tpl');
     }
 
+    public function checkAPIError($view) {
+        if (isset(Shopware()->Session()->EasyCredit["apiError"])) {
+            $this->setErrorMessages($view, Shopware()->Session()->EasyCredit["apiError"]);
+            unset(Shopware()->Session()->EasyCredit["apiError"]);
+        }
+    }
+
     public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
     {
         $action = $arguments->getSubject();
         $request = $action->Request();
         $view = $action->View();
 
-        if (
-            isset(Shopware()->Session()->EasyCredit["externRedirect"])
-            && Shopware()->Session()->EasyCredit["externRedirect"]
-        ) {
-            $this->redirectToTeamBank($action);
+        if ($this->checkExternRediret($action))
             return;
-        }
 
         if ($request->getActionName() == "confirm") {
-            $this->checkInterest($action, $view);
+            if ($this->checkInterest($action, $view))
+                return;
             $this->alterConfirmTemplate($view);
         } elseif ($request->getActionName() == "shippingPayment") {
             $this->alterChangePaymentTemplate($action, $view);
         } elseif ($request->getActionName() == "finish") {
             $this->unsetStorage();
         }
+
+        $this->checkAPIError($view);
     }
 
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
