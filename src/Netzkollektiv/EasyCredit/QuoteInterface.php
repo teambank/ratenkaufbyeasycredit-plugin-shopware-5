@@ -13,7 +13,7 @@ interface QuoteInterface {
     public function getCustomerEmail();
     public function getCustomerDob();
 
-    public function getRiskProducts();
+    public function isRiskProductInCart();
 
     public function getAllVisibleItems();
 }

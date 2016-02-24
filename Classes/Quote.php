@@ -14,9 +14,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         $this->_user = $paymentController->getUser();
     }
 
-    public function isLoggedIn() {
-        return $this->_paymentController->isUserLoggedIn();
-    }
 
     public function getGrandTotal() {
         return $this->_paymentController->getAmount();
@@ -58,15 +55,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         return $dob;
     }
 
-    public function getRiskProducts() {
-        return array();
+    public function isRiskProductInCart() {
+        return false;
+    }
+
+    public function getCustomer() {
+        return new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Customer();
     }
 
     public function getAllVisibleItems() {
         $basketContent = $this->_basket['content'];
 
         $items = [];
-
         foreach($basketContent as $rawItem) {
             $item = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item($rawItem);
             array_push($items, $item);

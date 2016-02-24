@@ -13,8 +13,6 @@ class Api
 
     protected $_config = null;
 
-    protected $_communicationErrorMessage = 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
-
     public function __construct($config, EasyCredit\LoggerInterface $logger) {
         $this->_config = $config;
         $this->_logger = $logger;
@@ -83,16 +81,7 @@ class Api
     }
 
     public function callDecision($token) {
-
-        try{
-            $result =  $this->call('GET','vorgang/'.$token.'/entscheidung');
-        } catch(Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $this->_communicationErrorMessage;
-            return array();
-        }
-
-
-        return $result;
+        return $this->call('GET','vorgang/'.$token.'/entscheidung');
     }
 
     public function callStatus($token) {
@@ -154,15 +143,15 @@ class Api
         if (empty($result)) {
 
             $this->_logger->log('EasyCredit result is empty');
-            throw new Exception('EasyCredit result is empty');
+            throw new \Exception('EasyCredit result is empty');
         }
 
         $result = json_decode($result);
-//        $this->_logger->log($result);
+        //$this->_logger->log($result);
 
         if ($result == null) {
             $this->_logger->log('EasyCredit result is null');
-            throw new Exception('result is null');
+            throw new \Exception('result is null');
         }
 
         if (isset($result->wsMessages)) {
@@ -232,10 +221,8 @@ class Api
             'nachname' => $quote->getCustomerLastname(),
         );
 
-        $dob = $quote->getCustomerDob();
-
-        if ($dob) {
-            $person['geburtsdatum'] = $dob;
+        if ($quote->getCustomerDob()) {
+            $person['geburtsdatum'] = $quote->getCustomerDob();
         }
 
         return $person;
@@ -263,22 +250,6 @@ class Api
         return $_items;
     }
 
-    protected function _getCustomerOrderCount($customer) {
-        return Mage::getResourceModel('sales/order_collection')
-            ->addFieldToSelect('*')
-            ->addFieldToFilter('customer_id',$customer->getId())
-            ->count();
-    }
-
-    protected function _isRiskProductInCart($quote) {
-        foreach ($quote->getAllVisibleItems() as $item) {
-            if ($item->getProduct()->getEasycreditRisk()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected $_customerRisk = array(
         'KEINE_INFORMATION',
         'KEINE_ZAHLUNGSSTOERUNGEN',
@@ -286,31 +257,21 @@ class Api
         'ZAHLUNGSAUSFALL',
     );
     
-    protected function _getCustomerRisk($customer) {
-        $risk = $customer->getEasycreditRisk();
-        return isset($this->_customerRisk[$risk]) ? $this->_customerRisk[$risk] : null;
-    }
-
     protected function _convertRiskDetails($quote) {
-        $session = Mage::getSingleton('customer/session'); 
-
         $details = array(
-            //'kundenstatus' => '',
-            'bestellungErfolgtUeberLogin'   => $session->isLoggedIn(),
-            'risikoartikelImWarenkorb'      => $this->_isRiskProductInCart($quote),
+            'bestellungErfolgtUeberLogin'   => $quote->getCustomer()->isLoggedIn(),
+            'risikoartikelImWarenkorb'      => $quote->isRiskProductInCart(),
             'anzahlProdukteImWarenkorb'     => count($quote->getAllVisibleItems())
         );
 
-        if ($session->isLoggedIn()) {
-            $customer = $session->getCustomer();
-
+        if ($quote->getCustomer()->isLoggedIn()) {
             $details = array_merge($details, array(
-                'kundeSeit'                     => $customer->getCreatedAt(),
-                'anzahlBestellungen'            => $this->_getCustomerOrderCount($customer),
-                'negativeZahlungsinformation'   => $this->_getCustomerRisk($customer),
+                'kundeSeit'                     => $quote->getCustomer()->getCreatedAt(),
+                'anzahlBestellungen'            => $quote->getCustomer()->getOrderCount(),
+                'negativeZahlungsinformation'   => $quote->getCustomer()->getRisk(),
             ));
         }
-        return $details;
+        return array_filter($details);
     }
 
     public function getProcessInitRequest($quote, $cancelUrl, $returnUrl, $rejectUrl) {
@@ -327,7 +288,7 @@ class Api
            'kontakt' => array(
              'email' => $quote->getCustomerEmail(),
            ),
-//           'risikorelevanteAngaben' => $this->_convertRiskDetails($quote),
+           'risikorelevanteAngaben' => $this->_convertRiskDetails($quote),
            'rechnungsadresse' => $this->_convertAddress($quote->getBillingAddress()),
            'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
            'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
