@@ -275,23 +275,25 @@ class Api
     }
 
     public function getProcessInitRequest($quote, $cancelUrl, $returnUrl, $rejectUrl) {
-        return array_filter(array(
-           'shopKennung' => $this->_getWebshopId(),
-           'bestellwert' => $quote->getGrandTotal(),
-           'ruecksprungadressen' => array(
-               'urlAbbruch' => $cancelUrl,
-               'urlErfolg' => $returnUrl,
-               'urlAblehnung' => $rejectUrl
-           ),
-           'laufzeit' => 36,
-           'personendaten' => $this->_convertPersonalData($quote),
-           'kontakt' => array(
-             'email' => $quote->getCustomerEmail(),
-           ),
-           'risikorelevanteAngaben' => $this->_convertRiskDetails($quote),
-           'rechnungsadresse' => $this->_convertAddress($quote->getBillingAddress()),
-           'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
-           'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
-        ));
+        $data = array(
+            'shopKennung' => $this->_getWebshopId(),
+            'bestellwert' => $quote->getGrandTotal(),
+            'ruecksprungadressen' => array(
+                'urlAbbruch' => $cancelUrl,
+                'urlErfolg' => $returnUrl,
+                'urlAblehnung' => $rejectUrl
+            ),
+            'laufzeit' => 36,
+            'personendaten' => $this->_convertPersonalData($quote),
+            'kontakt' => array(
+                'email' => $quote->getCustomerEmail(),
+            ),
+            'risikorelevanteAngaben' => $this->_convertRiskDetails($quote),
+            'rechnungsadresse' => $this->_convertAddress($quote->getBillingAddress()),
+            'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
+            'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
+        );
+        
+        return array_filter($data);
     }
 }

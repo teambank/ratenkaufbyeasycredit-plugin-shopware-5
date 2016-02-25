@@ -161,7 +161,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         ));
     }
 
-
     public function addInterestSurcharge() {
         if (!isset(Shopware()->Session()->EasyCredit["interest_amount"])
             || empty(Shopware()->Session()->EasyCredit["interest_amount"])

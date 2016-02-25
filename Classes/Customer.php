@@ -19,10 +19,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Customer impleme
     }
 
     public function getCreatedAt() {
-        return null;
         if ($this->_user) {
             return $this->_user->getFirstLogin()->format('Y-m-d');
         }
+
         return null;
     }
 
