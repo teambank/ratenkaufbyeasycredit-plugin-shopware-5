@@ -49,7 +49,7 @@ Allgemeine Einstellungen für die *Ratenkauf by easyCredit* finden Sie im Shopwa
 
 ![Bezahlmethode Einstellungen](screenshots/payment_method_settings.png "Bezahlmethode Einstellungen")
 
-Hier können Sie unter anderem die Bezahlmethode für das gesammte Shopware System aktivieren/dekativieren oder nur für einzelne Länder bzw Subshops zur Verfügung stellen.
+Hier können Sie unter anderem die Bezahlmethode für das gesamte Shopware System aktivieren/dekativieren oder nur für einzelne Länder bzw Subshops zur Verfügung stellen.
 
 ### Bezahlmethode für Versandarten aktivieren
 
@@ -57,12 +57,11 @@ Im Shopware Backend können Sie unter:
 
 `Einstellungen -> Versandkosten -> Versandart -> Zahlart Auswahl`
 
-die *Ratenkauf by easyCredit* Bezahlmethode für eine bestimmte Versandmethoden aktivieren.
+die *Ratenkauf by easyCredit* Bezahlmethode für eine bestimmte Versandmethode aktivieren.
 
 ![Versandmethode Einstellungen](screenshots/shipping_method_payment.png "Bezahlmethode für Versandmethode aktivieren")
 
 
 ## Kompatibilität
 
-Das Plugin wurde unter 5.1 getestet. Weitere Systemvoraussetzungen sind mit den von Shopware in der jeweiligen Vesion genannten abgedeckt.
-
+Das Plugin wurde unter Shopware 5.1 getestet. Weitere Systemvoraussetzungen sind mit den von Shopware in der jeweiligen Vesion genannten abgedeckt.
