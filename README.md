@@ -11,11 +11,9 @@ Kopieren Sie das Plugin Verzeichnis *NetzkollektivEasyCredit* in:
 
 Die folgenden Befehle installieren und aktivieren das Plugin.
 
-```
-cd /path/to/shopware/bin
-./console sw:plugin:install NetzkollektivEasyCredit
-./console sw:plugin:activate NetzkollektivEasyCredit
-```
+`cd /path/to/shopware/bin`
+`./console sw:plugin:install NetzkollektivEasyCredit`
+`./console sw:plugin:activate NetzkollektivEasyCredit`
 
 ## Konfiguartion
 
