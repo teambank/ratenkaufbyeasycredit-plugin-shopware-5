@@ -150,7 +150,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
             return Shopware()->Session()->sOrderVariables['sUserData'];
         } else {
-            return null;
+            return Shopware()->Modules()->Admin()->sGetUserData();
         }
     }
 

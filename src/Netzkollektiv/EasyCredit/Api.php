@@ -1,8 +1,6 @@
 <?php
 namespace Netzkollektiv\EasyCredit;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
-
 class Api
 {
     protected $_apiBaseUrl = 'https://www.easycredit.de/ratenkauf-ws/rest';
@@ -55,7 +53,7 @@ class Api
 
     public function getToken() {
         if (!isset($this->_config['api_token']) || empty($this->_config['api_token'])) {
-            throw new Exception('api token not configured');
+            throw new \Exception('api token not configured');
         }
         return $this->_config['api_token'];
     }
@@ -170,7 +168,7 @@ class Api
         foreach ($messages as $message) {
             switch (trim($message->severity)) {
                 case 'ERROR':
-                    throw(new Exception($message->renderedMessage));
+                    throw(new \Exception($message->renderedMessage));
                     break;
                 case 'INFO':
                     //echo($message->renderedMessage);
@@ -189,8 +187,7 @@ class Api
              'ort' => $address->getCity(),
              'land' => $address->getCountryId()
         );
-
-        if ($isShipping && stripos(implode(" ",$address->getStreet()),'packstation')) {
+        if ($isShipping && stripos(implode(" ",$address->getStreet()),'packstation') !== false) {
             $_address['packstation'] = true;
         }
 
@@ -293,7 +290,6 @@ class Api
             'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
             'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
         );
-
         return array_filter($data);
     }
 }
