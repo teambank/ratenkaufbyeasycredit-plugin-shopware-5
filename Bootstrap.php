@@ -156,23 +156,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getBasket()
     {
-        if (!empty(Shopware()->Session()->sOrderVariables['sBasket'])) {
-            return Shopware()->Session()->sOrderVariables['sBasket'];
-        } else {
-            return null;
-        }
+        return Shopware()->Modules()->Basket()->sGetBasket();
     }
-
 
     public function getAmount()
     {
-        $user = $this->getUser();
         $basket = $this->getBasket();
-        if (!empty($user['additional']['charge_vat'])) {
-            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
-        } else {
-            return $basket['AmountNetNumeric'];
-        }
+        return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric']; 
     }
 
     public function registerMyTemplateDir($responsive = false)
@@ -363,7 +353,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'status' => true,
                 'error' => ''
             );
-            $checkout->checkInstallementValues(round($this->getAmount(), 2));
+            $checkout->checkInstallmentValues(round($this->getAmount(), 2));
+
         } catch(Exception $e) {
             $installementValues = array(
                 'status' => false,
@@ -504,8 +495,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $apiClient = new EasyCredit\Api(array(
             'api_key' => $this->Config()->get('easycreditApiKey'),
             'api_token' => $this->Config()->get('easycreditApiToken')
-//            'api_key' => '2.de.9999.10001',
-//            'api_token' => '3nx-d5d-vpo'
         ), $logger);
 
         return new EasyCredit\Checkout(

@@ -293,7 +293,7 @@ class Api
             'lieferadresse' => $this->_convertAddress($quote->getShippingAddress(), true),
             'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
         );
-        
+
         return array_filter($data);
     }
 }

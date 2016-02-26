@@ -155,7 +155,7 @@ class Checkout {
             ->callConfirm($token);
     }
 
-    public function checkInstallementValues($amount) {
+    public function checkInstallmentValues($amount) {
 
         return $this->_getApi()->callModelCalculation($amount);
     }
