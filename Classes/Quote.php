@@ -25,11 +25,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
     {
         $user = $this->_getUser();
         $basket = $this->_basket;
-        if (!empty($user['additional']['charge_vat'])) {
-            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
-        } else {
-            return $basket['AmountNetNumeric'];
-        }
+        return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
     }
 
     public function getGrandTotal() {
