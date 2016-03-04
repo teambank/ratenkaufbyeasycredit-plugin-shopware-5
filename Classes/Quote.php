@@ -8,15 +8,32 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
     public function __construct($paymentController) {
         $this->_paymentController = $paymentController;
 
-        $this->_basket = $paymentController->get('modules')->Basket()->sGetBasket();
-
-
-        $this->_user = $paymentController->getUser();
+        $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
+        $this->_user = $this->_getUser();
     }
 
+    protected function _getUser()
+    {
+        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
+            return Shopware()->Session()->sOrderVariables['sUserData'];
+        } else {
+            return Shopware()->Modules()->Admin()->sGetUserData();
+        }
+    }
+
+    protected function _getAmount()
+    {
+        $user = $this->_getUser();
+        $basket = $this->_basket;
+        if (!empty($user['additional']['charge_vat'])) {
+            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        } else {
+            return $basket['AmountNetNumeric'];
+        }
+    }
 
     public function getGrandTotal() {
-        return $this->_paymentController->getAmount();
+        return $this->_getAmount();
     }
 
     public function getBillingAddress() {

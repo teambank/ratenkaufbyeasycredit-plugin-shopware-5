@@ -8,14 +8,14 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Customer impleme
     protected $_user = null;
 
     public function __construct() {
-
-        if ($this->isLoggedIn()) {
+        if (isset(Shopware()->Session()->sUserId) && !empty(Shopware()->Session()->sUserId)) {
             $this->_user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
         }
     }
 
     public function isLoggedIn() {
-        return (isset(Shopware()->Session()->sUserId) && !empty(Shopware()->Session()->sUserId));
+        return $this->_user
+            && $this->_user->getAccountMode() == 0;
     }
 
     public function getCreatedAt() {
@@ -39,6 +39,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Customer impleme
     }
 
     public function getRisk() {
-        return false;
+        return null;
     }
 }

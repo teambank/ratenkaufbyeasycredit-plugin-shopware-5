@@ -272,7 +272,7 @@ $this->_logger->log($result->wsMessages);
                 'negativeZahlungsinformation'   => $quote->getCustomer()->getRisk(),
             ));
         }
-        return array_filter($details);
+        return $details;
     }
 
     public function getProcessInitRequest($quote, $cancelUrl, $returnUrl, $rejectUrl) {
