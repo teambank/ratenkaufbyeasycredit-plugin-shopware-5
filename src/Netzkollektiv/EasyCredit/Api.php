@@ -119,6 +119,7 @@ class Api
         ));
 
         if ($method == 'POST') { 
+$this->_logger->log(json_encode($data));
             $client->setRawData(
                 json_encode($data), 
                 'application/json;charset=UTF-8'
@@ -153,6 +154,7 @@ class Api
         }
 
         if (isset($result->wsMessages)) {
+$this->_logger->log($result->wsMessages);
             $this->_handleMessages($result);
         }
         return $result;
@@ -187,7 +189,13 @@ class Api
              'ort' => $address->getCity(),
              'land' => $address->getCountryId()
         );
-        if ($isShipping && stripos(implode(" ",$address->getStreet()),'packstation') !== false) {
+
+        $completeAddress = implode(" ",$address->getStreet());
+        if ($isShipping && stripos($completeAddress,'packstation') !== false) {
+            preg_match('/([0-9]{13,18}+)/', $completeAddress, $m);
+            if (isset($m[0])) {
+                $_address['adresszusatz'] .= $m[0];
+            }
             $_address['packstation'] = true;
         }
 
