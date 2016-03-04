@@ -192,10 +192,6 @@ $this->_logger->log($result->wsMessages);
 
         $completeAddress = implode(" ",$address->getStreet());
         if ($isShipping && stripos($completeAddress,'packstation') !== false) {
-            preg_match('/([0-9]{13,18}+)/', $completeAddress, $m);
-            if (isset($m[0])) {
-                $_address['adresszusatz'] .= $m[0];
-            }
             $_address['packstation'] = true;
         }
 
