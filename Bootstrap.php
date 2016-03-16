@@ -17,7 +17,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.0.0';
+        return '1.0.2';
     }
 
     public function getInterestOrderName()
@@ -269,6 +269,16 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
     }
 
+    public function showInterestRemovedErrorTemplate($view) {
+        if (
+            (isset(Shopware()->Session()->EasyCredit["info_interest_removed"]))
+            && (Shopware()->Session()->EasyCredit["info_interest_removed"])
+        ) {
+            $view->assign('EasyCreditNewRates', true);
+            Shopware()->Session()->EasyCredit["info_interest_removed"] = false;
+        }
+    }
+
     public function reloadCheckoutConfirm($action) {
         $action->redirect(array(
             'controller' => 'checkout',
@@ -278,7 +288,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function checkInterest($action, $view) {
 
-        $this->showInterestRemovedError($view);
+        //$this->showInterestRemovedError($view);
 
         $user = $this->getUser();
         $payment = $user['additional']['payment'];
@@ -412,16 +422,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             return;
         }
 
-        $this->registerMyTemplateDir();
-
         $view->assign('EasyCreditPaymentShowRedemption', true);
         $view->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"]);
         $view->assign(
             'EasyCreditPaymentPreContractInformationUrl',
             Shopware()->Session()->EasyCredit["pre_contract_information_url"]
         );
-
-        $view->extendsTemplate('frontend/checkout/confirm.tpl');
     }
 
     public function checkAPIError($view) {
@@ -429,6 +435,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             $this->setErrorMessages($view, Shopware()->Session()->EasyCredit["apiError"]);
             unset(Shopware()->Session()->EasyCredit["apiError"]);
         }
+    }
+
+    public function addErrorTemplate($view) {
+        $this->registerMyTemplateDir();
+        $view->extendsTemplate('frontend/checkout/confirm.tpl');
+        $this->showInterestRemovedErrorTemplate($view);
     }
 
     public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
@@ -444,6 +456,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             if ($this->checkInterest($action, $view))
                 return;
             $this->alterConfirmTemplate($view);
+            $this->addErrorTemplate($view);
         } elseif ($request->getActionName() == "shippingPayment") {
             $this->alterChangePaymentTemplate($action, $view);
         } elseif ($request->getActionName() == "finish") {

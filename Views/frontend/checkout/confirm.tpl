@@ -14,4 +14,14 @@
             </div>
         </div>
     {/if}
+    {if $EasyCreditNewRates}
+        <div class="alert is--error is--rounded">
+            <div class="alert--icon">
+                <i class="icon--element icon--cross"></i>
+            </div>
+            <div class="alert--content">
+                EasyCredit Raten müssen neu berechnet werden. Bitte wählen Sie erneut die Zahlungsart <strong>Ratenkauf by easyCredit</strong>!
+            </div>
+        </div>
+    {/if}
 {/block}
