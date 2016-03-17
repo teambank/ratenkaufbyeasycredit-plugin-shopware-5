@@ -14,13 +14,18 @@
             </div>
         </div>
     {/if}
-    {if $EasyCreditNewRates}
+    {if $EasyCreditError}
         <div class="alert is--error is--rounded">
             <div class="alert--icon">
                 <i class="icon--element icon--cross"></i>
             </div>
             <div class="alert--content">
-                EasyCredit Raten müssen neu berechnet werden. Bitte wählen Sie erneut die Zahlungsart <strong>Ratenkauf by easyCredit</strong>!
+                {if $EasyCreditAPIError}
+                    <p>{$EasyCreditAPIErrorMessage}</p>
+                {/if}
+                {if $EasyCreditNewRates}
+                    <p>EasyCredit Raten müssen neu berechnet werden. Bitte wählen Sie erneut die Zahlungsart <strong>Ratenkauf by easyCredit</strong>.</p>
+                {/if}
             </div>
         </div>
     {/if}

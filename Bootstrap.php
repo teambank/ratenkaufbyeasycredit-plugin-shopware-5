@@ -274,6 +274,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             (isset(Shopware()->Session()->EasyCredit["info_interest_removed"]))
             && (Shopware()->Session()->EasyCredit["info_interest_removed"])
         ) {
+            $view->assign('EasyCreditError', true);
             $view->assign('EasyCreditNewRates', true);
             Shopware()->Session()->EasyCredit["info_interest_removed"] = false;
         }
@@ -437,10 +438,20 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
     }
 
+    public function checkAPIErrorTemplate($view) {
+        if (isset(Shopware()->Session()->EasyCredit["apiError"])) {
+            $view->assign('EasyCreditError', true);
+            $view->assign('EasyCreditAPIError', true);
+            $view->assign('EasyCreditAPIErrorMessage', Shopware()->Session()->EasyCredit["apiError"]);
+            unset(Shopware()->Session()->EasyCredit["apiError"]);
+        }
+    }
+
     public function addErrorTemplate($view) {
         $this->registerMyTemplateDir();
         $view->extendsTemplate('frontend/checkout/confirm.tpl');
         $this->showInterestRemovedErrorTemplate($view);
+        $this->checkAPIErrorTemplate($view);
     }
 
     public function onPostDispatch(\Enlight_Event_EventArgs $arguments)
@@ -463,7 +474,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             $this->unsetStorage();
         }
 
-        $this->checkAPIError($view);
+//        $this->checkAPIError($view);
     }
 
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
