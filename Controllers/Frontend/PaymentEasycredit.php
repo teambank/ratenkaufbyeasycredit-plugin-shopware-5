@@ -26,6 +26,29 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     /**
+     * @inheritdoc
+     */
+/*    public function validate(\Enlight_Controller_Request_Request $request)
+    {
+        if (!$request->getParam("sEasycreditAgreement")) {
+            $sErrorFlag["sDebitAccount"] = true;
+        }
+
+        if (count($sErrorFlag)) {
+            $sErrorMessages[] = Shopware()->Snippets()->getNamespace('frontend/account/internalMessages')
+                ->get('ErrorFillIn','Please fill in all red fields');
+
+            return array(
+                "sErrorFlag" => $sErrorFlag,
+                "sErrorMessages" => $sErrorMessages
+            );
+        } else {
+            return true;
+        }
+    }
+*/
+
+    /**
      * {@inheritdoc}
      */
     public function get($name)

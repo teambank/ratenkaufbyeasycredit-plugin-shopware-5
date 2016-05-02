@@ -11,7 +11,7 @@ class Api
 
     protected $_config = null;
 
-    public function __construct($config, EasyCredit\LoggerInterface $logger) {
+    public function __construct($config, $logger) {
         $this->_config = $config;
         $this->_logger = $logger;
     }

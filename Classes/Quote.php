@@ -5,7 +5,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
 
     protected $basket = null;
 
-    public function __construct($paymentController) {
+    public function __construct($paymentController = null) {
         $this->_paymentController = $paymentController;
 
         $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
@@ -23,7 +23,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
 
     protected function _getAmount()
     {
-        $user = $this->_getUser();
         $basket = $this->_basket;
         return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
     }
