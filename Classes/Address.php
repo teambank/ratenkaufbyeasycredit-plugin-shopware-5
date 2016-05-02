@@ -9,6 +9,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Address implemen
     }
 
     public function getStreet($line = null) {
+
+        /* Shopware 4 saves street number with index 'streetnumber' */
+        if (isset($this->_address['streetnumber']) && $this->_address['streetnumber'] != '') {
+            $this->_address['street_number'] = $this->_address['streetnumber'];
+        }
+
         $address = array_filter(array(
             trim($this->_address['street'].' '.$this->_address['street_number']),
             $this->_address['street2'],
