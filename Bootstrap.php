@@ -173,21 +173,17 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return Shopware()->Modules()->Basket()->sGetBasket();
     }
 
-    public function registerMyTemplateDir($responsive = false)
-    {
-        if ($responsive) {
-            $this->get('template')->addTemplateDir(__DIR__ . '/Views/responsive/', 'easycredit_responsive');
+    public function registerTemplateDir() {
+
+        $template = $this->get('template');
+        $template->addTemplateDir($this->Path() . 'Views/');
+        $template->addTemplateDir($this->Path() . 'Views/common/');
+
+        if (Shopware()->Shop()->getTemplate()->getVersion() >= 3) {
+            $template->addTemplateDir($this->Path() . 'Views/responsive/');
+        } else {
+            $template->addTemplateDir($this->Path() . 'Views/emotion/');
         }
-        $this->get('template')->addTemplateDir(__DIR__ . '/Views/', 'easycredit');
-    }
-
-
-    protected function setErrorMessages(\Enlight_View_Default $view, $message)
-    {
-        $errorMessages = $view->getAssign('sErrorMessages');
-        $errorMessages[] = $message;
-
-        $view->assign('sErrorMessages', $errorMessages);
     }
 
     /**
@@ -263,32 +259,6 @@ Shopware()->PluginLogger()->info('removing Interest Rate');
         return false;
     }
 
-/*
-    public function showInterestRemovedError($view) {
-        if (
-            (isset(Shopware()->Session()->EasyCredit["info_interest_removed"]))
-            && (Shopware()->Session()->EasyCredit["info_interest_removed"])
-        ) {
-            $this->setErrorMessages(
-                $view,
-                "EasyCredit Raten müssen neu berechnet werden. " .
-                "Bitte wählen Sie erneut die Zahlungsart <strong>Ratenkauf by easyCredit</strong>."
-            );
-            Shopware()->Session()->EasyCredit["info_interest_removed"] = false;
-        }
-    }
-
-    public function showInterestRemovedErrorTemplate($view) {
-        if (
-            (isset(Shopware()->Session()->EasyCredit["info_interest_removed"]))
-            && (Shopware()->Session()->EasyCredit["info_interest_removed"])
-        ) {
-            $view->assign('EasyCreditError', true);
-            $view->assign('EasyCreditNewRates', true);
-            Shopware()->Session()->EasyCredit["info_interest_removed"] = false;
-        }
-    }
-*/
     public function reloadCheckoutConfirm($action) {
         $action->redirect(array(
             'controller' => 'checkout',
@@ -374,7 +344,6 @@ Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rat
 
     public function _extendPaymentTemplate($action, $view) {
         $checkout = $action->get('easyCreditCheckout');
-        $this->registerMyTemplateDir();
 
         $error = false;
         try {
@@ -385,16 +354,6 @@ Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rat
 
         $view->assign('EasyCreditError', $error);
         $view->assign('EasyCreditPaymentCompanyName', $this->Config()->get('easycreditCompanyName'));
-//        $view->assign('EasyCreditPaymentDisabled', !$enabled);
-//        $view->assign('EasyCreditPaymentSelected', ($selectedPaymentName == 'easycredit'));
-
-/*        if ($this->isShopware5()) {
-            $view->extendsTemplate('frontend/checkout/change_payment.tpl');
-        }
-        if ($this->isShopware4()) {
-            $view->extendsTemplate('frontend/register/payment_fieldset.tpl');
-        }
-*/
     }
 
     protected function _redirectToEasycredit($action) {
@@ -416,7 +375,7 @@ Shopware()->PluginLogger()->info(__METHOD__.': redir to gatway');
         return false;
     }
 
-    public function alterConfirmTemplate($view) {
+    public function _changeConfirmTemplate($view) {
         $user = $this->getUser();
 
         $paymentName = $user['additional']['payment']['name'];
@@ -425,50 +384,24 @@ Shopware()->PluginLogger()->info(__METHOD__.': redir to gatway');
             return;
         }
 
-        $view->addTemplateDir($this->Path() . 'Views/common/');
-        if (Shopware()->Shop()->getTemplate()->getVersion() >= 3) {
-            $view->addTemplateDir($this->Path() . 'Views/responsive/');
-        } else {
-            $view->addTemplateDir($this->Path() . 'Views/emotion/');
+        if (Shopware()->Shop()->getTemplate()->getVersion() == 2) {
             $view->extendsTemplate('frontend/checkout/confirm_easycredit.tpl');
         }
-
-        $view->addTemplateDir($this->Path() . 'Views/','easycredit');
         $view->assign('EasyCreditPaymentShowRedemption', true)
+            ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
             ->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"])
             ->assign(
                 'EasyCreditPaymentPreContractInformationUrl',
                 Shopware()->Session()->EasyCredit["pre_contract_information_url"]
             );
     }
-/*
-    public function checkAPIError($view) {
-        if (isset(Shopware()->Session()->EasyCredit["apiError"])) {
-            $this->setErrorMessages($view, Shopware()->Session()->EasyCredit["apiError"]);
-            unset(Shopware()->Session()->EasyCredit["apiError"]);
-        }
-    }
-
-    public function checkAPIErrorTemplate($view) {
-        if (isset(Shopware()->Session()->EasyCredit["apiError"])) {
-            $view->assign('EasyCreditError', true);
-            $view->assign('EasyCreditAPIError', true);
-            $view->assign('EasyCreditAPIErrorMessage', Shopware()->Session()->EasyCredit["apiError"]);
-            unset(Shopware()->Session()->EasyCredit["apiError"]);
-        }
-    }
-    public function addErrorTemplate($view) {
-        $this->registerMyTemplateDir();
-        $view->extendsTemplate('frontend/checkout/confirm.tpl');
-        $this->showInterestRemovedErrorTemplate($view);
-        $this->checkAPIErrorTemplate($view);
-    }
-*/
 
     public function onFrontendAccountPostDispatch(\Enlight_Event_EventArgs $arguments) {
         $action = $arguments->getSubject();
         $request = $action->Request();
         $view = $action->View();
+
+        $this->registerTemplateDir();
 
         switch ($request->getActionName()) {
             case 'payment':
@@ -546,6 +479,8 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
         $action = $arguments->getSubject();
         $request = $action->Request();
         $view = $action->View();
+        
+        $this->registerTemplateDir();
 
         if ($this->_checkRedirect($action)) {
             return;
@@ -557,9 +492,7 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                     return;
                 }
                 $this->_onCheckoutConfirm($view);
-                
-                $this->alterConfirmTemplate($view);
-                //$this->addErrorTemplate($view);
+                $this->_changeConfirmTemplate($view);
                 break;
 
             case 'shippingPayment':
@@ -695,7 +628,7 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
             $logo[] = 'style="filter: grayscale(100%); -webkit-filter: grayscale(100%)"';
         }
         $logo[] = 'src="https://static.easycredit.de/content/image/logo/ratenkauf_42_55.png"';
-        $logo[] = 'alt="easycredit Logo">';
+        $logo[] = 'alt="easycredit Logo" style="display:inline;">';
 
         return implode(' ',$logo);
     }
@@ -765,8 +698,7 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
      */
     public function onGetControllerPathFrontend()
     {
-        $templateVersion = $this->get('shop')->getTemplate()->getVersion();
-        $this->registerMyTemplateDir($templateVersion >= 3);
+        $this->registerTemplateDir();
 
         return __DIR__ . '/Controllers/Frontend/PaymentEasycredit.php';
     }

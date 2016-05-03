@@ -1,45 +1,42 @@
 {if $EasyCreditError}
-<div id="easycredit-error"> 
-
-    {$EasyCreditError}
-    <script>
-        var method = $('#easycredit-error').closest('.method');
-        var radio = method.find('input.radio').get(0);
-        radio.disabled = true;
-        radio.checked = false;
-        method.find('img').addClass('easycredit-disabled');
-    </script>
-
-</div>
+    <div id="easycredit-error"> 
+        {$EasyCreditError}
+    </div>
 {else}
-<div id="easycredit-description">
 
-    <p>Datenübermittlung Ratenkauf by easyCredit</p>
-    <p>
-        <label for="easycredit-agreement" class="easycredit-agreement">
-                <input type="checkbox" class="required-entry" id="easycredit-agreement" /> 
-                <span>Ja, ich möchte per Ratenkauf zahlen und willige ein, dass die {$EasyCreditPaymentCompanyName} der TeamBank AG (Partner der Genossenschaftlichen FinanzGruppe Volksbanken Raiffeisenbanken), Beuthener Str. 25, 90471 Nürnberg zur Identitäts- und Bonitätsprüfung sowie Betrugsprävention Anrede und Name, Geburtsdatum und -ort, Kontaktdaten (Adresse, Telefon, E-Mail) sowie Angaben zur aktuellen und zu früheren Bestellungen übermittelt und das Prüfungsergebnis zu diesem Zweck erhält.</span>
-        </label>
-    </p>
+    <div id="easycredit-description">
 
-</div>
-<script>
-    jQuery(function($){
+        <p>Datenübermittlung Ratenkauf by easyCredit</p>
+        <p>
+            <label for="easycredit-agreement" class="easycredit-agreement">
+                    <input type="checkbox" class="required-entry" id="easycredit-agreement" /> 
+                    <span>Ja, ich möchte per Ratenkauf zahlen und willige ein, dass die {$EasyCreditPaymentCompanyName} der TeamBank AG (Partner der Genossenschaftlichen FinanzGruppe Volksbanken Raiffeisenbanken), Beuthener Str. 25, 90471 Nürnberg zur Identitäts- und Bonitätsprüfung sowie Betrugsprävention Anrede und Name, Geburtsdatum und -ort, Kontaktdaten (Adresse, Telefon, E-Mail) sowie Angaben zur aktuellen und zu früheren Bestellungen übermittelt und das Prüfungsergebnis zu diesem Zweck erhält.</span>
+            </label>
+        </p>
 
-        var easycreditVal = $('#easycredit-description').closest('.method').find('input.radio').val();
-        var toggleEasycreditDescription = function(){
-            var desc = $('#easycredit-description').hide();
-            desc.find('input').attr('required',null);
-            if ($(this).val()==easycreditVal) {
-                desc.show().attr('required','required');
-            }
-        };
+    </div>
 
-        $('input.radio[name="register[payment]"]')
-            .each(toggleEasycreditDescription)
-            .change(toggleEasycreditDescription);
-    });
-</script>
+    {if $EasyCreditThemeVersion == 2}
+    {block name="frontend_index_header_javascript_jquery_lib" append}
+    <script>
+        jQuery(function($){
+
+            var easycreditVal = $('#easycredit-description').closest('.method').find('input.radio').val();
+            var toggleEasycreditDescription = function(){
+                var desc = $('#easycredit-description').hide();
+                desc.find('input').attr('required',null);
+                if ($(this).val()==easycreditVal) {
+                    desc.show().attr('required','required');
+                }
+            };
+
+            $('input.radio[name="register[payment]"]')
+                .each(toggleEasycreditDescription)
+                .change(toggleEasycreditDescription);
+        });
+    </script>
+    {/block}
+    {/if}
 
 {/if}
 
