@@ -419,19 +419,27 @@ Shopware()->PluginLogger()->info(__METHOD__.': redir to gatway');
     public function alterConfirmTemplate($view) {
         $user = $this->getUser();
 
-        $payment = $user['additional']['payment'];
-        $paymentName = $payment['name'];
+        $paymentName = $user['additional']['payment']['name'];
 
         if ($paymentName != 'easycredit') {
             return;
         }
 
-        $view->assign('EasyCreditPaymentShowRedemption', true);
-        $view->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"]);
-        $view->assign(
-            'EasyCreditPaymentPreContractInformationUrl',
-            Shopware()->Session()->EasyCredit["pre_contract_information_url"]
-        );
+        $view->addTemplateDir($this->Path() . 'Views/common/');
+        if (Shopware()->Shop()->getTemplate()->getVersion() >= 3) {
+            $view->addTemplateDir($this->Path() . 'Views/responsive/');
+        } else {
+            $view->addTemplateDir($this->Path() . 'Views/emotion/');
+            $view->extendsTemplate('frontend/checkout/confirm_easycredit.tpl');
+        }
+
+        $view->addTemplateDir($this->Path() . 'Views/','easycredit');
+        $view->assign('EasyCreditPaymentShowRedemption', true)
+            ->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"])
+            ->assign(
+                'EasyCreditPaymentPreContractInformationUrl',
+                Shopware()->Session()->EasyCredit["pre_contract_information_url"]
+            );
     }
 /*
     public function checkAPIError($view) {
@@ -550,7 +558,7 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 }
                 $this->_onCheckoutConfirm($view);
                 
-                //$this->alterConfirmTemplate($view);
+                $this->alterConfirmTemplate($view);
                 //$this->addErrorTemplate($view);
                 break;
 
@@ -687,7 +695,7 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
             $logo[] = 'style="filter: grayscale(100%); -webkit-filter: grayscale(100%)"';
         }
         $logo[] = 'src="https://static.easycredit.de/content/image/logo/ratenkauf_42_55.png"';
-        $logo[] = 'alt="easycredit Logo"><br>';
+        $logo[] = 'alt="easycredit Logo">';
 
         return implode(' ',$logo);
     }
