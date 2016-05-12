@@ -171,7 +171,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 return;
             }
         } catch (Exception $e) {
-echo $e->getMessage(); exit;
             Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
             Shopware()->Session()->EasyCredit["externRedirect"] = false;
             $this->redirectCheckoutConfirm();

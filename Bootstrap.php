@@ -271,13 +271,20 @@ Shopware()->PluginLogger()->info('removing Interest Rate');
         return $quote->getGrandTotal();
     }
 
+    protected function _getSelectedPaymentMethod() {
+        $user = $this->getUser();
+        $payment = $user['additional']['payment'];
+        $paymentName = $payment['name'];
+        return $paymentName;
+    }
+
+    protected $_interestRemovedError = 'Raten müssen neu berechnet werden. Bitte wählen Sie erneut Ratenkauf by Easycredit in der Zahlartenauswahl.';
+
     public function checkInterest($action, $view) {
 
         //$this->showInterestRemovedError($view);
 
-        $user = $this->getUser();
-        $payment = $user['additional']['payment'];
-        $paymentName = $payment['name'];
+        $paymentName = $this->_getSelectedPaymentMethod();
 
         $amount_basket = round($this->getAmount(), 2);
 
@@ -313,7 +320,9 @@ Shopware()->PluginLogger()->info('checkInterest: '.$amount_authorized.' != '.$am
             $this->removeInterest();
             $this->resetPaymentToDefault();
 
-            Shopware()->Session()->EasyCredit["info_interest_removed"] = true;
+            if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
+                Shopware()->Session()->EasyCredit["apiError"] = $this->_interestRemovedError;
+            }
 
             $action->redirect(array(
                 'controller' => 'checkout',
@@ -330,7 +339,9 @@ Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rat
             $this->resetPaymentToDefault();
             $this->reloadCheckoutConfirm($action);
 
-            Shopware()->Session()->EasyCredit["info_interest_removed"] = true;
+            if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
+                Shopware()->Session()->EasyCredit["apiError"] = $this->_interestRemovedError;
+            }
 
             $action->redirect(array(
                 'controller' => 'checkout',
@@ -352,8 +363,9 @@ Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rat
             $error = $e->getMessage();
         }
 
-        $view->assign('EasyCreditError', $error);
-        $view->assign('EasyCreditPaymentCompanyName', $this->Config()->get('easycreditCompanyName'));
+        $view->assign('EasyCreditError', $error)
+            ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
+            ->assign('EasyCreditPaymentCompanyName', $this->Config()->get('easycreditCompanyName'));
     }
 
     protected function _redirectToEasycredit($action) {
@@ -430,7 +442,6 @@ Shopware()->PluginLogger()->info('easycredit approved? '.$approved);
                 $e->getMessage(),
                 true
             );
-
         }
     }
 
@@ -491,6 +502,20 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 if ($this->checkInterest($action, $view)) {
                     return;
                 }
+
+                if (!empty(Shopware()->Session()->EasyCredit["apiError"])) {
+                    $view->sBasketInfo = Shopware()->Snippets()->getSnippet()->get(
+                        'CheckoutSelectPremiumVariant',
+                        Shopware()->Session()->EasyCredit["apiError"],
+                        true
+                    );
+                    Shopware()->Session()->EasyCredit["apiError"] = null;
+                }
+
+                if ($this->_getSelectedPaymentMethod() !== 'easycredit') {
+                    return;
+                }
+
                 $this->_onCheckoutConfirm($view);
                 $this->_changeConfirmTemplate($view);
                 break;
@@ -503,21 +528,39 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 break;
 
             case 'finish':
-
-                //$this->unsetStorage();
+                $this->unsetStorage();
         }
     }
 
     public function onSavePayment(Enlight_Event_EventArgs $arguments) {
         $action = $arguments->getSubject();
         $request = $action->Request();
-        
-        if ($request->getParam('sTarget') !== 'checkout') {
+
+        if (!$request->isPost()) {
             return;
         }
 
         $values = $request->getPost('register');
 	    $paymentId = $values['payment'];
+
+        $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
+            $paymentId
+        );
+
+        if ($payment['name'] != 'easycredit') {
+            return;
+        }
+
+        $agreementChecked = $request->getParam('easycredit-agreement');
+        if (empty($agreementChecked)) {
+            $action->redirect(array('controller'=>'account', 'action'=>'payment','sTarget'=>'checkout'));
+            return false;
+        }
+
+        if ($request->getParam('sTarget') !== 'checkout') {
+            return;
+        }
+
 
 	    return $this->_handleRedirect($paymentId);
     }
@@ -533,7 +576,7 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
             return;
         }
 
-	    $this->_handleRedirect((int)$request->getPost('payment'));
+	    return $this->_handleRedirect((int)$request->getPost('payment'));
     }
 
     protected function _handleRedirect($selectedPaymentId) {
@@ -611,7 +654,7 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
                 'action' => 'payment_easycredit',
                 'active' => 0,
                 'position' => 0,
-                'additionalDescription' => $this->getPaymentLogo(). ' <a href="https://www.easycredit.de/Ratenkauf.htm" onclick="javascript:window.open(\'https://www.easycredit.de/Ratenkauf.htm\',\'whatiseasycredit\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600\'); return false;" class="easycredit-tooltip">Was ist Ratenkauf by easyCredit?</a>',
+                'additionalDescription' => $this->getPaymentLogo(). ' <a href="https://www.easycredit.de/Ratenkauf.htm" onclick="javascript:window.open(\'https://www.easycredit.de/Ratenkauf.htm\',\'whatiseasycredit\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600\'); return false;" class="easycredit-tooltip" style="color:#000000;">Was ist Ratenkauf by easyCredit?</a>',
                 'template' => 'easycredit.tpl'
             )
         );
