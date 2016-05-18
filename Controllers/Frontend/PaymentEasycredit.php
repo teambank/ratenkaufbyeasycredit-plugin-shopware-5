@@ -1,6 +1,7 @@
 <?php
 class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controllers_Frontend_Payment
 {
+    const CONNECTION_ERROR =  'Kommunikationsproblem mit Zahlungsprovider. Bitte versuchen sie es später nochmal.';
     
     /**
      * @var Shopware_Plugins_Frontend_SwagPaymentPaypal_Bootstrap $plugin
@@ -21,32 +22,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->session = $this->get('session');
     }
 
-    public function getCommunicationError() {
-        return 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
-    }
-
-    /**
-     * @inheritdoc
-     */
-/*    public function validate(\Enlight_Controller_Request_Request $request)
-    {
-        if (!$request->getParam("sEasycreditAgreement")) {
-            $sErrorFlag["sDebitAccount"] = true;
-        }
-
-        if (count($sErrorFlag)) {
-            $sErrorMessages[] = Shopware()->Snippets()->getNamespace('frontend/account/internalMessages')
-                ->get('ErrorFillIn','Please fill in all red fields');
-
-            return array(
-                "sErrorFlag" => $sErrorFlag,
-                "sErrorMessages" => $sErrorMessages
-            );
-        } else {
-            return true;
-        }
-    }
-*/
 
     /**
      * {@inheritdoc}
@@ -125,13 +100,13 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             }
 
             if (!isset($captureResult->uuid)) {
-                Shopware()->Session()->EasyCredit["apiError"] = $this->getCommunicationError();
+                Shopware()->Session()->EasyCredit["apiError"] = self::CONNECTION_ERROR;
                 $this->redirectCheckoutConfirm();
                 return;
             }
 
             $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
-            $transactionUuid= $captureResult->uuid;
+            $transactionUuid = $captureResult->uuid;
             $paymentUniqueId = $this->createPaymentUniqueId();
 
             $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId);
@@ -144,44 +119,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 'sUniqueID' => $paymentUniqueId
             ));
         }
-
-
-    }
-
-    /**
-     * Gateway payment action method.
-     *
-     * Collects the payment information and transmit it to the payment provider.
-     */
-    public function gatewayAction()
-    {
-        $router = $this->Front()->Router();
-        $config = $this->plugin->Config();
-
-        try {
-            $checkout = $this->get('easyCreditCheckout')
-               ->setCancelUrl($this->_getUrl('cancel'))
-               ->setReturnUrl($this->_getUrl('return'))
-               ->setRejectUrl($this->_getUrl('reject'))
-               ->start(new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote($this));
-
-            if ($url = $checkout->getRedirectUrl()) {
-                $this->redirect($url);
-
-                return;
-            }
-        } catch (Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
-            Shopware()->Session()->EasyCredit["externRedirect"] = false;
-            $this->redirectCheckoutConfirm();
-            return;
-        }
-    }
-
-    protected function _getUrl($action) {
-        return $this->Front()->Router()->assemble(array(
-            'action'    => $action,
-        ));
     }
 
     public function addInterestSurcharge() {
@@ -229,12 +166,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 'action' => 'confirm',
             )
         );
-        return;
     }
 
     public function returnAction()
     {
-
         Shopware()->Session()->EasyCredit["externRedirect"] = false;
         $checkout = $this->get('easyCreditCheckout');
 
@@ -261,33 +196,37 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         $this->addInterestSurcharge();
-
         $this->redirectCheckoutConfirm();
     }
 
-    /**
-     * Cancel action method
-     */
-    public function cancelAction()
-    {
-        // storage->clear
-
-        Shopware()->Session()->EasyCredit["externRedirect"] = false;
-
-        $this->redirect(array(
-            'controller'=>'checkout',
-            'action'=>'shippingPayment'
-        ));
+    public function cancelAction() {
+        $this->_redirToPaymentSelection();
     }
 
     public function rejectAction() {
-        // storage->clear
+        $this->_redirToPaymentSelection();
+    }
 
-        Shopware()->Session()->EasyCredit["externRedirect"] = false;
+    protected function _redirToPaymentSelection() {
 
-        $this->redirect(array(
-            'controller'=>'checkout',
-            'action'=>'shippingPayment'
-        ));
+        $storage = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Storage();
+        $storage->clear();
+
+        if (Shopware()->Shop()->getTemplate()->getVersion() >= 3) {
+
+            $this->redirect(array(
+                'controller'=>'checkout',
+                'action'=>'shippingPayment'
+            ));
+
+        } else {
+
+            $this->redirect(array(
+                'controller'=>'account',
+                'action' => 'payment',
+                'target' => 'checkout'
+            ));
+
+        }
     }
 }

@@ -1,0 +1,12 @@
+shop:
+  image: dnhsoft/shopware:4.3.0
+  volumes:
+      - .:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
+  links:
+   - db
+  ports:
+   - "8430:80"
+db:
+  image: tutum/mysql:5.6
+  environment:
+   MYSQL_PASS: 123456

@@ -12,6 +12,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         $this->_user = $this->_getUser();
     }
 
+    protected static $_checkoutController = null;
+
+    public static function setCheckoutController(Shopware_Controllers_Frontend_Checkout $controller) {
+        self::$_checkoutController = $controller;
+    }
+    public static function getCheckoutController() {
+        return self::$_checkoutController;
+    }
+
     protected function _getUser()
     {
         if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
@@ -21,10 +30,55 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         }
     }
 
+    protected function _getBasket()
+    {
+        if (!empty(Shopware()->Session()->sOrderVariables['sBasket'])) {
+            return Shopware()->Session()->sOrderVariables['sBasket'];
+        } else {
+            return null;
+        }
+    }
+
+    protected function _getAmountViaBasket($basket) {
+        $user = $this->_getUser();
+        //if (!empty($user['additional']['charge_vat'])) {
+            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        //} else {
+        //    return $basket['AmountNetNumeric'];
+        //}
+    }
+
     protected function _getAmount()
     {
-        $basket = $this->_basket;
-        return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        // "reliable" way to get the amount
+        // amount is being calculated in here
+        if (self::$_checkoutController != null) {
+            $basket = self::$_checkoutController->getBasket();
+Shopware()->PluginLogger()->info('amount via checkout controller');
+            return $this->_getAmountViaBasket($basket);
+        }
+
+        // "documented" way to get the full amount, looks like best practice
+        // but the controller is not always available & sometimes it returns values without shipping/surcharge/...
+        if ($this->_paymentController instanceof Shopware_Controllers_Frontend_PaymentEasycredit && $this->_paymentController->getAmount() !== null) {
+Shopware()->PluginLogger()->info('amount via payment controller');
+            return $this->_paymentController->getAmount();
+        }
+
+        // "payment controller" way to get the full amount
+        // sometimes it just returns null ... (e.g. guest checkout with empty session)
+        $basket = $this->_getBasket();
+        if ($this->_getAmountViaBasket($basket) !== null) {
+Shopware()->PluginLogger()->info('amount via payment controller way');
+            return $this->_getAmountViaBasket($basket);
+        }
+
+        // The "costly" way to get the full amount
+        $basket = Shopware()->Modules()->Basket()->sGetBasket();
+        if ($this->_getAmountViaBasket($basket) !== null) {
+Shopware()->PluginLogger()->info('amount via basket');
+            return $this->_getAmountViaBasket($basket);
+        }
     }
 
     public function getGrandTotal() {

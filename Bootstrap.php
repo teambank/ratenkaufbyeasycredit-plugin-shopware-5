@@ -1,32 +1,36 @@
 <?php
 use Netzkollektiv\EasyCredit;
+use Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
 
 class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     extends Shopware_Components_Plugin_Bootstrap
 {
+    const INTEREST_REMOVED_ERROR = 'Raten müssen neu berechnet werden';
+
     public function afterInit()
     {
         $loader = new \Doctrine\Common\ClassLoader('Netzkollektiv\EasyCredit', __DIR__ . '/src');
         $loader->register();
+
+        $this->get('Loader')->registerNamespace(
+            'Shopware\Plugins\NetzkollektivEasycredit',
+            $this->Path()
+        );
     }
 
     public function getLabel()
     {
-        return 'Ratenkauf by easyCredit';
+        return 'Ratenkauf by Easycredit';
     }
 
     public function getVersion()
     {
-        return '1.0.2.1';
+        return '1.0.3';
     }
 
     public function getInterestOrderName()
     {
         return 'sw-payment-ec-interest';
-    }
-
-    public function getCommunicationError() {
-        return 'Kommunikationsproblem zum EasyCredit Server. Bitte versuchen sie es später nocheinmal.';
     }
 
     public function getInfo()
@@ -36,7 +40,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'label' => $this->getLabel(),
             'supplier' => 'Teambank AG',
             'author' => 'Teambank AG',
-            'description' => 'Dieses Plugin ermöglicht die Zahlung mittels Ratenkauf by easyCredit',
+            'description' => 'Dieses Plugin ermöglicht die Zahlung mittels '.$this->getLabel(),
             'support' => 'service@easycredit.de',
             'link' => 'https://www.easycredit.de/Ratenkauf.htm',
         );
@@ -55,16 +59,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     public function install()
     {
 
-        $this->createMyEvents();
-        $this->createMyMenu();
-        $this->createMyForm();
-        $this->createMyPayment();
-        $this->createAdditionalOrderAttributes();
+        $this->_createEvents();
+        $this->_createPaymentConfigForm();
+        $this->_createPayment();
+        $this->_createAdditionalOrderAttributes();
 
         return true;
     }
 
-    public function createAdditionalOrderAttributes() {
+    protected function _createAdditionalOrderAttributes() {
         Shopware()->Models()->addAttribute('s_order_attributes','easycredit','transaction_uuid','varchar(255)');
         $metaDataCache = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
         $metaDataCache->deleteAll();
@@ -93,11 +96,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    /**
-     * Disable plugin method and sets the active flag in the payment row
-     *
-     * @return bool
-     */
     public function disable()
     {
         $payment = $this->getPayment();
@@ -112,22 +110,31 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    /**
-     * Creates and subscribe the events and hooks.
-     */
-    private function createMyEvents()
+    protected function _createEvents()
     {
+        $this->subscribeEvent(
+            'Enlight_Controller_Front_DispatchLoopStartup',
+            'onDispatchLoopStartup'
+        );
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PreDispatch_Frontend_Checkout',
+            'registerCheckoutController'
+        );
         $this->subscribeEvent(
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
 	    $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout',
+            'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout',
             'onFrontendCheckoutPostDispatch'
         );
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit',
             'onGetControllerPathFrontend'
+        );
+        $this->subscribeEvent(
+            'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit',
+            'onGetControllerPathPaymentEasycredit'
         );
 
         if ($this->isShopware5()) {
@@ -135,8 +142,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment',
                 'onSaveShippingPayment'
             );
-        }
-        else if ($this->isShopware4()) {
+        } else if ($this->isShopware4()) {
             $this->subscribeEvent(
                 'Enlight_Controller_Action_Frontend_Account_SavePayment',
                 'onSavePayment'
@@ -147,6 +153,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             );
         } else {
             throw new Exception('easycredit Plugin does not support this Shopware version');
+        }
+    }
+
+    public function registerCheckoutController(Enlight_Event_EventArgs $arguments) {
+        if ($arguments->getSubject() instanceof Shopware_Controllers_Frontend_Checkout) {
+            Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote::setCheckoutController($arguments->getSubject());    
         }
     }
 
@@ -186,15 +198,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
     }
 
-    /**
-     * Sets the payment method for the current to paymentId
-     * if no ID given the shops default payment method is used
-     *
-     * @param null $paymentId
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
-     */
     public function setPaymentId($paymentId = null) {
         $user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
 
@@ -225,7 +228,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function removeInterest()
     {
-Shopware()->PluginLogger()->info('removing Interest Rate');
         $session = Shopware()->Session();
 
         $this->get('db')->delete(
@@ -255,11 +257,10 @@ Shopware()->PluginLogger()->info('removing Interest Rate');
                 return true;
             }
         }
-
         return false;
     }
 
-    public function reloadCheckoutConfirm($action) {
+    public function redirectCheckoutConfirm($action) {
         $action->redirect(array(
             'controller' => 'checkout',
             'action' => 'confirm'
@@ -278,11 +279,7 @@ Shopware()->PluginLogger()->info('removing Interest Rate');
         return $paymentName;
     }
 
-    protected $_interestRemovedError = 'Raten müssen neu berechnet werden. Bitte wählen Sie erneut Ratenkauf by Easycredit in der Zahlartenauswahl.';
-
     public function checkInterest($action, $view) {
-
-        //$this->showInterestRemovedError($view);
 
         $paymentName = $this->_getSelectedPaymentMethod();
 
@@ -299,7 +296,6 @@ Shopware()->PluginLogger()->info('removing Interest Rate');
             $paymentName != 'easycredit'
             && $interestInBasket
         ) {
-Shopware()->PluginLogger()->info('checkInterest: other payment method but interest still in basket => remove interest');
             $this->removeInterest();
 
             $action->redirect(array(
@@ -315,13 +311,12 @@ Shopware()->PluginLogger()->info('checkInterest: other payment method but intere
             && $interestInBasket
             && $amount_authorized != $amount_basket_without_interest
         ) {
-Shopware()->PluginLogger()->info('checkInterest: '.$amount_authorized.' != '.$amount_basket_without_interest);
 
             $this->removeInterest();
             $this->resetPaymentToDefault();
 
             if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
-                Shopware()->Session()->EasyCredit["apiError"] = $this->_interestRemovedError;
+                Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
             }
 
             $action->redirect(array(
@@ -335,12 +330,11 @@ Shopware()->PluginLogger()->info('checkInterest: '.$amount_authorized.' != '.$am
             $paymentName == 'easycredit'
             && !$interestInBasket
         ) {
-Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rates should not be possible => remove it');
             $this->resetPaymentToDefault();
-            $this->reloadCheckoutConfirm($action);
+            $this->redirectCheckoutConfirm($action);
 
             if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
-                Shopware()->Session()->EasyCredit["apiError"] = $this->_interestRemovedError;
+                Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
             }
 
             $action->redirect(array(
@@ -369,25 +363,37 @@ Shopware()->PluginLogger()->info('checkInterest: easycredit without interest rat
     }
 
     protected function _redirectToEasycredit($action) {
-        $action->redirect(array(
-            'module' => 'payment_easycredit',
-            'action' => 'gateway'
-        ));
+        try {
+            $checkout = $this->get('easyCreditCheckout')
+               ->setCancelUrl($this->getUrl('cancel'))
+               ->setReturnUrl($this->getUrl('return'))
+               ->setRejectUrl($this->getUrl('reject'))
+               ->start(new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote($action));
+
+            if ($url = $checkout->getRedirectUrl()) {
+                header('Location: '.$url);
+                exit;
+            }
+        } catch (Exception $e) {
+            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->redirectCheckoutConfirm($action);
+            return;
+        }
     }
 
     protected function _checkRedirect($action) {
         if (
             isset(Shopware()->Session()->EasyCredit["externRedirect"])
             && Shopware()->Session()->EasyCredit["externRedirect"]
+            && empty(Shopware()->Session()->EasyCredit["apiError"])
         ) {
-Shopware()->PluginLogger()->info(__METHOD__.': redir to gatway');
             $this->_redirectToEasycredit($action);
             return true;
         }
         return false;
     }
 
-    public function _changeConfirmTemplate($view) {
+    public function _extendConfirmTemplate($view) {
         $user = $this->getUser();
 
         $paymentName = $user['additional']['payment']['name'];
@@ -427,15 +433,11 @@ Shopware()->PluginLogger()->info(__METHOD__.': redir to gatway');
 
         try {
             $approved = $checkout->isApproved();
-Shopware()->PluginLogger()->info('easycredit approved? '.$approved);
             if (!$approved) {
-                throw new Exception('EasyCredit Ratenkauf wurde nicht genehmigt.');
+                throw new Exception($this->getLabel().' wurde nicht genehmigt.');
             }
 
             $checkout->loadFinancingInformation();
-
-            $this->_addInterestSurcharge();
-
         } catch (Exception $e) {
             $view->sBasketInfo = Shopware()->Snippets()->getSnippet()->get(
                 'CheckoutSelectPremiumVariant',
@@ -449,10 +451,8 @@ Shopware()->PluginLogger()->info('easycredit approved? '.$approved);
         if (!isset(Shopware()->Session()->EasyCredit["interest_amount"])
             || empty(Shopware()->Session()->EasyCredit["interest_amount"])
            ) {
-Shopware()->PluginLogger()->info(__METHOD__.': interest amount is empty');
             return;
         }
-Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCredit["interest_amount"]);
 
         $interest_order_name = 'sw-payment-ec-interest';
 
@@ -478,8 +478,8 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 'netprice' => $interest_amount,
                 'tax_rate' => 0,
                 'datum' => new Zend_Date(),
-                'modus' => 4,
-                'currencyFactor' => 1
+                'currencyFactor' => 1,
+                'shippingfree' => 1
             )
         );
 
@@ -502,11 +502,10 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 if ($this->checkInterest($action, $view)) {
                     return;
                 }
-
                 if (!empty(Shopware()->Session()->EasyCredit["apiError"])) {
                     $view->sBasketInfo = Shopware()->Snippets()->getSnippet()->get(
                         'CheckoutSelectPremiumVariant',
-                        Shopware()->Session()->EasyCredit["apiError"],
+                        Shopware()->Session()->EasyCredit["apiError"].' Bitte wählen Sie erneut <strong>'.$this->getLabel().'</strong> in der Zahlartenauswahl.',
                         true
                     );
                     Shopware()->Session()->EasyCredit["apiError"] = null;
@@ -517,7 +516,7 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
                 }
 
                 $this->_onCheckoutConfirm($view);
-                $this->_changeConfirmTemplate($view);
+                $this->_extendConfirmTemplate($view);
                 break;
 
             case 'shippingPayment':
@@ -551,18 +550,15 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
             return;
         }
 
-        $agreementChecked = $request->getParam('easycredit-agreement');
+        $agreementChecked = $request->getParam('sEasycreditAgreement');
         if (empty($agreementChecked)) {
-            $action->redirect(array('controller'=>'account', 'action'=>'payment','sTarget'=>'checkout'));
-            return false;
+            return;
         }
 
         if ($request->getParam('sTarget') !== 'checkout') {
             return;
         }
-
-
-	    return $this->_handleRedirect($paymentId);
+	    return $this->_handleRedirect($paymentId, $action, true);
     }
 
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
@@ -576,11 +572,11 @@ Shopware()->PluginLogger()->info(__METHOD__.': '.Shopware()->Session()->EasyCred
             return;
         }
 
-	    return $this->_handleRedirect((int)$request->getPost('payment'));
+	    return $this->_handleRedirect((int)$request->getPost('payment'), $action);
     }
 
-    protected function _handleRedirect($selectedPaymentId) {
-Shopware()->PluginLogger()->info('_handleRedirect (payment = '.$selectedPaymentId.')');
+    protected function _handleRedirect($selectedPaymentId, $action, $queue = false) {
+
         if ($this->isInterestInBasket()) {
             $this->removeInterest();
         }
@@ -604,15 +600,22 @@ Shopware()->PluginLogger()->info('_handleRedirect (payment = '.$selectedPaymentI
         ) {
             return;
         }
-Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
-        Shopware()->Session()->EasyCredit["externRedirect"] = true;
+
+        if ($queue) {
+            Shopware()->Session()->EasyCredit["externRedirect"] = true;
+            return;
+        }
+
+        $this->_redirectToEasycredit($action);
     }
 
-    /**
-     * Fetches and returns easycredit payment row instance.
-     * @version 5.0.0
-     * @return \Shopware\Models\Payment\Payment
-     */
+    public function getUrl($action) {
+        return Shopware()->Front()->Router()->assemble(array(
+            'controller' => 'payment_easycredit',
+            'action'    => $action,
+        ));
+    }
+
     public function onInitResourceCheckout()
     {
 
@@ -629,11 +632,6 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
         );
     }
 
-    /**
-     * Fetches and returns easycredit payment row instance.
-     *
-     * @return \Shopware\Models\Payment\Payment
-     */
     public function getPayment()
     {
         return $this->Payments()->findOneBy(
@@ -641,21 +639,18 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
         );
     }
 
-    /**
-     * Creates and save the payment row.
-     */
-
-    private function createMyPayment()
+    protected function _createPayment()
     {
         $this->createPayment(
             array(
                 'name' => 'easycredit',
-                'description' => 'Ratenkauf by easyCredit',
+                'description' => $this->getLabel(),
                 'action' => 'payment_easycredit',
                 'active' => 0,
                 'position' => 0,
-                'additionalDescription' => $this->getPaymentLogo(). ' <a href="https://www.easycredit.de/Ratenkauf.htm" onclick="javascript:window.open(\'https://www.easycredit.de/Ratenkauf.htm\',\'whatiseasycredit\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600\'); return false;" class="easycredit-tooltip" style="color:#000000;">Was ist Ratenkauf by easyCredit?</a>',
-                'template' => 'easycredit.tpl'
+                'additionalDescription' => $this->getPaymentLogo(). ' <a href="https://www.easycredit.de/Ratenkauf.htm" onclick="javascript:window.open(\'https://www.easycredit.de/Ratenkauf.htm\',\'whatiseasycredit\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600\'); return false;" class="easycredit-tooltip" style="color:#000000;">Was ist '.$this->getLabel().'?</a>',
+                'template' => 'easycredit.tpl',
+                'class' => 'easycredit',
             )
         );
     }
@@ -676,28 +671,7 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
         return implode(' ',$logo);
     }
 
-    /**
-     * Creates and stores a payment item.
-     */
-    private function createMyMenu()
-    {
-        $parent = $this->Menu()->findOneBy(array('label' => 'Zahlungen'));
-        $this->createMenuItem(
-            array(
-                'label' => 'EasyCredit',
-                'controller' => 'PaymentEasyCredit',
-                'action' => 'Index',
-                'class' => 'easycredit--icon',
-                'active' => 1,
-                'parent' => $parent
-            )
-        );
-    }
-
-    /**
-     * Creates and stores the payment config form.
-     */
-    private function createMyForm()
+    protected function _createPaymentConfigForm()
     {
         $form = $this->Form();
 
@@ -734,16 +708,16 @@ Shopware()->PluginLogger()->info('_handleRedirect: externRediret = true');
         );
     }
 
-    /**
-     * Returns the path to a frontend controller for an event.
-     * @version 5.0.0
-     * @return string
-     */
-    public function onGetControllerPathFrontend()
-    {
+    public function onGetControllerPathFrontend() {
         $this->registerTemplateDir();
-
-        return __DIR__ . '/Controllers/Frontend/PaymentEasycredit.php';
+        return $this->Path() . 'Controllers/Frontend/PaymentEasycredit.php';
     }
 
+    public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
+        $this->get('events')->addSubscriber(new Subscriber\Payment());
+    }
+
+    public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
+        return $this->Path() . 'Controllers/Backend/PaymentEasycredit.php';
+    }
 }

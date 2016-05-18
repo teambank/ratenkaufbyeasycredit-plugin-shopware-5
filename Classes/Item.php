@@ -58,7 +58,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements 
 
         $this->name = $this->rawItem['articlename'];
         $this->qty = $this->rawItem['quantity'];
-        $this->price = $this->rawItem['additional_details']['price_numeric'];
+
+        $this->price = (isset($this->rawItem['additional_details']['price_numeric'])) ? 
+            $this->rawItem['additional_details']['price_numeric']
+          : $this->rawItem['priceNumeric'];
+
         $this->manufacturer = $this->rawItem['additional_details']['supplierName'];
         $this->sku = $this->rawItem['id'];
 
