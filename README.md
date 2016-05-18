@@ -64,4 +64,5 @@ die *Ratenkauf by easyCredit* Bezahlmethode für eine bestimmte Versandmethode a
 
 ## Kompatibilität
 
-Das Plugin wurde unter Shopware 5.1 getestet. Weitere Systemvoraussetzungen sind mit den von Shopware in der jeweiligen Vesion genannten abgedeckt.
+Das Plugin ist kompatibel mit Shopware in den Versionen 4.3.x und 5.x.x. 
+Weitere Systemvoraussetzungen sind mit den von Shopware in der jeweiligen Vesion genannten abgedeckt.
