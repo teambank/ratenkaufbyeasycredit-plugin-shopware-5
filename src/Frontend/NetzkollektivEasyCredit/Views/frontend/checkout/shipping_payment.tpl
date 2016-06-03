@@ -14,3 +14,11 @@ jQuery(function($){
 });
 </script>
 {/block}
+
+{block name="frontend_index_content" prepend}
+    {if $sBasketInfo != ''}
+    <div style="margin-top:10px;">
+        {include file="frontend/_includes/messages.tpl" type="error" content=$sBasketInfo}
+    </div>
+    {/if}
+{/block}

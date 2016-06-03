@@ -198,7 +198,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
     }
 
-    public function setPaymentId($paymentId = null) {
+    public function resetPaymentToDefault($paymentId = null) {
         $user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
 
         if ($paymentId === null)
@@ -209,11 +209,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         Shopware()->Models()->flush();
         Shopware()->Models()->refresh($user);
     }
-
-    public function resetPaymentToDefault() {
-        $this->setPaymentId();
-    }
-
 
     public function unsetStorage() {
         unset(Shopware()->Session()->EasyCredit["interest_amount"]);
@@ -298,11 +293,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         ) {
             $this->removeInterest();
 
-            $action->redirect(array(
-                'controller' => 'checkout',
-                'action' => 'confirm'
-            ));
-
+            $this->_redirectWithError($action);
             return true;
         } // still easycredit but amount has changed => remove interest and reset payment method to shop default
 
@@ -319,11 +310,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
             }
 
-            $action->redirect(array(
-                'controller' => 'checkout',
-                'action' => 'confirm'
-            ));
-
+            $this->_redirectWithError($action);
             return true;
         } // easycredit without interest rates should not be possible => remove it
         elseif (
@@ -331,20 +318,32 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             && !$interestInBasket
         ) {
             $this->resetPaymentToDefault();
-            $this->redirectCheckoutConfirm($action);
 
             if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
                 Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
             }
-
-            $action->redirect(array(
-                'controller' => 'checkout',
-                'action' => 'confirm'
-            ));
+            $this->_redirectWithError($action);
             return true;
         }
 
         return false;
+    }
+
+    protected function _redirectWithError($action) {
+        if ($this->isShopware5() && $action instanceof Shopware_Proxies_ShopwareControllersFrontendCheckoutProxy) {
+            $payment = $action->getSelectedPayment();
+            if (array_key_exists('validation', $payment) && !empty($payment['validation'])) {
+                return $action->redirect(array(
+                    'controller' => 'checkout',
+                    'action' => 'shippingPayment'
+                ));
+            }
+        }
+
+        return $action->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'confirm'
+        ));
     }
 
     public function _extendPaymentTemplate($action, $view) {
@@ -485,6 +484,21 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     }
 
+    protected function _displayError($action) {
+        $error = false;
+        if (!empty(Shopware()->Session()->EasyCredit["apiError"]) && !$action->Response()->isRedirect()) {
+_log(Shopware()->Session()->EasyCredit["apiError"]);
+            $error = Shopware()->Snippets()->getSnippet()->get(
+                'CheckoutSelectPremiumVariant',
+                Shopware()->Session()->EasyCredit["apiError"].' Bitte wählen Sie erneut <strong>'.$this->getLabel().'</strong> in der Zahlartenauswahl.',
+                true
+            );
+            Shopware()->Session()->EasyCredit["apiError"] = null;
+_log('error removed');
+        }
+        return $error;
+    }
+
     public function onFrontendCheckoutPostDispatch(\Enlight_Event_EventArgs $arguments)
     {
         $action = $arguments->getSubject();
@@ -502,13 +516,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 if ($this->checkInterest($action, $view)) {
                     return;
                 }
-                if (!empty(Shopware()->Session()->EasyCredit["apiError"])) {
-                    $view->sBasketInfo = Shopware()->Snippets()->getSnippet()->get(
-                        'CheckoutSelectPremiumVariant',
-                        Shopware()->Session()->EasyCredit["apiError"].' Bitte wählen Sie erneut <strong>'.$this->getLabel().'</strong> in der Zahlartenauswahl.',
-                        true
-                    );
-                    Shopware()->Session()->EasyCredit["apiError"] = null;
+                if ($error = $this->_displayError($action)) {
+                    $view->sBasketInfo = $error; 
                 }
 
                 if ($this->_getSelectedPaymentMethod() !== 'easycredit') {
@@ -523,6 +532,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 if (!$this->isShopware5()) {
                     break;
                 }
+                if ($error = $this->_displayError($action)) {
+                    $view->sBasketInfo = $error;
+                }
+
                 $this->_extendPaymentTemplate($action, $view);
                 break;
 

@@ -6,16 +6,18 @@ use ShopwarePlugin\PaymentMethods\Components\GenericPaymentMethod;
 class BaseEasycreditPaymentMethod extends GenericPaymentMethod
 {
     protected function _validate($paymentData) {
+        $errors = array();
         if (empty($paymentData['sEasycreditAgreement'])) {
-            return array(
-                "sErrorFlag" => array(
-                    'sEasycreditAgreement' => true
-                ),
-                "sErrorMessages" => Shopware()->Snippets()->getNamespace('frontend/account/internalMessages')
-                    ->get('ErrorFillIn','Bitte bestätigen Sie die Datenübermittlung.')
-            );
+            $errors["sErrorFlag"]['sEasycreditAgreement'] = true;
+            $errors["sErrorMessages"][] = Shopware()->Snippets()->getNamespace('frontend/account/internalMessages')
+                    ->get('ErrorFillIn','Bitte bestätigen Sie die Datenübermittlung.');
         }
-        return array();
+        if (!empty(Shopware()->Session()->EasyCredit["apiError"])) {
+            $errors["sErrorFlag"]['sEasycreditError'] = true;
+            $errors["sErrorMessages"][] = Shopware()->Snippets()->getNamespace('frontend/account/internalMessages')
+                    ->get('ErrorFillIn',Shopware()->Session()->EasyCredit["apiError"]); 
+        }
+        return $errors;
     }
 }
 
