@@ -10,23 +10,12 @@ class Frontend implements SubscriberInterface
 
     public static function getSubscribedEvents() {
         return array(
-            'Enlight_Controller_Action_PreDispatch_Frontend_Checkout'                   => 'registerCheckoutController',
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit'   => 'onGetControllerPathFrontend',
             'Enlight_Controller_Action_Frontend_Account_SavePayment'                    => 'onSavePayment',
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
             'Enlight_Controller_Action_PostDispatch_Frontend_Account'                   => 'onFrontendAccountPostDispatch',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
         );
-    }
-
-    public function __construct(Bootstrap $bootstrap) {
-        $this->bootstrap = $bootstrap;
-    }
-
-    public function registerCheckoutController(Enlight_Event_EventArgs $arguments) {
-        if ($arguments->getSubject() instanceof Shopware_Controllers_Frontend_Checkout) {
-            \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote::setCheckoutController($arguments->getSubject());
-        }
     }
 
     public function onGetControllerPathFrontend() {
@@ -38,13 +27,13 @@ class Frontend implements SubscriberInterface
      * Handle redirect to payment terminal, Emotion Template only
      */
     public function onSavePayment(Enlight_Event_EventArgs $arguments) {
-        if ($this->_isResponsive()) {
+        if ($this->getPlugin()->isResponsive()) {
             return;
         } 
 
         $action = $arguments->getSubject();
         $request = $action->Request();
-
+        $view = $action->View();
         if (!$request->isPost()) {
             return;
         }
@@ -52,11 +41,8 @@ class Frontend implements SubscriberInterface
         $values = $request->getPost('register');
         $paymentId = $values['payment'];
 
-        $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
-            $paymentId
-        );
-
-        if ($payment['name'] != 'easycredit') {
+        if (!$this->getPlugin()->isSelected($paymentId)) {
+            $this->getPlugin()->clear();
             return;
         }
 
@@ -68,7 +54,7 @@ class Frontend implements SubscriberInterface
         if ($request->getParam('sTarget') !== 'checkout') {
             return;
         }
-        return $this->_handleRedirect($paymentId, $action, true);
+        return $this->_handleRedirect($paymentId, $action);
     }
 
     /**
@@ -76,27 +62,33 @@ class Frontend implements SubscriberInterface
      */
     public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
     {
-        if (!$this->_isResponsive()) {
+        if (!$this->getPlugin()->isResponsive()) {
             return;
         }
 
         $action = $arguments->getSubject();
         $request = $action->Request();
 
+        $paymentId = (int)$request->getPost('payment');
+
+        if (!$this->getPlugin()->isSelected($paymentId)) {
+            $this->getPlugin()->clear();
+            return;
+        }
+
         if (!$request->isPost()
             || $request->getParam('isXHR')
         ) {
             return;
         }
-
-        return $this->_handleRedirect((int)$request->getPost('payment'), $action);
+        return $this->_handleRedirect($paymentId, $action);
     }
 
     /**
      * Add legal text, agreement & amount logic to payment selection, Emotion only
      */
     public function onFrontendAccountPostDispatch(\Enlight_Event_EventArgs $arguments) {
-        if ($this->_isResponsive()) {
+        if ($this->getPlugin()->isResponsive()) {
             return;
         }
 
@@ -108,6 +100,11 @@ class Frontend implements SubscriberInterface
 
         switch ($request->getActionName()) {
             case 'payment':
+
+                if ($error = $this->_displayError($action)) {
+                    $view->sErrorFlag = 1;
+                    $view->sErrorMessages = $error;
+                }
                 $this->_extendPaymentTemplate($action, $view);
                 break;
         }
@@ -124,83 +121,54 @@ class Frontend implements SubscriberInterface
 
         $this->_registerTemplateDir();
 
-        if ($this->_checkRedirect($action)) {
-            return;
-        }
-
         switch ($request->getActionName()) {
             case 'confirm':
-                if ($this->_checkInterest($action, $view)) {
-                    return;
-                }
-                if ($error = $this->_displayError($action)) {
-                    $view->sBasketInfo = $error;
-                }
-
-                if ($this->_getSelectedPaymentMethod() !== 'easycredit') {
+                if (!$this->getPlugin()->isSelected()) {
                     return;
                 }
 
-                $this->_onCheckoutConfirm($view);
+                $this->_onCheckoutConfirm($view, $action);
                 $this->_extendConfirmTemplate($view);
                 break;
 
-/*            case 'cart':
+            case 'shippingPayment':
+                if (!$this->getPlugin()->isResponsive()) {
+                    return;
+                }
+
                 if ($error = $this->_displayError($action)) {
                     $view->sBasketInfo = $error;
-                }
-                break;
-*/
-            case 'shippingPayment': // Responsive Template only
-                if (!$this->_isResponsive()) {
-                    return;
                 }
 
                 $this->_extendPaymentTemplate($action, $view);
                 break;
 
             case 'finish':
-                $this->_unsetStorage();
-                $this->_resetPaymentToDefault();
+                $this->getPlugin()->unsetStorage();
         }
-    }
-
-    protected function _checkRedirect($action) {
-        if (
-            isset(Shopware()->Session()->EasyCredit["externRedirect"])
-            && Shopware()->Session()->EasyCredit["externRedirect"]
-            && empty(Shopware()->Session()->EasyCredit["apiError"])
-        ) {
-            $this->_redirectToEasycredit($action);
-            return true;
-        }
-        return false;
     }
 
     protected function _redirectToEasycredit($action) {
         try {
-            $checkout = $this->bootstrap->get('easyCreditCheckout')
+            $checkout = $this->getPlugin()->get('easyCreditCheckout')
                ->setCancelUrl($this->_getUrl('cancel'))
                ->setReturnUrl($this->_getUrl('return'))
                ->setRejectUrl($this->_getUrl('reject'))
-               ->start(new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote($action));
-
+               ->start(new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote());
+            $this->getPlugin()->saveAddress();
+ 
             if ($url = $checkout->getRedirectUrl()) {
                 header('Location: '.$url);
                 exit;
             }
         } catch (\Exception $e) {
             Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
-            $this->_redirectCheckoutConfirm($action);
+            $action->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'confirm'
+            ));
             return;
         }
-    }
-
-    protected function _redirectCheckoutConfirm($action) {
-        $action->redirect(array(
-            'controller' => 'checkout',
-            'action' => 'confirm'
-        ));
     }
 
     protected function _extendPaymentTemplate($action, $view) {
@@ -218,35 +186,52 @@ class Frontend implements SubscriberInterface
             ->assign('EasyCreditPaymentCompanyName', Shopware()->Config()->get('easycreditCompanyName'));
     }
 
-    protected function _onCheckoutConfirm($view) {
-        $checkout = $this->bootstrap->get('easyCreditCheckout');
+    protected function _onCheckoutConfirm($view, $action) {
+        if (!is_null(Shopware()->Session()->EasyCredit["apiError"])) {
+            return $this->_redirToPaymentSelection($action);
+        }
 
+        $checkout = $this->getPlugin()->get('easyCreditCheckout');
+
+        if (!$checkout->isInitialized()) {
+            return $this->_redirToPaymentSelection($action);
+        }
+
+        if (!$this->getPlugin()->isValid()) {
+            Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
+            return $this->_redirToPaymentSelection($action);
+        }
+        
         try {
             $approved = $checkout->isApproved();
             if (!$approved) {
-                throw new \Exception($this->getLabel().' wurde nicht genehmigt.');
+                throw new \Exception($this->getPlugin()->getLabel().' wurde nicht genehmigt.');
             }
 
             $checkout->loadFinancingInformation();
         } catch (\Exception $e) {
-            $view->sBasketInfo = Shopware()->Snippets()->getSnippet()->get(
-                'CheckoutSelectPremiumVariant',
-                $e->getMessage(),
-                true
-            );
+            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            return $this->_redirToPaymentSelection($action);
+        }
+    }
+
+    protected function _redirToPaymentSelection($action) {
+        if ($this->getPlugin()->isResponsive()) {
+            $action->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'shippingPayment'
+            ));
+        } else {
+            $action->redirect(array(
+                'controller' => 'account',
+                'action' => 'payment',
+                'sTarget'=>'checkout'
+            ));
         }
     }
 
     protected function _extendConfirmTemplate($view) {
-        $user = $this->_getUser();
-
-        $paymentName = $user['additional']['payment']['name'];
-
-        if ($paymentName != 'easycredit') {
-            return;
-        }
-
-        if (!$this->_isResponsive()) {
+        if (!$this->getPlugin()->isResponsive()) {
             $view->extendsTemplate('frontend/checkout/confirm_easycredit.tpl');
         }
         $view->assign('EasyCreditPaymentShowRedemption', true)
@@ -257,224 +242,61 @@ class Frontend implements SubscriberInterface
                 Shopware()->Session()->EasyCredit["pre_contract_information_url"]
             );
     }
+    
+    public function getPlugin() {
+        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
+    }
 
-    protected function _handleRedirect($selectedPaymentId, $action, $queue = false) {
+    protected function _handleRedirect($selectedPaymentId, $action) {
 
-        if ($this->_isInterestInBasket()) {
-            $this->_removeInterest();
+        if ($this->getPlugin()->isInterestInBasket() !== false) {
+            $this->getPlugin()->clear();
         }
-
-        $payment = Shopware()->Modules()->Admin()->sGetPaymentMeanById(
-            $selectedPaymentId
-        );
-
-        if ($payment['name'] != 'easycredit') {
+        if (!$this->getPlugin()->isSelected($selectedPaymentId)) {
             return;
         }
-
-        $amount_basket = round($this->_getAmount(), 2);
-        $amount_authorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
-        $amount_interest = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
-        $amount_basket_without_interest = round($amount_basket - $amount_interest, 2);
-
-        if (
-            $this->_isInterestInBasket()
-            && $amount_authorized == $amount_basket_without_interest
-        ) {
+        if ($this->getPlugin()->isValid()) {
             return;
         }
-
-        if ($queue) {
-            Shopware()->Session()->EasyCredit["externRedirect"] = true;
-            return;
-        }
-
         $this->_redirectToEasycredit($action);
     }
 
     protected function _registerTemplateDir() {
 
-        $template = $this->bootstrap->get('template');
+        $template = $this->getPlugin()->get('template');
         $template->addTemplateDir($this->Path() . 'Views/');
         $template->addTemplateDir($this->Path() . 'Views/common/');
 
-        if ($this->_isResponsive()) {
+        if ($this->getPlugin()->isResponsive()) {
             $template->addTemplateDir($this->Path() . 'Views/responsive/');
         } else {
             $template->addTemplateDir($this->Path() . 'Views/emotion/');
         }
     }
 
-    protected function _checkInterest($action, $view) {
-
-        $paymentName = $this->_getSelectedPaymentMethod();
-
-        $amount_basket = round($this->_getAmount(), 2);
-
-        $amount_authorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
-        $amount_interest = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
-        $amount_basket_without_interest = round($amount_basket - $amount_interest, 2);
-
-        $interestInBasket = $this->_isInterestInBasket();
-
-        if (
-            $paymentName != 'easycredit'
-            && $interestInBasket
-        ) {
-            $this->_debug('other payment method but interest in basket => remove interest');
-
-            $this->_removeInterest();
-            $this->_redirectWithError($action);
-            return true;
-        } 
-
-        if (
-            $paymentName == 'easycredit'
-            && $interestInBasket
-            && $amount_authorized != $amount_basket_without_interest
-        ) {
-            $this->_debug('easycredit selected, amount changed => remove interest, reset payment method to default');
-
-            $this->_removeInterest();
-            $this->_resetPaymentToDefault();
-
-            if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
-                Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
-            }
-
-            $this->_redirectWithError($action);
-            return true;
-        } elseif (
-            $paymentName == 'easycredit'
-            && !$interestInBasket
-        ) {
-            $this->_debug('easycredit without interest rates => reset payment method to default');
-
-            $this->_resetPaymentToDefault();
-
-            if (empty(Shopware()->Session()->EasyCredit["apiError"])) {
-                Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
-            }
-            $this->_redirectWithError($action);
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function _redirectWithError($action) {
-/*        return $action->redirect(array(
-            'controller' => 'checkout',
-            'action' => 'cart'
-        ));
-*/
-        if ($this->_isResponsive() && $action instanceof Shopware_Proxies_ShopwareControllersFrontendCheckoutProxy) {
-            $payment = $action->getSelectedPayment();
-            if((array_key_exists('validation', $payment) && !empty($payment['validation']))
-                || isset(Shopware()->Session()->EasyCredit["apiError"])
-                ) {
-                return $action->redirect(array(
-                    'controller' => 'checkout',
-                    'action' => 'shippingPayment'
-                ));
-            }
-        }
-        return $this->_redirectCheckoutConfirm($action);
-    }
-
-    protected function _resetPaymentToDefault($paymentId = null) {
-        $user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
-
-        if ($paymentId === null)
-            $paymentId = Shopware()->Config()->get('paymentdefault');
-
-        $user->setPaymentId($paymentId);
-        Shopware()->Models()->persist($user);
-        Shopware()->Models()->flush();
-        Shopware()->Models()->refresh($user);
-    }
-
-    /**
-     * remove interest from basket via DB call
-     */
-    protected function _removeInterest()
-    {
-        $session = Shopware()->Session();
-
-        Shopware()->Db()->delete(
-            's_order_basket',
-            array(
-                'sessionID = ?' => $session->get('sessionId'),
-                'ordernumber = ?' => self::INTEREST_ORDERNUM
-            )
-        );
-
-        $this->_unsetStorage();
-    }
-
     protected function _displayError($action) {
         $error = false;
         if (!empty(Shopware()->Session()->EasyCredit["apiError"]) && !$action->Response()->isRedirect()) {
+            $apiError = Shopware()->Session()->EasyCredit["apiError"];    
+            $apiError = trim($apiError);
+            if (!in_array(substr($apiError, -1),array('.','!','?'))) {
+                $apiError.='.';
+            }
+
             $error = Shopware()->Snippets()->getSnippet()->get(
                 'CheckoutSelectPremiumVariant',
-                Shopware()->Session()->EasyCredit["apiError"].' Bitte wählen Sie erneut <strong>'.$this->bootstrap->getLabel().'</strong> in der Zahlartenauswahl.',
+                $apiError.' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.',
                 true
             );
             Shopware()->Session()->EasyCredit["apiError"] = null;
+            $this->getPlugin()->clear();
         }
         return $error;
-    }
-
-    /**
-     * checks if the easycredit interest is in the user's basket
-     *
-     * @return bool
-     */
-    protected function _isInterestInBasket()
-    {
-        $basket = $this->_getBasket();
-
-        $content = $basket['content'];
-        foreach ($content as $c) {
-            if (isset($c['ordernumber']) && $c['ordernumber'] == self::INTEREST_ORDERNUM) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected function _unsetStorage() {
-        unset(Shopware()->Session()->EasyCredit["interest_amount"]);
-        unset(Shopware()->Session()->EasyCredit["authorized_amount"]);
-        unset(Shopware()->Session()->EasyCredit["pre_contract_information_url"]);
-        unset(Shopware()->Session()->EasyCredit["redemption_plan"]);
-        unset(Shopware()->Session()->EasyCredit["transaction_id"]);
-    }
-
-    protected function _getSelectedPaymentMethod() {
-        $user = $this->_getUser();
-        $payment = $user['additional']['payment'];
-        $paymentName = $payment['name'];
-        return $paymentName;
-    }
-
-    protected function _getUser()
-    {
-        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
-            return Shopware()->Session()->sOrderVariables['sUserData'];
-        } else {
-            return Shopware()->Modules()->Admin()->sGetUserData();
-        }
     }
 
     protected function _getAmount(){
         $quote = new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote();
         return $quote->getGrandTotal();
-    }
-
-    protected function _getBasket()
-    {
-        return Shopware()->Modules()->Basket()->sGetBasket();
     }
 
     protected function _getUrl($action) {
@@ -485,14 +307,6 @@ class Frontend implements SubscriberInterface
     }
     
     public function Path() {
-        return $this->bootstrap->Path();
-    }
-
-    protected function _isResponsive() {
-        return Shopware()->Shop()->getTemplate()->getVersion() >= 3;
-    }
-
-    protected function _debug($msg) {
-        file_put_contents('/shopware/debug.log',$msg.PHP_EOL,FILE_APPEND);
+        return $this->getPlugin()->Path();
     }
 }

@@ -80,9 +80,6 @@ class Checkout {
         $storage->setData('transaction_id',$result->fachlicheVorgangskennung);
         $storage->setData('authorized_amount',$quote->getGrandTotal());
 
-        file_put_contents('/tmp/setSession.log', date('Y-m-d H:i:s'), FILE_APPEND);
-
-        //$quote->collectTotals()->save();
         return $this;
     }
 

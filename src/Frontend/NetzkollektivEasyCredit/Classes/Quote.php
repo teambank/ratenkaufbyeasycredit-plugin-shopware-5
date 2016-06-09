@@ -1,24 +1,25 @@
 <?php
 use Netzkollektiv\EasyCredit;
 
+class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_CheckoutController extends Shopware_Controllers_Frontend_Checkout {
+    public function __construct() {
+        $this->admin = Shopware()->Modules()->Admin();
+        $this->basket = Shopware()->Modules()->Basket();
+        $this->session = Shopware()->Session();
+    }
+    
+    public function getSelectedPayment() {
+        return 'easycredit';
+    }
+}
+
 class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements EasyCredit\QuoteInterface {
 
     protected $basket = null;
 
-    public function __construct($paymentController = null) {
-        $this->_paymentController = $paymentController;
-
+    public function __construct() {
         $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
         $this->_user = $this->_getUser();
-    }
-
-    protected static $_checkoutController = null;
-
-    public static function setCheckoutController(Shopware_Controllers_Frontend_Checkout $controller) {
-        self::$_checkoutController = $controller;
-    }
-    public static function getCheckoutController() {
-        return self::$_checkoutController;
     }
 
     protected function _getUser()
@@ -30,55 +31,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote implements
         }
     }
 
-    protected function _getBasket()
-    {
-        if (!empty(Shopware()->Session()->sOrderVariables['sBasket'])) {
-            return Shopware()->Session()->sOrderVariables['sBasket'];
-        } else {
-            return null;
-        }
-    }
-
-    protected function _getAmountViaBasket($basket) {
-        $user = $this->_getUser();
-        //if (!empty($user['additional']['charge_vat'])) {
-            return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
-        //} else {
-        //    return $basket['AmountNetNumeric'];
-        //}
-    }
-
     protected function _getAmount()
     {
-        // "reliable" way to get the amount
-        // amount is being calculated in here
-        if (self::$_checkoutController != null) {
-            $basket = self::$_checkoutController->getBasket();
-Shopware()->PluginLogger()->info('amount via checkout controller');
-            return $this->_getAmountViaBasket($basket);
-        }
-
-        // "documented" way to get the full amount, looks like best practice
-        // but the controller is not always available & sometimes it returns values without shipping/surcharge/...
-        if ($this->_paymentController instanceof Shopware_Controllers_Frontend_PaymentEasycredit && $this->_paymentController->getAmount() !== null) {
-Shopware()->PluginLogger()->info('amount via payment controller');
-            return $this->_paymentController->getAmount();
-        }
-
-        // "payment controller" way to get the full amount
-        // sometimes it just returns null ... (e.g. guest checkout with empty session)
-        $basket = $this->_getBasket();
-        if ($this->_getAmountViaBasket($basket) !== null) {
-Shopware()->PluginLogger()->info('amount via payment controller way');
-            return $this->_getAmountViaBasket($basket);
-        }
-
-        // The "costly" way to get the full amount
-        $basket = Shopware()->Modules()->Basket()->sGetBasket();
-        if ($this->_getAmountViaBasket($basket) !== null) {
-Shopware()->PluginLogger()->info('amount via basket');
-            return $this->_getAmountViaBasket($basket);
-        }
+        $controller = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_CheckoutController();
+        $basket = $controller->getBasket();
+        return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
     }
 
     public function getGrandTotal() {

@@ -119,7 +119,7 @@ class Api
         ));
 
         if ($method == 'POST') { 
-$this->_logger->log(json_encode($data));
+            $this->_logger->log(json_encode($data));
             $client->setRawData(
                 json_encode($data), 
                 'application/json;charset=UTF-8'
@@ -134,7 +134,7 @@ $this->_logger->log(json_encode($data));
         # TODO catch these exceptions
         if ($response->isError()) {
             $this->_logger->log($response->getBody());
-            throw new \Exception('Received error from EasyCredit api');
+            throw new \Exception('Received error from easyCredit API');
         }
 
         $result = $response->getBody();
@@ -154,7 +154,7 @@ $this->_logger->log(json_encode($data));
         }
 
         if (isset($result->wsMessages)) {
-$this->_logger->log($result->wsMessages);
+            $this->_logger->log($result->wsMessages);
             $this->_handleMessages($result);
         }
         return $result;
