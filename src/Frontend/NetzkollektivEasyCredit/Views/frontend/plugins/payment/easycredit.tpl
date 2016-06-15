@@ -26,16 +26,15 @@
     </div>
 
     {if $EasyCreditThemeVersion == 2}
-    {block name="frontend_index_header_javascript_jquery_lib" append}
     <script>
         jQuery(function($){
-
-            var easycreditVal = $('#easycredit-description').closest('.method').find('input.radio').val();
+            var ecDesc = $('#easycredit-description');
+            var ecVal = ecDesc.closest('.method').find('input.radio').val();
             var toggleEasycreditDescription = function(){
-                var desc = $('#easycredit-description').hide();
-                desc.find('input').attr('required',null);
-                if ($(this).val()==easycreditVal) {
-                    desc.show().attr('required','required');
+                if ($('input[name="register[payment]"]:checked').val() == ecVal) {
+                    ecDesc.show().attr('required','required');
+                } else {
+                    ecDesc.hide().find('input').attr('required',null);
                 }
             };
 
@@ -44,7 +43,6 @@
                 .change(toggleEasycreditDescription);
         });
     </script>
-    {/block}
     {/if}
 
 {/if}
