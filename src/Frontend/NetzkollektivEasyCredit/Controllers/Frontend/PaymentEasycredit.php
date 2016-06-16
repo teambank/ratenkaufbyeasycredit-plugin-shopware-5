@@ -161,7 +161,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function returnAction()
     {
-        Shopware()->Session()->EasyCredit["externRedirect"] = false;
         $checkout = $this->get('easyCreditCheckout');
 
         try {
@@ -224,7 +223,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $this->redirect(array(
                 'controller'=>'account',
                 'action' => 'payment',
-                'target' => 'checkout'
+                'sTarget' => 'checkout'
             ));
 
         }

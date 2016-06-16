@@ -266,11 +266,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function unsetStorage() {
-        unset(Shopware()->Session()->EasyCredit["interest_amount"]);
-        unset(Shopware()->Session()->EasyCredit["authorized_amount"]);
-        unset(Shopware()->Session()->EasyCredit["pre_contract_information_url"]);
-        unset(Shopware()->Session()->EasyCredit["redemption_plan"]);
-        unset(Shopware()->Session()->EasyCredit["transaction_id"]);
+        if (count(Shopware()->Session()->EasyCredit) > 0) {
+            foreach (Shopware()->Session()->EasyCredit as $key => $value) {
+                unset(Shopware()->Session()->EasyCredit[$key]);
+            }
+        }
     }
 
     protected function _getUser()
