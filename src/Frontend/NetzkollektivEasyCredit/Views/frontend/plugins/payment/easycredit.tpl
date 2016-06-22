@@ -29,7 +29,7 @@
     <script>
         jQuery(function($){
             var ecDesc = $('#easycredit-description');
-            var ecVal = ecDesc.closest('.method').find('input.radio').val();
+            var ecVal = ecDesc.closest('.method, .method_last').find('input.radio').val();
             var toggleEasycreditDescription = function(){
                 if ($('input[name="register[payment]"]:checked').val() == ecVal) {
                     ecDesc.show().attr('required','required');
