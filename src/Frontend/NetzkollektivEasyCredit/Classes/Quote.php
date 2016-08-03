@@ -6,6 +6,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_CheckoutController exten
         $this->admin = Shopware()->Modules()->Admin();
         $this->basket = Shopware()->Modules()->Basket();
         $this->session = Shopware()->Session();
+        $this->container = Shopware()->Container();
     }
     
     public function getSelectedPayment() {
