@@ -4,7 +4,7 @@ namespace Netzkollektiv\EasyCredit;
 class Api
 {
     protected $_apiBaseUrl = 'https://www.easycredit.de/ratenkauf-ws/rest';
-    protected $_apiVersion = 'v0';
+    protected $_apiVersion = 'v0.3';
 
     protected $_customerPrefixMalePatterns = array('Herr','Mr','male','männlich');
     protected $_customerPrefixFemalePatterns = array('Frau','Ms','Miss','Mrs','female','weiblich');
@@ -94,6 +94,10 @@ class Api
         return $this->call('POST','vorgang/'.$token.'/bestaetigen');
     }
 
+    public function callAgreement() {
+        return $this->call('GET','texte/zustimmung/'.$this->_getWebshopId());
+    }
+
     protected function _buildUrl($method, $resource) {
         $url = implode('/',array(
             $this->_apiBaseUrl,
@@ -128,7 +132,7 @@ class Api
         } else {
             $client->setParameterGet($data);
         }
-
+$this->_logger->log($data);
         $response = $client->request($method);
 
         # TODO catch these exceptions
@@ -146,7 +150,7 @@ class Api
         }
 
         $result = json_decode($result);
-        //$this->_logger->log($result);
+        $this->_logger->log($result);
 
         if ($result == null) {
             $this->_logger->log('EasyCredit result is null');

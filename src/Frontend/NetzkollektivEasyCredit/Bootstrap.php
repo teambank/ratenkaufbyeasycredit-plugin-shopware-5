@@ -203,16 +203,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'stripCharsRe' => ' '
             )
         );
-
-        $form->setElement(
-            'text',
-            'easycreditCompanyName',
-            array(
-                'label' => 'Rechtlicher Firmenname',
-                'required' => true,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-            )
-        );
     }
 
     protected function _getAmount(){
@@ -352,10 +342,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             $this->_getAddress()
         ));
 
-        return count($this->_array_diff_recursive(
-            $authorizedAddress,
-            $this->_getAddress()
-        )) == 0;
+        return (
+            count($this->_array_diff_recursive(
+                $authorizedAddress,
+                $this->_getAddress()
+            )) == 0 && count($this->_array_diff_recursive(
+                $authorizedAddress,
+                $this->_getAddress('shipping')
+            )) == 0
+        );
     }
 
     protected function _array_diff_recursive($arr1, $arr2)
@@ -392,9 +387,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         Shopware()->Session()->EasyCredit['authorized_address'] = $this->_getAddress();
     }
 
-    protected function _getAddress() {
+    protected function _getAddress($type = 'billing') {
         $quote = new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote();
-        $address = $quote->getBillingAddress();
+        $address = ($type == 'billing') ? $quote->getBillingAddress() : $quote->getShippingAddress();
+
         return array(
             $address->getStreet(),
             $address->getCity(),

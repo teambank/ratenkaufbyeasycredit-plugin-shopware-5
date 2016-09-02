@@ -180,10 +180,9 @@ class Frontend implements SubscriberInterface
         } catch(\Exception $e) {
             $error = $e->getMessage();
         }
-
         $view->assign('EasyCreditError', $error)
             ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
-            ->assign('EasyCreditPaymentCompanyName', Shopware()->Config()->get('easycreditCompanyName'));
+            ->assign('EasyCreditAgreement', $checkout->getAgreement());
     }
 
     protected function _onCheckoutConfirm($view, $action) {

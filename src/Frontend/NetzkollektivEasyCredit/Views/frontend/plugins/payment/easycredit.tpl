@@ -19,7 +19,7 @@
         <p>
             <label for="easycredit-agreement" class="easycredit-agreement {if $error_flags.sEasycreditAgreement}instyle_error{/if}">
                     <input type="checkbox" name="sEasycreditAgreement" class="required-entry" {if $payment_mean.id == $form_data.payment}required="required"{/if} id="easycredit-agreement" /> 
-                    <span>Ja, ich möchte per Ratenkauf zahlen und willige ein, dass die {$EasyCreditPaymentCompanyName} der TeamBank AG (Partner der Genossenschaftlichen FinanzGruppe Volksbanken Raiffeisenbanken), Beuthener Str. 25, 90471 Nürnberg zur Identitäts- und Bonitätsprüfung sowie Betrugsprävention Anrede und Name, Geburtsdatum und -ort, Kontaktdaten (Adresse, Telefon, E-Mail) sowie Angaben zur aktuellen und zu früheren Bestellungen übermittelt und das Prüfungsergebnis zu diesem Zweck erhält.</span>
+                    <span>{$EasyCreditAgreement}</span>
             </label>
         </p>
 

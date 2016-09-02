@@ -156,4 +156,16 @@ class Checkout {
 
         return $this->_getApi()->callModelCalculation($amount);
     }
+
+    public function getAgreement() {
+        $cacheKey = 'easycreditAgreements';
+        $cache    = Shopware()->Container()->get('cache');
+        if ($cache->test($cacheKey)) {
+            $agreements = $cache->load($cacheKey);
+        } else {
+            $agreements = $this->_getApi()->callAgreement();
+            $cache->save($agreements, $cacheKey, ['Shopware_Plugin'], 86400);
+        }
+        return $agreements->zustimmungDatenuebertragungServiceIntegration;
+    }
 }
