@@ -26,7 +26,7 @@ class Frontend implements SubscriberInterface
     /**
      * Handle redirect to payment terminal, Emotion Template only
      */
-    public function onSavePayment(Enlight_Event_EventArgs $arguments) {
+    public function onSavePayment(\Enlight_Event_EventArgs $arguments) {
         if ($this->getPlugin()->isResponsive()) {
             return;
         } 
@@ -60,7 +60,7 @@ class Frontend implements SubscriberInterface
     /**
      * Handle redirect to payment terminal, Responsive only
      */
-    public function onSaveShippingPayment(Enlight_Event_EventArgs $arguments)
+    public function onSaveShippingPayment(\Enlight_Event_EventArgs $arguments)
     {
         if (!$this->getPlugin()->isResponsive()) {
             return;

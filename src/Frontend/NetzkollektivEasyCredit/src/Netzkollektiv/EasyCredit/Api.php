@@ -185,7 +185,7 @@ $this->_logger->log($data);
         unset($result->wsMessages);
     }
 
-    protected function _convertAddress(Mage_Sales_Model_Quote_Address $address, $isShipping = false) {
+    protected function _convertAddress($address, $isShipping = false) {
         $_address = array(
              'strasseHausNr' => $address->getStreet(1),
              'adresszusatz' => is_array($address->getStreet()) ? implode(',',array_slice($address->getStreet(),1)) : '',
