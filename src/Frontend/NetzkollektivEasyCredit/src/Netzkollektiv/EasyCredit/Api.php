@@ -3,6 +3,21 @@ namespace Netzkollektiv\EasyCredit;
 
 class Api
 {
+
+    const API_BASE_URL = 'https://www.easycredit.de/ratenkauf-ws/rest';
+    // TODO v0.4
+    const API_VERSION = 'v0.3';
+
+    const API_MODEL_CALCULATION = 'modellrechnung/guenstigsterRatenplan/';
+    const API_TEXT_CONSENT = 'texte/zustimmung';
+
+    const API_SHOP_ID_PLACEHOLDER = '%shopId%';
+    const API_VERIFY_CREDENTIALS = 'webshop/%shopId%/restbetragankaufobergrenze';
+    const API_VERIFY_CREDENTIALS_METHOD = 'GET';
+
+    const REST_INTERNAL_VERIFY_CREDENTIALS = '/rest/V1/easycredit/verify/credentials';
+    const REST_INTERNAL_VERIFY_CREDENTIALS_METHOD = 'get';
+
     protected $_apiBaseUrl = 'https://www.easycredit.de/ratenkauf-ws/rest';
     protected $_apiVersion = 'v0.3';
 
@@ -107,7 +122,14 @@ class Api
         return $url;
     }
 
-    public function call($method, $resource, $data = array()) { 
+    public function call($method, $resource, $data = array(), $webShopId = null, $webShopToken = null) {
+
+        if ($webShopId === null) {
+            $webShopId = $this->_getWebshopId();
+        }
+        if ($webShopToken === null) {
+            $webShopToken = $this->getToken();
+        }
 
         $url = $this->_buildUrl($method, $resource);
         $method = strtoupper($method);
@@ -118,8 +140,8 @@ class Api
         ));
         $client->setHeaders(array(
             'Accept' => 'application/json, text/plain, */*',
-            'tbk-rk-shop' => $this->_getWebshopId(),
-            'tbk-rk-token' => $this->getToken()
+            'tbk-rk-shop' => $webShopId,
+            'tbk-rk-token' => $webShopToken
         ));
 
         if ($method == 'POST') { 
@@ -132,7 +154,7 @@ class Api
         } else {
             $client->setParameterGet($data);
         }
-$this->_logger->log($data);
+        $this->_logger->log($data);
         $response = $client->request($method);
 
         # TODO catch these exceptions
@@ -299,5 +321,17 @@ $this->_logger->log($data);
             'warenkorbinfos' => $this->_convertItems($quote->getAllVisibleItems()),
         );
         return array_filter($data);
+    }
+
+    public function verifyCredentials($apiKey, $apiToken) {
+        $resource = str_replace(self::API_SHOP_ID_PLACEHOLDER, $apiKey, self::API_VERIFY_CREDENTIALS);
+
+        try {
+            $this->call(self::API_VERIFY_CREDENTIALS_METHOD, $resource, [], $apiKey, $apiToken);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }

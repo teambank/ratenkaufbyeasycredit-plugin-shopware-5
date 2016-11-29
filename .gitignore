@@ -1,3 +1,4 @@
 /.docker-compose-default
 /docker-compose.yml
 /tools/tmp
+shopware/*

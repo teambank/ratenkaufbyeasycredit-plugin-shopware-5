@@ -14,4 +14,13 @@ class Backend implements SubscriberInterface
     public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
         return $this->Path() . 'Controllers/Backend/PaymentEasycredit.php';
     }
+
+    public function Path() {
+        return $this->getPlugin()->Path();
+    }
+
+    public function getPlugin() {
+        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
+    }
+
 }

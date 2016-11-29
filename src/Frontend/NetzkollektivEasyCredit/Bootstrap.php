@@ -203,6 +203,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'stripCharsRe' => ' '
             )
         );
+
+        if (is_file(__DIR__ . '/Views/backend/plugins/easycredit/test.js')) {
+            $form->setElement(
+                'button',
+                'easycreditButtonClientTest',
+                array(
+                    'label' => '<strong>Jetzt API testen<strong>',
+                    'handler' => "function(btn) {"
+                        . file_get_contents(__DIR__ . '/Views/backend/plugins/easycredit/test.js') . "}"
+                )
+            );
+        }
     }
 
     protected function _getAmount(){

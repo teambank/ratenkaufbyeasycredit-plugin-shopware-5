@@ -168,4 +168,9 @@ class Checkout {
         }
         return $agreements->zustimmungDatenuebertragungServiceIntegration;
     }
+
+    public function verifyCredentials($apiKey, $apiToken) {
+        return $this->_getApi()->verifyCredentials($apiKey, $apiToken);
+    }
+
 }
