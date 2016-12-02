@@ -1,4 +1,5 @@
 <?php
+use Doctrine\Common\Collections\ArrayCollection;
 use Netzkollektiv\EasyCredit;
 use Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
 
@@ -6,6 +7,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     extends Shopware_Components_Plugin_Bootstrap
 {
 
+    const PAYMENT_NAME = 'easycredit';
     const INTEREST_ORDERNUM = 'sw-payment-ec-interest';
     const DEBUG = true;
 
@@ -117,10 +119,22 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
+        $this->subscribeEvent(
+            'Theme_Compiler_Collect_Plugin_Javascript',
+            'onCollectJavascriptFiles'
+        );
+    }
+
+    public function onCollectJavascriptFiles() {
+        $jsDir = __DIR__ . '/Views/frontend/_public/src/js/';
+
+        return new ArrayCollection(array(
+            $jsDir . 'pp-plugin.js'
+        ));
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
-        $this->get('events')->addSubscriber(new Subscriber\Frontend());
+        $this->get('events')->addSubscriber(new Subscriber\Frontend($this));
         $this->get('events')->addSubscriber(new Subscriber\Backend($this));
     }
 
@@ -130,7 +144,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         $apiClient = new EasyCredit\Api(array(
             'api_key' => $this->Config()->get('easycreditApiKey'),
-            'api_token' => $this->Config()->get('easycreditApiToken')
+            'api_token' => $this->Config()->get('easycreditApiToken'),
+            'debug_logging' => $this->Config()->get('easycreditDebugLogging')
         ), $logger);
 
         return new EasyCredit\Checkout(
@@ -150,7 +165,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     {
         $this->createPayment(
             array(
-                'name' => 'easycredit',
+                'name' => self::PAYMENT_NAME,
                 'description' => $this->getLabel(),
                 'action' => 'payment_easycredit',
                 'active' => 0,
@@ -178,9 +193,58 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return implode(' ',$logo);
     }
 
+    /**
+     * @return array
+     */
+    private function getOrderStates() {
+        /**@var $repository \Shopware\Models\Order\Repository*/
+        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
+        $orderStatusRaw = $repository->getOrderStatusQuery($filters)->getArrayResult();
+        $orderStates = array();
+        foreach ($orderStatusRaw as $o) {
+            $orderStates[] = array($o['id'], $o['description']);
+        }
+
+        return  $orderStates;
+    }
+
     protected function _createPaymentConfigForm()
     {
         $form = $this->Form();
+
+        // Frontend settings
+
+        $form->setElement(
+            'boolean',
+            'easycreditModelWidget',
+            array(
+                'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditOrderStatus',
+            array(
+                'label' => 'Bestellungsstatus',
+                'value' => 0, // open
+                'store' => $this->getOrderStates(),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditDebugLogging',
+            array(
+                'label' => 'API Debug Logging',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
 
         $form->setElement(
             'text',
@@ -209,7 +273,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'button',
                 'easycreditButtonClientTest',
                 array(
-                    'label' => '<strong>Jetzt API testen<strong>',
+                    'label' => '<strong>Jetzt API-Zugangsdaten testen<strong>',
                     'handler' => "function(btn) {"
                         . file_get_contents(__DIR__ . '/Views/backend/plugins/easycredit/test.js') . "}"
                 )

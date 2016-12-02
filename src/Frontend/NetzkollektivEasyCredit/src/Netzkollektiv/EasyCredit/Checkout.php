@@ -173,4 +173,10 @@ class Checkout {
         return $this->_getApi()->verifyCredentials($apiKey, $apiToken);
     }
 
+    /**
+     * @return int
+     */
+    public function getNewOrderStatus() {
+       return 0;
+    }
 }

@@ -73,6 +73,16 @@ class Api
         return $this->_config['api_token'];
     }
 
+    /**
+     * logo data if easycreditDebugLogging is true
+     * @param $data
+     */
+    private function logDebug($data) {
+        if (isset($this->_config['easycreditDebugLogging']) &&  $this->_config['easycreditDebugLogging']) {
+            $this->_logger->log($data);
+        }
+    }
+
     public function getRedirectUrl($token) {
         return 'https://ratenkauf.easycredit.de/ratenkauf/content/intern/einstieg.jsf?vorgangskennung='.$token;
     }
@@ -134,7 +144,8 @@ class Api
         $url = $this->_buildUrl($method, $resource);
         $method = strtoupper($method);
 
-        $this->_logger->log($data);
+        $this->logDebug($data);
+
         $client = new \Zend_Http_Client($url,array(
             'keepalive' => true
         ));
@@ -145,7 +156,7 @@ class Api
         ));
 
         if ($method == 'POST') { 
-            $this->_logger->log(json_encode($data));
+            $this->logDebug(json_encode($data));
             $client->setRawData(
                 json_encode($data), 
                 'application/json;charset=UTF-8'
@@ -154,7 +165,7 @@ class Api
         } else {
             $client->setParameterGet($data);
         }
-        $this->_logger->log($data);
+        $this->logDebug($data);
         $response = $client->request($method);
 
         # TODO catch these exceptions
@@ -166,13 +177,12 @@ class Api
         $result = $response->getBody();
 
         if (empty($result)) {
-
             $this->_logger->log('EasyCredit result is empty');
             throw new \Exception('EasyCredit result is empty');
         }
 
         $result = json_decode($result);
-        $this->_logger->log($result);
+        $this->logDebug($result);
 
         if ($result == null) {
             $this->_logger->log('EasyCredit result is null');

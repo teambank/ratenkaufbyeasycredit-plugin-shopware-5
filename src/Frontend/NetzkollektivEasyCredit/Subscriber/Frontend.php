@@ -8,6 +8,24 @@ class Frontend implements SubscriberInterface
     const INTEREST_REMOVED_ERROR = 'Raten müssen neu berechnet werden';
     const INTEREST_ORDERNUM = 'sw-payment-ec-interest';
 
+    protected $bootstrap;
+
+    /**
+     * @var \Enlight_Config $config
+     */
+    protected $config;
+
+    /**
+     * Frontend constructor.
+     *
+     * @param \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap $bootstrap
+     */
+    public function __construct(\Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+        $this->config = $bootstrap->Config();
+    }
+
     public static function getSubscribedEvents() {
         return array(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit'   => 'onGetControllerPathFrontend',
@@ -15,6 +33,8 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
             'Enlight_Controller_Action_PostDispatch_Frontend_Account'                   => 'onFrontendAccountPostDispatch',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
+            'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
+            'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget'
         );
     }
 
@@ -23,8 +43,53 @@ class Frontend implements SubscriberInterface
         return $this->Path() . 'Controllers/Frontend/PaymentEasycredit.php';
     }
 
+    public function addEasyCreditModelWidget(\Enlight_Event_EventArgs $arguments) {
+        /** @var $action \Enlight_Controller_Action */
+        $action = $arguments->getSubject();
+        $request = $action->Request();
+        $response = $action->Response();
+        $view = $action->View();
+        $config = $this->config;
+        $widgetActive = $config->get('easycreditModelWidget');
+
+        if (!$request->isDispatched()
+            || $response->isException()
+            || $request->getModuleName() != 'frontend'
+            || !$view->hasTemplate()
+            || !$widgetActive
+            || $request->getControllerName() !== 'detail'
+        ) {
+            return;
+        }
+
+        $this->_registerTemplateDir();
+
+        $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
+    }
+
+    public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
+        $orderParams = $arguments->getReturn();
+
+        $paymentID = $orderParams['paymentID'];
+
+        /** @var $payment \Shopware\Models\Payment\Payment */
+        $payment = Shopware()->Models()->find('Shopware\Models\Payment\Payment', $paymentID);
+
+        if ($payment) {
+            $paymentName = $payment->getName();
+
+            if ($paymentName === \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap::PAYMENT_NAME) {
+                $orderParams['status'] = $this->config->get('easycreditOrderStatus');
+            }
+        }
+
+        return $orderParams;
+    }
+
+
     /**
      * Handle redirect to payment terminal, Emotion Template only
+     * @param \Enlight_Event_EventArgs $arguments
      */
     public function onSavePayment(\Enlight_Event_EventArgs $arguments) {
         if ($this->getPlugin()->isResponsive()) {
@@ -59,6 +124,7 @@ class Frontend implements SubscriberInterface
 
     /**
      * Handle redirect to payment terminal, Responsive only
+     * @param \Enlight_Event_EventArgs $arguments
      */
     public function onSaveShippingPayment(\Enlight_Event_EventArgs $arguments)
     {
@@ -86,6 +152,7 @@ class Frontend implements SubscriberInterface
 
     /**
      * Add legal text, agreement & amount logic to payment selection, Emotion only
+     * @param \Enlight_Event_EventArgs $arguments
      */
     public function onFrontendAccountPostDispatch(\Enlight_Event_EventArgs $arguments) {
         if ($this->getPlugin()->isResponsive()) {
@@ -112,6 +179,7 @@ class Frontend implements SubscriberInterface
 
     /**
      * Checkout related modifications, both templates
+     * @param \Enlight_Event_EventArgs $arguments
      */
     public function onFrontendCheckoutPostDispatch(\Enlight_Event_EventArgs $arguments)
     {
