@@ -13,15 +13,34 @@
         };
 
         var addPpToDetailPage = function() {
-            var me = $('#easycredit-pp-plugin-box');
+            var productPrice = $(".product--buybox div.product--price"),
+                    target = null;
 
-            if (me === null) {
+            if (productPrice === null) {
                 return;
+            }
+
+            var productPriceSiblings = $(productPrice).siblings();
+
+            $.each(productPriceSiblings, function( key, value ) {
+                if (target !== null) {
+                    return;
+                }
+
+                var classes = $(value).attr('class');
+
+                if (classes !== undefined && classes.match(/product--tax/i)) {
+                    target = value;
+                }
+            });
+
+            if (target === null) {
+                target = productPrice;
             }
 
             var elementId = 'easycredit-pp-plugin-placeholder-' + guid(),
                     amount = function () {
-                        var price = $(me).parent().find('.price--default').text();
+                        var price = $(productPrice).text();
 
                         if (price === undefined) {
                             return NaN;
@@ -34,7 +53,7 @@
                 return;
             }
 
-            me.html('<div id="' + elementId + '"></div>');
+            $(target).after('<div id="' + elementId + '"></div>');
 
             window.rkPlugin.anzeige(elementId, {
                 webshopId: '{$EasyCreditApiKey}',
