@@ -201,11 +201,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
         $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
         $orderStatusRaw = $repository->getOrderStatusQuery($filters)->getArrayResult();
-        $orderStates = array();
+        $orderStates = array(
+            array(-1, '(Shopware-Standard)') // default: do nothing
+        );
         foreach ($orderStatusRaw as $o) {
             $orderStates[] = array($o['id'], $o['description']);
         }
-
+        file_put_contents('/tmp/orderStates.log', print_r($orderStates, true), FILE_APPEND);
         return  $orderStates;
     }
 
@@ -230,7 +232,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditOrderStatus',
             array(
                 'label' => 'Bestellungsstatus',
-                'value' => 0, // open
+                'value' => -1, // do nothing
                 'store' => $this->getOrderStates(),
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
             )

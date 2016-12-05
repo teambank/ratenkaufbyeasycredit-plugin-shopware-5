@@ -69,6 +69,12 @@ class Frontend implements SubscriberInterface
 
     public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
         $orderParams = $arguments->getReturn();
+        $newOrderState = $this->config->get('easycreditOrderStatus');
+
+        // use default shopware order state
+        if ($newOrderState === null || $newOrderState === -1 || !is_numeric($newOrderState)) {
+            return $orderParams;
+        }
 
         $paymentID = $orderParams['paymentID'];
 
@@ -79,7 +85,7 @@ class Frontend implements SubscriberInterface
             $paymentName = $payment->getName();
 
             if ($paymentName === \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap::PAYMENT_NAME) {
-                $orderParams['status'] = $this->config->get('easycreditOrderStatus');
+                $orderParams['status'] = $newOrderState;
             }
         }
 
