@@ -207,7 +207,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         foreach ($orderStatusRaw as $o) {
             $orderStates[] = array($o['id'], $o['description']);
         }
-        file_put_contents('/tmp/orderStates.log', print_r($orderStates, true), FILE_APPEND);
         return  $orderStates;
     }
 
