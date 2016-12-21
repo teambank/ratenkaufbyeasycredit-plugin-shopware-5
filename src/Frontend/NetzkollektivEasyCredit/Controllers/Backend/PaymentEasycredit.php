@@ -45,8 +45,7 @@ if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
         public function getWhitelistedCSRFActions()
         {
             return array(
-                'verifyCredentials',
-                'test'
+                'verifyCredentials'
             );
         }
     }
