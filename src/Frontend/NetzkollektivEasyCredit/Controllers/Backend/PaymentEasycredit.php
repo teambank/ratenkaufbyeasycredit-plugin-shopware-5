@@ -1,6 +1,6 @@
 <?php
-class Shopware_Controllers_Backend_PaymentEasycredit extends Shopware_Controllers_Backend_ExtJs implements \Shopware\Components\CSRFWhitelistAware {
 
+abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends Shopware_Controllers_Backend_ExtJs {
     public function verifyCredentialsAction() {
         /**
          * @var \Netzkollektiv\EasyCredit\Checkout $checkout
@@ -32,17 +32,27 @@ class Shopware_Controllers_Backend_PaymentEasycredit extends Shopware_Controller
         $orderStatus = $repository->getOrderStatusQuery($filters)->getArrayResult();
         $this->View()->assign(array('success' => true, 'data' => $orderStatus));
     }
+}
 
-    /**
-     * Returns a list with actions which should not be validated for CSRF protection
-     *
-     * @return string[]
-     */
-    public function getWhitelistedCSRFActions()
-    {
-        return array(
-            'verifyCredentials',
-            'test'
-        );
+if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
+    class Shopware_Controllers_Backend_PaymentEasycredit extends Shopware_Controllers_Backend_PaymentEasycredit_Abstract implements \Shopware\Components\CSRFWhitelistAware {
+
+        /**
+         * Returns a list with actions which should not be validated for CSRF protection
+         *
+         * @return string[]
+         */
+        public function getWhitelistedCSRFActions()
+        {
+            return array(
+                'verifyCredentials',
+                'test'
+            );
+        }
+    }
+} else {
+    class Shopware_Controllers_Backend_PaymentEasycredit extends Shopware_Controllers_Backend_PaymentEasycredit_Abstract {
+
     }
 }
+
