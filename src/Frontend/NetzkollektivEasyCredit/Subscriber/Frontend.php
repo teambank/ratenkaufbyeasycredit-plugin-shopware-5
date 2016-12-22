@@ -344,6 +344,7 @@ class Frontend implements SubscriberInterface
             $template->addTemplateDir($this->Path() . 'Views/responsive/');
         } else {
             $template->addTemplateDir($this->Path() . 'Views/emotion/');
+            $template->addTemplateDir($this->Path() . 'Views/emotion/index');
         }
     }
 
