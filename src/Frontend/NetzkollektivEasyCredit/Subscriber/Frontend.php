@@ -64,6 +64,13 @@ class Frontend implements SubscriberInterface
 
         $this->_registerTemplateDir();
 
+        $this->extendIndexTemplate($view, $config);
+    }
+
+    public function extendIndexTemplate($view, $config) {
+        if (!$this->getPlugin()->isResponsive()) {
+            $view->extendsTemplate('frontend/index/index.tpl');
+        }
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
     }
 
@@ -344,7 +351,6 @@ class Frontend implements SubscriberInterface
             $template->addTemplateDir($this->Path() . 'Views/responsive/');
         } else {
             $template->addTemplateDir($this->Path() . 'Views/emotion/');
-            $template->addTemplateDir($this->Path() . 'Views/emotion/index');
         }
     }
 
