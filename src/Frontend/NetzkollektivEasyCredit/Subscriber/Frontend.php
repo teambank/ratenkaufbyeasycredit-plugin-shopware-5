@@ -2,6 +2,8 @@
 namespace Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
+use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
+use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 
 class Frontend implements SubscriberInterface
 {
@@ -71,7 +73,15 @@ class Frontend implements SubscriberInterface
         if (!$this->getPlugin()->isResponsive()) {
             $view->extendsTemplate('frontend/index/index_pp.tpl');
         }
+
+        /**
+         * @var ProductContextInterface $context
+         */
+        $context = Shopware()->Container()->get('shopware_storefront.context_service')->getShopContext();
+        $locale = $context->getShop()->getLocale()->getLocale();
+
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
+        $view->assign('EasyCreditLocale', $locale);
     }
 
     public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {

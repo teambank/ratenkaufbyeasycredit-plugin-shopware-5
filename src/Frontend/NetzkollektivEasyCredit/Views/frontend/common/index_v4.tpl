@@ -67,5 +67,5 @@
         });
 
     }());
-
+// {$EasyCreditLocale}
 </script>
