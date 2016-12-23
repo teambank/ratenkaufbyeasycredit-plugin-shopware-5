@@ -71,7 +71,7 @@
 
             var re = new RegExp(thousandsSeparator, "g");
 
-            parseFloat(price.replace(/[^\d.,-]/g, '').replace(re, '').replace(decimalSeparator, '.'));
+            return parseFloat(price.replace(/[^\d.,-]/g, '').replace(re, '').replace(decimalSeparator, '.'));
         };
 
         var guid = function () {
