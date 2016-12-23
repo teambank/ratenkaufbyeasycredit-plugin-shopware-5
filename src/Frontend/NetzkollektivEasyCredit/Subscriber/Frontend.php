@@ -69,7 +69,7 @@ class Frontend implements SubscriberInterface
 
     public function extendIndexTemplate($view, $config) {
         if (!$this->getPlugin()->isResponsive()) {
-            $view->extendsTemplate('frontend/index/index.tpl');
+            $view->extendsTemplate('frontend/index/index_pp.tpl');
         }
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
     }
