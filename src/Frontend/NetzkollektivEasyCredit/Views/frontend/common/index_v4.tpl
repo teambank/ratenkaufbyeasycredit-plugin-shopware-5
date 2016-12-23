@@ -67,7 +67,7 @@
                 decimalSeparator = '.';
             }
 
-            thousandsSeparator = (decimalSeparator === '.') ? ',' : '.';
+            thousandsSeparator = (decimalSeparator === '.') ? ',' : '\\.';
 
             var re = new RegExp(thousandsSeparator, "g");
 
