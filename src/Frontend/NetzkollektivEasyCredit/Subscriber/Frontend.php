@@ -259,14 +259,28 @@ class Frontend implements SubscriberInterface
         $checkout = $action->get('easyCreditCheckout');
 
         $error = false;
+
         try {
             $checkout->checkInstallmentValues(round($this->_getAmount(), 2));
         } catch(\Exception $e) {
             $error = $e->getMessage();
         }
+
+        $agreement = '';
+
+        if (!$error) {
+            try {
+                $agreement = $checkout->getAgreement();
+            } catch (\Exception $e) { }
+        }
+
+        if ($error && $error === 'Der Webshop existiert nicht.') {
+            $error = 'Ratenkauf by easyCredit zur Zeit nicht verfügbar.';
+        }
+
         $view->assign('EasyCreditError', $error)
             ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
-            ->assign('EasyCreditAgreement', $checkout->getAgreement());
+            ->assign('EasyCreditAgreement', $agreement);
     }
 
     protected function _onCheckoutConfirm($view, $action) {
