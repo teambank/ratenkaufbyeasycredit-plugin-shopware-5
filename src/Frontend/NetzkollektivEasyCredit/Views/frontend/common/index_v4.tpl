@@ -48,8 +48,9 @@
 
 
             for (var p in priceElements) {
-                productPrice = buybox.find(priceElements[p]);
-                if (productPrice !== null) {
+                var find = buybox.find(priceElements[p]);
+                if (find.length > 0) {
+                    productPrice = find[0];
                     break;
                 }
             }
