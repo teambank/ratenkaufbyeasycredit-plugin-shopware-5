@@ -36,9 +36,23 @@
                     s4() + '-' + s4() + s4() + s4();
         };
 
+
         var addPpToDetailPage = function () {
-            var productPrice = $("#buybox").find(".article_details_price"),
+            var buybox = $("#buybox"),
+                    priceElements = [
+                        '.article_details_price',
+                        '.article_details_price2 strong'
+                    ],
+                    productPrice = null,
                     target = null;
+
+
+            for (var p in priceElements) {
+                productPrice = buybox.find(p);
+                if (productPrice !== null) {
+                    break;
+                }
+            }
 
             if (productPrice === null) {
                 return;
