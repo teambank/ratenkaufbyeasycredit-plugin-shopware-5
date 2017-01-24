@@ -41,7 +41,7 @@
             var buybox = $("#buybox"),
                     priceElements = [
                         '.article_details_price',
-                        '.article_details_price2 strong'
+                        '.article_details_price2'
                     ],
                     productPrice = null,
                     target = null;
@@ -79,7 +79,7 @@
 
             var elementId = 'easycredit-pp-plugin-placeholder-' + guid(),
                     amount = function () {
-                        var price = $(productPrice).text();
+                        var price = $(productPrice).find('strong').text();
 
                         if (price === undefined) {
                             return NaN;
