@@ -12,6 +12,29 @@
                     s4() + '-' + s4() + s4() + s4();
         };
 
+        var getPriceAsFloat = function (price) {
+            var separatorComa,
+                    separatorDot;
+
+            price = price.replace(/[^\d.,-]/g,'');
+
+            separatorComa = price.indexOf(',');
+            separatorDot = price.indexOf('.');
+
+            if (separatorComa > -1 && separatorDot > -1) {
+                if (separatorComa > separatorDot) {
+                    price = price.replace(/\./g, '');
+                    price = price.replace(',', '.');
+                } else {
+                    price = price.replace(/,/g, '');
+                }
+            }  else if (separatorComa > -1) {
+                price = price.replace(',', '.');
+            }
+
+            return parseFloat(price);
+        };
+
         var addPpToDetailPage = function() {
             var productPrice = $(".product--buybox div.product--price"),
                     target = null;
@@ -46,7 +69,7 @@
                             return NaN;
                         }
 
-                        return parseFloat(price.replace(/[^\d.,-]/g, '').replace(',', '.'));
+                        return getPriceAsFloat(price);
                     }();
 
             if (isNaN(amount)) {

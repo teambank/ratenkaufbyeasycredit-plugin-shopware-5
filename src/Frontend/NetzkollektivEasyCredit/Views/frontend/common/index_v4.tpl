@@ -2,76 +2,27 @@
 <script>
     (function () {
 
-        var sepLanguages = {
-            'gr': ',',
-            'id': ',',
-            'he': ',',
-            'de': ',',
-            'hu': ',',
-            'lt': ',',
-            'fi': ',',
-            'da': ',',
-            'ja': '.',
-            'fa': ',',
-            'sr': ',',
-            'hr': ',',
-            'es': ',',
-            'vn': ',',
-            'mk': ',',
-            'sk': ',',
-            'sl': ',',
-            'fr': ',',
-            'ca': ',',
-            'th': ',',
-            'pt': ',',
-            'lv': ',',
-            'tr': ',',
-            'bg': ',',
-            'af': ',',
-            'pl': ',',
-            'en': '.',
-            'ru': ',',
-            'ro': ',',
-            'ko': '.',
-            'it': ',',
-            'nl': ',',
-            'cs': ',',
-            'ukr': ','
-        };
+        var getPriceAsFloat = function (price) {
+            var separatorComa,
+                    separatorDot;
 
-        var sepCountries = {
-            'el_GR': ',',
-            'no_NB': ',',
-            'pt_PT': ',',
-            'zh_CN': '.',
-            'fr_CA': ',',
-            'pt_BR': '.',
-            'sv_SE': ',',
-            'no_NN': ',',
-            'en_GB': '.',
-            'sr_RS': ','
-        };
+            price = price.replace(/[^\d.,-]/g,'');
 
-        var parsePrice = function (price) {
-            var locale = '{$Shop->getLocale()->toString()}',
-                    s = locale.split('_'),
-                    lang = s[0],
-                    decimalSeparator,
-                    thousandsSeparator;
+            separatorComa = price.indexOf(',');
+            separatorDot = price.indexOf('.');
 
-            if (sepCountries.hasOwnProperty(locale)) {
-                decimalSeparator = sepCountries[locale];
-            } else if (sepLanguages.hasOwnProperty(lang)) {
-                decimalSeparator = sepLanguages[locale];
-            } else {
-                decimalSeparator = '.';
+            if (separatorComa > -1 && separatorDot > -1) {
+                if (separatorComa > separatorDot) {
+                    price = price.replace(/\./g, '');
+                    price = price.replace(',', '.');
+                } else {
+                    price = price.replace(/,/g, '');
+                }
+            }  else if (separatorComa > -1) {
+                price = price.replace(',', '.');
             }
 
-            thousandsSeparator = (decimalSeparator === '.') ? ',' : '\\.';
-
-            var re = new RegExp(thousandsSeparator, "g");
-
-            return parseFloat(price.replace(/[^\d.,-]/g, '').replace(re, '').replace(decimalSeparator, '.'));
+            return parseFloat(price);
         };
 
         var guid = function () {
@@ -119,7 +70,7 @@
                             return NaN;
                         }
 
-                        return parsePrice(price);
+                        return getPriceAsFloat(price);
                     }();
 
             if (isNaN(amount)) {
