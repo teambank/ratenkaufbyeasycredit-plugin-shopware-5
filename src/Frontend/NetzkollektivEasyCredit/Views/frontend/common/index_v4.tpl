@@ -48,7 +48,7 @@
 
 
             for (var p in priceElements) {
-                productPrice = buybox.find(p);
+                productPrice = buybox.find(priceElements[p]);
                 if (productPrice !== null) {
                     break;
                 }
