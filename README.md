@@ -1,6 +1,6 @@
-# easyCredit Magento Extension
+# easyCredit Shopware Extension
 
-Das easyCredit Zahlungsmodul für Magento ermöglicht es Ihnen durch einfache Installation Ratenkauf by easyCredit in Ihrem Shopware-Store anbieten zu können.
+Das easyCredit Zahlungsmodul für Shopware 4./5. ermöglicht es Ihnen durch einfache Installation Ratenkauf by easyCredit in Ihrem Shopware-Store anbieten zu können.
 Weitere Informationen zu easyCredit finden Sie unter  [Ratenkauf by easyCredit](https://www.easycredit.de/Ratenkauf.htm)
 
 ## Installation
@@ -27,4 +27,9 @@ Die Zahlungsarten-Konfiguration befindet sich in unter *System -> Konfiguration 
 
 ## Kompatibilität
 
-Die Extension wurde mit Shopware 5.2.10 getestet.
+Die Extension wurde mit folgenden Shopware Versionen und PHP5 getestet:
+* 4.3.0
+* 4.3.6
+* 5.1.3
+* 5.1.5
+* 5.2.x (auch PHP7)
