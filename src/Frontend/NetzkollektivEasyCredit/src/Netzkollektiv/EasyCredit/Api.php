@@ -3,10 +3,8 @@ namespace Netzkollektiv\EasyCredit;
 
 class Api
 {
-
-    const API_BASE_URL = 'https://www.easycredit.de/ratenkauf-ws/rest';
-    // TODO v0.4
-    const API_VERSION = 'v0.3';
+    const API_BASE_URL = 'https://ratenkauf.easycredit.de/ratenkauf-ws/rest';
+    const API_VERSION = 'v0.4';
 
     const API_MODEL_CALCULATION = 'modellrechnung/guenstigsterRatenplan/';
     const API_TEXT_CONSENT = 'texte/zustimmung';
@@ -18,8 +16,8 @@ class Api
     const REST_INTERNAL_VERIFY_CREDENTIALS = '/rest/V1/easycredit/verify/credentials';
     const REST_INTERNAL_VERIFY_CREDENTIALS_METHOD = 'get';
 
-    protected $_apiBaseUrl = 'https://www.easycredit.de/ratenkauf-ws/rest';
-    protected $_apiVersion = 'v0.3';
+    protected $_apiBaseUrl = self::API_BASE_URL;
+    protected $_apiVersion = self::API_VERSION;
 
     protected $_customerPrefixMalePatterns = array('Herr','Mr','male','männlich');
     protected $_customerPrefixFemalePatterns = array('Frau','Ms','Miss','Mrs','female','weiblich');
