@@ -86,8 +86,19 @@
                 });
             };
 
+            {if isset($EasyCreditShopwareLt53)}
+
             $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
             $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+
+            {else}
+
+            document.asyncReady(function() {
+                $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
+                $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+            });
+
+            {/if}
 
         }());
 

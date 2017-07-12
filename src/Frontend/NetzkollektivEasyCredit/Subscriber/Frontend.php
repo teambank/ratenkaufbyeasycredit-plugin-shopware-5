@@ -4,6 +4,7 @@ namespace Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
 use Enlight\Event\SubscriberInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
+use \Shopware;
 
 class Frontend implements SubscriberInterface
 {
@@ -75,6 +76,7 @@ class Frontend implements SubscriberInterface
         }
 
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
+        $view->assign('EasyCreditShopwareLt53', version_compare(Shopware::VERSION, '5.3.0', '<'));
     }
 
     public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
