@@ -32,9 +32,7 @@ class Frontend implements SubscriberInterface
     public static function getSubscribedEvents() {
         return array(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit'   => 'onGetControllerPathFrontend',
-            'Enlight_Controller_Action_Frontend_Account_SavePayment'                    => 'onSavePayment',
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Account'                   => 'onFrontendAccountPostDispatch',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget'
@@ -71,10 +69,6 @@ class Frontend implements SubscriberInterface
     }
 
     public function extendIndexTemplate($view, $config) {
-        if (!$this->getPlugin()->isResponsive()) {
-            $view->extendsTemplate('frontend/index/index_pp.tpl');
-        }
-
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
         $view->assign('EasyCreditShopwareLt53', version_compare(Shopware::VERSION, '5.3.0', '<'));
     }
@@ -82,6 +76,8 @@ class Frontend implements SubscriberInterface
     public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
         $orderParams = $arguments->getReturn();
         $newOrderState = $this->config->get('easycreditOrderStatus');
+
+        file_put_contents('/tmp/orderParams.log', print_r($orderParams, true), FILE_APPEND);
 
         // use default shopware order state
         if ($newOrderState === null || $newOrderState === -1 || !is_numeric($newOrderState)) {
@@ -104,52 +100,12 @@ class Frontend implements SubscriberInterface
         return $orderParams;
     }
 
-
-    /**
-     * Handle redirect to payment terminal, Emotion Template only
-     * @param \Enlight_Event_EventArgs $arguments
-     */
-    public function onSavePayment(\Enlight_Event_EventArgs $arguments) {
-        if ($this->getPlugin()->isResponsive()) {
-            return;
-        } 
-
-        $action = $arguments->getSubject();
-        $request = $action->Request();
-        $view = $action->View();
-        if (!$request->isPost()) {
-            return;
-        }
-
-        $values = $request->getPost('register');
-        $paymentId = $values['payment'];
-
-        if (!$this->getPlugin()->isSelected($paymentId)) {
-            $this->getPlugin()->clear();
-            return;
-        }
-
-        $agreementChecked = $request->getParam('sEasycreditAgreement');
-        if (empty($agreementChecked)) {
-            return;
-        }
-
-        if ($request->getParam('sTarget') !== 'checkout') {
-            return;
-        }
-        return $this->_handleRedirect($paymentId, $action);
-    }
-
     /**
      * Handle redirect to payment terminal, Responsive only
      * @param \Enlight_Event_EventArgs $arguments
      */
     public function onSaveShippingPayment(\Enlight_Event_EventArgs $arguments)
     {
-        if (!$this->getPlugin()->isResponsive()) {
-            return;
-        }
-
         $action = $arguments->getSubject();
         $request = $action->Request();
 
@@ -166,33 +122,6 @@ class Frontend implements SubscriberInterface
             return;
         }
         return $this->_handleRedirect($paymentId, $action);
-    }
-
-    /**
-     * Add legal text, agreement & amount logic to payment selection, Emotion only
-     * @param \Enlight_Event_EventArgs $arguments
-     */
-    public function onFrontendAccountPostDispatch(\Enlight_Event_EventArgs $arguments) {
-        if ($this->getPlugin()->isResponsive()) {
-            return;
-        }
-
-        $action = $arguments->getSubject();
-        $request = $action->Request();
-        $view = $action->View();
-
-        $this->_registerTemplateDir();
-
-        switch ($request->getActionName()) {
-            case 'payment':
-
-                if ($error = $this->_displayError($action)) {
-                    $view->sErrorFlag = 1;
-                    $view->sErrorMessages = $error;
-                }
-                $this->_extendPaymentTemplate($action, $view);
-                break;
-        }
     }
 
     /**
@@ -218,10 +147,6 @@ class Frontend implements SubscriberInterface
                 break;
 
             case 'shippingPayment':
-                if (!$this->getPlugin()->isResponsive()) {
-                    return;
-                }
-
                 if ($error = $this->_displayError($action)) {
                     $view->sBasketInfo = $error;
                 }
@@ -315,24 +240,13 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _redirToPaymentSelection($action) {
-        if ($this->getPlugin()->isResponsive()) {
-            $action->redirect(array(
-                'controller' => 'checkout',
-                'action' => 'shippingPayment'
-            ));
-        } else {
-            $action->redirect(array(
-                'controller' => 'account',
-                'action' => 'payment',
-                'sTarget'=>'checkout'
-            ));
-        }
+        $action->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'shippingPayment'
+        ));
     }
 
     protected function _extendConfirmTemplate($view) {
-        if (!$this->getPlugin()->isResponsive()) {
-            $view->extendsTemplate('frontend/checkout/confirm_easycredit.tpl');
-        }
         $view->assign('EasyCreditPaymentShowRedemption', true)
             ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
             ->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"])
@@ -361,16 +275,8 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _registerTemplateDir() {
-
         $template = $this->getPlugin()->get('template');
         $template->addTemplateDir($this->Path() . 'Views/');
-        $template->addTemplateDir($this->Path() . 'Views/common/');
-
-        if ($this->getPlugin()->isResponsive()) {
-            $template->addTemplateDir($this->Path() . 'Views/responsive/');
-        } else {
-            $template->addTemplateDir($this->Path() . 'Views/emotion/');
-        }
     }
 
     protected function _displayError($action) {
