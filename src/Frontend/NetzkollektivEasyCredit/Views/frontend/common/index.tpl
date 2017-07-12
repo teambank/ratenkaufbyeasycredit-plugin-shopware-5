@@ -37,10 +37,10 @@
             };
 
             var addPpToDetailPage = function() {
-                var productPrice = $(".product--buybox div.product--price"),
+                var productPrice = $(".product--buybox div.price--default"),
                         target = null;
 
-                if (productPrice === null) {
+                if (productPrice === null || productPrice.length === 0) {
                     return;
                 }
 
