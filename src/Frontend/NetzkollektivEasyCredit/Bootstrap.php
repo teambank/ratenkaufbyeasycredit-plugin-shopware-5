@@ -210,6 +210,25 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return  $orderStates;
     }
 
+    /**
+     * @return array
+     */
+    public function getPaymentStates() {
+        /**@var $repository \Shopware\Models\Order\Repository*/
+        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
+
+        $paymentStatusRaw = $repository->getPaymentStatusQuery($filters)->getArrayResult();
+
+        $paymentStates = array(
+            array(-1, '(Shopware-Standard)') // default: do nothing
+        );
+        foreach ($paymentStatusRaw as $o) {
+            $paymentStates[] = array($o['id'], $o['description']);
+        }
+        return  $paymentStates;
+    }
+
     protected function _createPaymentConfigForm()
     {
         $form = $this->Form();
@@ -233,6 +252,17 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Bestellungsstatus',
                 'value' => -1, // do nothing
                 'store' => $this->getOrderStates(),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditPaymentStatus',
+            array(
+                'label' => 'Zahlungsstatus',
+                'value' => -1, // do nothing
+                'store' => $this->getPaymentStates(),
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
             )
         );
