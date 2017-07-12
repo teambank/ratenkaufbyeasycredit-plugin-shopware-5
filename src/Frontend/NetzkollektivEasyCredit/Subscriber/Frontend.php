@@ -77,8 +77,6 @@ class Frontend implements SubscriberInterface
         $orderParams = $arguments->getReturn();
         $newOrderState = $this->config->get('easycreditOrderStatus');
 
-        file_put_contents('/tmp/orderParams.log', print_r($orderParams, true), FILE_APPEND);
-
         // use default shopware order state
         if ($newOrderState === null || $newOrderState === -1 || !is_numeric($newOrderState)) {
             return $orderParams;
