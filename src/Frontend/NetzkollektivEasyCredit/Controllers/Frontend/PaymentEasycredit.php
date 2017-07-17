@@ -4,7 +4,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     const CONNECTION_ERROR =  'Kommunikationsproblem mit Zahlungsprovider. Bitte versuchen sie es später nochmal.';
     
     /**
-     * @var Shopware_Plugins_Frontend_SwagPaymentPaypal_Bootstrap $plugin
+     * @var Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap $plugin
      */
     private $plugin;
 
@@ -102,7 +102,14 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $transactionUuid = $captureResult->uuid;
         $paymentUniqueId = $this->createPaymentUniqueId();
 
-        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId);
+        $paymentStatusId = null;
+        $configPaymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
+
+        if ($configPaymentStatusId && $configPaymentStatusId > -1 && is_numeric($configPaymentStatusId)) {
+            $paymentStatusId = $configPaymentStatusId;
+        }
+
+        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatusId);
 
         $this->saveTransactionUuidForOrderNumber($transactionUuid, $orderNumber);
 
