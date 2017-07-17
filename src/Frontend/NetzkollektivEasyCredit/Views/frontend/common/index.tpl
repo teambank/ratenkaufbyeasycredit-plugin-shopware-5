@@ -37,10 +37,10 @@
             };
 
             var addPpToDetailPage = function() {
-                var productPrice = $(".product--buybox div.product--price"),
+                var productPrice = $(".product--buybox div.price--default"),
                         target = null;
 
-                if (productPrice === null) {
+                if (productPrice === null || productPrice.length === 0) {
                     return;
                 }
 
@@ -86,8 +86,19 @@
                 });
             };
 
+            {if isset($EasyCreditShopwareLt53) && $EasyCreditShopwareLt53}
+
             $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
             $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+
+            {else}
+
+            document.asyncReady(function() {
+                $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
+                $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+            });
+
+            {/if}
 
         }());
 
