@@ -37,6 +37,20 @@
             };
 
             var addPpToDetailPage = function() {
+                var priceMeta = $("meta[itemprop=price]");
+                var price = null;
+
+                if (priceMeta.length === 1) {
+                    price = parseFloat($(priceMeta[0]).attr('content'));
+                } else {
+                    priceMeta = $('meta[property="product:price"]');
+
+                    if (priceMeta.length === 1) {
+                        price = getPriceAsFloat($(priceMeta[0]).attr('content'));
+                    }
+                }
+
+
                 var productPrice = $(".product--buybox div.price--default"),
                         target = null;
 
@@ -64,7 +78,12 @@
 
                 var elementId = 'easycredit-pp-plugin-placeholder-' + guid(),
                         amount = function () {
-                            var price = $(productPrice).text();
+                            // if price is identifed by meta tag
+                            if (price !== undefined && price !== null && !isNaN(price)) {
+                                return price;
+                            }
+
+                            price = $(productPrice).text();
 
                             if (price === undefined) {
                                 return NaN;
