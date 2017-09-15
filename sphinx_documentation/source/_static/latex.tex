@@ -1,0 +1,19 @@
+\ProvidesPackage{latex}[2017/06/17 v1.6.3 LaTeX package (Sphinx markup)]
+
+\definecolor{easyorange}{HTML}{F37122}
+
+\protected\def\sphinxcode#1{{\def\@tempa{alltt}%
+  \ifx\@tempa\@currenvir\else
+   \ifspx@opt@inlineliteralwraps
+      \sphinxbreaksviaactive\let\sphinxafterbreak\empty
+      % do not overwrite the comma set-up
+      \let\verbatim@nolig@list\sphinx@literal@nolig@list
+   \fi
+   % fix a space-gobbling issue due to LaTeX's original \do@noligs
+   \let\do@noligs\sphinx@do@noligs
+   \@noligs\endlinechar\m@ne\everyeof{}% (<- in case inside \sphinxhref)
+   \expandafter\scantokens
+  \fi {{\color{easyorange} \texttt{#1}}}}}
+\def\sphinx@do@noligs #1{\catcode`#1\active\begingroup\lccode`\~`#1\relax
+    \lowercase{\endgroup\def~{\leavevmode\kern\z@\char`#1 }}}
+\def\sphinx@literal@nolig@list {\do\`\do\<\do\>\do\'\do\-}%
