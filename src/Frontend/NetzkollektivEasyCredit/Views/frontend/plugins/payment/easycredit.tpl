@@ -5,17 +5,21 @@
 
     {if $EasyCreditThemeVersion == 2}
     <script>
-    jQuery(function($){
+    (function(){
+
         {include file="frontend/common/payment_error_js.tpl"}
-        checkEasycreditAvailable();
-    });
+
+        if (typeof document.asyncReady !== 'undefined') {
+            document.asyncReady(checkEasycreditAvailable);
+        } else {
+            checkEasycreditAvailable();
+        }
+    })();
     </script>
     {/if}
 {else}
 
     <div id="easycredit-description">
-
-        <p>Datenübermittlung Ratenkauf by easyCredit</p>
         <p>
             <label for="easycredit-agreement" class="easycredit-agreement {if $error_flags.sEasycreditAgreement}instyle_error{/if}">
                     <input type="checkbox" name="sEasycreditAgreement" class="required-entry" {if $payment_mean.id == $form_data.payment}required="required"{/if} id="easycredit-agreement" /> 

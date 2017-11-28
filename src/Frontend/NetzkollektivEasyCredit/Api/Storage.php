@@ -1,19 +1,22 @@
 <?php
-use Netzkollektiv\EasyCredit;
+namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
-class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Storage implements EasyCredit\StorageInterface {
-    public function setData($key,$value) {
+class Storage implements \Netzkollektiv\EasyCreditApi\StorageInterface {
+
+    public function set($key,$value) {
         if (!isset(Shopware()->Session()->EasyCredit)) {
             Shopware()->Session()->EasyCredit = array();
         }
         Shopware()->Session()->EasyCredit[$key] = $value;
+        return $this;
     }
 
-    public function getData($key) {
+    public function get($key) {
         return Shopware()->Session()->EasyCredit[$key];
     }
 
     public function clear() {
         unset(Shopware()->Session()->EasyCredit);
+        return $this;
     }
 }

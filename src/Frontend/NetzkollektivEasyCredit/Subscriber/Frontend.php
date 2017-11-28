@@ -1,10 +1,11 @@
 <?php
-namespace Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
+namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
+use Shopware\Plugins\NetzkollektivEasyCredit\Api;
 use Enlight\Event\SubscriberInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
-use \Shopware;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Frontend implements SubscriberInterface
 {
@@ -35,8 +36,23 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
-            'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget'
+            'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget',
+            'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
+            'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles'
         );
+    }
+
+    public function addJsFiles() {
+        $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
+        return new ArrayCollection(array(
+            $jsDir . 'easycredit-widget.js'
+        ));
+    }
+
+    public function addCssFiles(\Enlight_Event_EventArgs $args) {
+        return new ArrayCollection(array(
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css'
+        ));
     }
 
     public function onGetControllerPathFrontend() {
@@ -70,7 +86,6 @@ class Frontend implements SubscriberInterface
 
     public function extendIndexTemplate($view, $config) {
         $view->assign('EasyCreditApiKey', $config->get('easycreditApiKey'));
-        $view->assign('EasyCreditShopwareLt53', version_compare(Shopware::VERSION, '5.3.0', '<'));
     }
 
     public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
@@ -153,18 +168,18 @@ class Frontend implements SubscriberInterface
                 break;
 
             case 'finish':
-                $this->getPlugin()->unsetStorage();
+                $this->getPlugin()->clear();
         }
     }
 
     protected function _redirectToEasycredit($action) {
         try {
-            $checkout = $this->getPlugin()->get('easyCreditCheckout')
-               ->setCancelUrl($this->_getUrl('cancel'))
-               ->setReturnUrl($this->_getUrl('return'))
-               ->setRejectUrl($this->_getUrl('reject'))
-               ->start(new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote());
-            $this->getPlugin()->saveAddress();
+            $checkout = $this->getPlugin()->get('easyCreditCheckout')->start(
+                new Api\Quote(),
+                $this->_getUrl('cancel'),
+                $this->_getUrl('return'),
+                $this->_getUrl('reject')
+            );
  
             if ($url = $checkout->getRedirectUrl()) {
                 header('Location: '.$url);
@@ -180,15 +195,30 @@ class Frontend implements SubscriberInterface
         }
     }
 
+
+    protected function _getUser()
+    {
+        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
+            return Shopware()->Session()->sOrderVariables['sUserData'];
+        } else {
+            return Shopware()->Modules()->Admin()->sGetUserData();
+        }
+    }
+
     protected function _extendPaymentTemplate($action, $view) {
         $checkout = $action->get('easyCreditCheckout');
 
         $error = false;
 
         try {
-            $checkout->checkInstallmentValues(round($this->_getAmount(), 2));
+            $checkout->getInstallmentValues(round($this->_getAmount(), 2));
         } catch(\Exception $e) {
-            $error = $e->getMessage();
+            $error = str_replace('ratenkauf by easyCredit: ','',$e->getMessage());
+        }
+
+        $user = $this->_getUser();
+        if (isset($user['billingaddress']['company']) && !empty($user['billingaddress']['company'])) {
+            $error = 'Ein Ratenkauf ist nur für Privatpersonen möglich.';
         }
 
         $agreement = '';
@@ -200,7 +230,7 @@ class Frontend implements SubscriberInterface
         }
 
         if ($error && $error === 'Der Webshop existiert nicht.') {
-            $error = 'Ratenkauf by easyCredit zur Zeit nicht verfügbar.';
+            $error = 'ratenkauf by easyCredit zur Zeit nicht verfügbar.';
         }
 
         $view->assign('EasyCreditError', $error)
@@ -298,7 +328,7 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _getAmount(){
-        $quote = new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote();
+        $quote = new Api\Quote();
         return $quote->getGrandTotal();
     }
 

@@ -1,5 +1,4 @@
 {if isset($EasyCreditApiKey)}
-    <script src="https://ratenkauf.easycredit.de/ratenkauf/js/paymentPagePlugin.js" type="text/javascript"></script>
     <script>
         (function () {
             var guid = function () {
@@ -98,27 +97,32 @@
 
                 $(target).after('<div id="' + elementId + '"></div>');
 
-                window.rkPlugin.anzeige(elementId, {
-                    webshopId: '{$EasyCreditApiKey}',
-                    finanzierungsbetrag: amount,
-                    textVariante: 'KURZ'
+                $('#'+elementId).rkPaymentPage({
+                    webshopId : '{$EasyCreditApiKey}',
+                    amount: amount,
+                    modal: function(element, content, opts) {
+                        content = '<div class="easycredit-embed-responsive">'+content+'</div>';
+                        $.modal.open(content, {
+                            title: 'ratenkauf by easyCredit'
+                        });
+                        $.modal._$content.find('.easycredit-embed-responsive')
+                            .css('height','700px')
+                            .closest('.modal-inner-wrap')
+                            .css('max-width','600px');
+                    }
                 });
             };
 
-            {if isset($EasyCreditShopwareLt53) && $EasyCreditShopwareLt53}
 
-            $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
-            $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
-
-            {else}
-
-            document.asyncReady(function() {
+            var addSubscriber =  function(){
                 $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
                 $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
-            });
-
-            {/if}
-
+            }
+            if (typeof document.asyncReady !== 'undefined') {
+                document.asyncReady(addSubscriber);
+            } else {
+                addSubscriber();
+            }
         }());
 
     </script>

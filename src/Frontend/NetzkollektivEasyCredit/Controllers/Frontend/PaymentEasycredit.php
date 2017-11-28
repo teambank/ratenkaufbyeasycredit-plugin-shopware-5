@@ -1,8 +1,6 @@
 <?php
 class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controllers_Frontend_Payment
 {
-    const CONNECTION_ERROR =  'Kommunikationsproblem mit Zahlungsprovider. Bitte versuchen sie es später nochmal.';
-    
     /**
      * @var Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap $plugin
      */
@@ -59,27 +57,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return parent::createPaymentUniqueId();
     }
 
-    /**
-     * Index action method.
-     *
-     * Forwards to correct the action.
-     */
-
-    public function saveTransactionUuidForOrderNumber($transactionUuid, $orderNumber) {
-        $orderId = Shopware()->Db()->fetchOne(
-            'SELECT `id` FROM `s_order` WHERE `ordernumber`=?',
-            array($orderNumber)
-        );
-
-        Shopware()->Db()->update(
-            's_order_attributes',
-            array(
-                'easycredit_transaction_uuid' => $transactionUuid,
-            ),
-            'orderID=' . $orderId
-        );
-    }
-
     public function indexAction()
     {
         $checkout = $this->get('easyCreditCheckout');
@@ -92,14 +69,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             return;
         }
 
-        if (!isset($captureResult->uuid)) {
-            Shopware()->Session()->EasyCredit["apiError"] = self::CONNECTION_ERROR;
-            $this->redirectCheckoutConfirm();
-            return;
-        }
-
         $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
-        $transactionUuid = $captureResult->uuid;
         $paymentUniqueId = $this->createPaymentUniqueId();
 
         $paymentStatusId = null;
@@ -110,8 +80,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatusId);
-
-        $this->saveTransactionUuidForOrderNumber($transactionUuid, $orderNumber);
 
         $this->redirect(array(
             'controller' => 'checkout',

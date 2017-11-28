@@ -1,5 +1,5 @@
 <?php
-namespace Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
+namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 

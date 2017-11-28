@@ -1,9 +1,7 @@
 <?php
+namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
-use Netzkollektiv\EasyCredit;
-
-
-class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements EasyCredit\ItemInterface
+class Item implements \Netzkollektiv\EasyCreditApi\Rest\ItemInterface
 {
     private $db;
     private $rawItem;
@@ -16,6 +14,26 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements 
     private $price;
     private $categoryName;
     private $sku;
+
+    public function __construct($shopwareItem)
+    {
+
+        $this->db = Shopware()->Db();
+        $this->rawItem = $shopwareItem;
+
+        $this->name = $this->rawItem['articlename'];
+        $this->qty = $this->rawItem['quantity'];
+
+        $this->price = (isset($this->rawItem['additional_details']['price_numeric'])) ?
+            $this->rawItem['additional_details']['price_numeric']
+          : $this->rawItem['priceNumeric'];
+
+        $this->manufacturer = $this->rawItem['additional_details']['supplierName'];
+        $this->sku = $this->rawItem['id'];
+
+        $this->articleId = $this->rawItem['articleID'];
+        $this->loadCategory();
+    }
 
     private function getCategoryId() {
         $query = 'SELECT categoryID from s_articles_categories WHERE articleID = ?';
@@ -50,26 +68,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements 
         $this->categoryName = $this->getCategoryDescriptions();
     }
 
-    public function __construct($shopwareItem)
-    {
-
-        $this->db = Shopware()->Db();
-        $this->rawItem = $shopwareItem;
-
-        $this->name = $this->rawItem['articlename'];
-        $this->qty = $this->rawItem['quantity'];
-
-        $this->price = (isset($this->rawItem['additional_details']['price_numeric'])) ? 
-            $this->rawItem['additional_details']['price_numeric']
-          : $this->rawItem['priceNumeric'];
-
-        $this->manufacturer = $this->rawItem['additional_details']['supplierName'];
-        $this->sku = $this->rawItem['id'];
-
-        $this->articleId = $this->rawItem['articleID'];
-        $this->loadCategory();
-    }
-
     public function getName()
     {
         return $this->name;
@@ -90,7 +88,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements 
         return $this->manufacturer;
     }
 
-    public function getCategoryName()
+    public function getCategory()
     {
         return $this->categoryName;
     }
@@ -99,4 +97,5 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Item implements 
     {
         return $this->sku;
     }
+
 }

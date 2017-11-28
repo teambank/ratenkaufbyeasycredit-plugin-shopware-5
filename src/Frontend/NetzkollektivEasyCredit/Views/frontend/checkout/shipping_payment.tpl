@@ -3,15 +3,23 @@
 {block name="frontend_index_header_javascript_jquery_lib" append}
 
 <script>
-jQuery(function($){
+(function(){
     {include file="frontend/common/payment_error_js.tpl"}
 
-    checkEasycreditAvailable();
-    $.subscribe(
-        'plugin/swShippingPayment/onInputChanged', 
-        checkEasycreditAvailable
-    );
-});
+    var check = function() {
+        checkEasycreditAvailable();
+        $.subscribe(
+            'plugin/swShippingPayment/onInputChanged', 
+            checkEasycreditAvailable
+        );
+    }
+
+    if (typeof document.asyncReady !== 'undefined') {
+        document.asyncReady(check);
+    } else {
+        check();
+    }
+})();
 </script>
 {/block}
 

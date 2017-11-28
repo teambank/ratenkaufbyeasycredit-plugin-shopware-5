@@ -1,7 +1,8 @@
 <?php
-use Doctrine\Common\Collections\ArrayCollection;
-use Netzkollektiv\EasyCredit;
-use Shopware\Plugins\NetzkollektivEasycredit\Subscriber;
+use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
+use Shopware\Plugins\NetzkollektivEasyCredit\Api;
+
+use Netzkollektiv\EasyCreditApi;
 
 class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     extends Shopware_Components_Plugin_Bootstrap
@@ -13,12 +14,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getLabel()
     {
-        return 'Ratenkauf by easyCredit';
+        return 'ratenkauf by easyCredit';
     }
 
     public function getVersion()
     {
-        return '1.3.0';
+        return '1.4.0';
     }
 
     public function getInfo()
@@ -57,11 +58,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function afterInit()
     {
-        $loader = new \Doctrine\Common\ClassLoader('Netzkollektiv\EasyCredit', __DIR__ . '/src');
+        $loader = new \Doctrine\Common\ClassLoader('Netzkollektiv\EasyCreditApi', __DIR__ . '/Library/');
         $loader->register();
 
         $this->get('Loader')->registerNamespace(
-            'Shopware\Plugins\NetzkollektivEasycredit',
+            'Shopware\Plugins\NetzkollektivEasyCredit',
             $this->Path()
         );
     }
@@ -119,18 +120,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
-        $this->subscribeEvent(
-            'Theme_Compiler_Collect_Plugin_Javascript',
-            'onCollectJavascriptFiles'
-        );
-    }
-
-    public function onCollectJavascriptFiles() {
-        $jsDir = __DIR__ . '/Views/frontend/_public/src/js/';
-
-        return new ArrayCollection(array(
-            $jsDir . 'pp-plugin.js'
-        ));
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
@@ -140,17 +129,20 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function onInitResourceCheckout()
     {
-        $logger = new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Logger();
+        $logger = new Api\Logger();
+        $config = new Api\Config();
+        $clientFactory = new EasyCreditApi\Client\HttpClientFactory();
 
-        $apiClient = new EasyCredit\Api(array(
-            'api_key' => $this->Config()->get('easycreditApiKey'),
-            'api_token' => $this->Config()->get('easycreditApiToken'),
-            'debug_logging' => $this->Config()->get('easycreditDebugLogging')
-        ), $logger);
+        $client = new EasyCreditApi\Client(
+            $config,
+            $clientFactory,
+            $logger
+        );
+        $storage = new Api\Storage();
 
-        return new EasyCredit\Checkout(
-            $apiClient,
-            new Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Storage()
+        return new EasyCreditApi\Checkout(
+            $client,
+            $storage
         );
     }
 
@@ -312,26 +304,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
     }
 
-    protected function _getAmount(){
-        $quote = new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote();
-        return $quote->getGrandTotal();
-    }
-
-    public function isInterestAmountValid() {
-
-        $amountInterest = $this->getInterestAmount();
-        if (false == $amountInterest) {
-            return false;
-        }
-
-        $amountBasket = round($this->_getAmount(), 2);
-        $amountInterest = round($amountInterest, 2);
-        $amountBasketWithoutInterest = round($amountBasket - $amountInterest, 2);
-
-        $amountAuthorized = round(Shopware()->Session()->EasyCredit["authorized_amount"], 2);
-        $this->_debug('basket:'.$amountBasket.', interest: '.$amountInterest);
-        $this->_debug($amountAuthorized." == ".$amountBasketWithoutInterest);
-        return $amountAuthorized == $amountBasketWithoutInterest; 
+    public function getCheckout() {
+        return $this->get('easyCreditCheckout');
     }
 
     public function getInterestAmount()
@@ -351,23 +325,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return $this->getInterestAmount() !== false;
     }
 
+
     public function isValid() {
-        return $this->isInterestInBasket() 
-            && $this->isInterestAmountValid() 
-            && $this->isAddressValid();
+        $quote = new Api\Quote();
+
+        return $this->isInterestInBasket()
+            && $this->getCheckout()->isAmountValid($quote)
+            && $this->getCheckout()->verifyAddressNotChanged($quote);
     }
 
     public function clear() {
         $this->removeInterest();
-        $this->unsetStorage();
-    }
-
-    public function unsetStorage() {
-        if (count(Shopware()->Session()->EasyCredit) > 0) {
-            foreach (Shopware()->Session()->EasyCredit as $key => $value) {
-                unset(Shopware()->Session()->EasyCredit[$key]);
-            }
-        }
+        $this->getCheckout()->clear();
     }
 
     protected function _getUser()
@@ -392,15 +361,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function addInterest() {
-        if (!isset(Shopware()->Session()->EasyCredit["interest_amount"])
-            || empty(Shopware()->Session()->EasyCredit["interest_amount"])
-           ) {
+        $interestAmount = Shopware()->Session()->EasyCredit['interest_amount'];
+        if (empty($interestAmount)) {
             return;
         }
 
         $this->removeInterest();
-
-        $interest_amount = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
 
         $this->get('db')->insert(
             's_order_basket',
@@ -410,8 +376,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'articleID' => 0,
                 'ordernumber' => self::INTEREST_ORDERNUM,
                 'quantity' => 1,
-                'price' => $interest_amount,
-                'netprice' => $interest_amount,
+                'price' => $interestAmount,
+                'netprice' => $interestAmount,
                 'tax_rate' => 0,
                 'datum' => new Zend_Date(),
                 'modus' => 4,
@@ -426,7 +392,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function removeInterest()
     {
-        $this->_debug('removing interest');
         $session = Shopware()->Session();
 
         Shopware()->Db()->delete(
@@ -437,82 +402,5 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             )
         );
         Shopware()->Modules()->Basket()->sRefreshBasket();
-    }
-
-    public function isAddressValid() {
-        $authorizedAddress = Shopware()->Session()->EasyCredit['authorized_address'];
-
-        $this->_debug($authorizedAddress);
-        $this->_debug($this->_getAddress());
-        $this->_debug($this->_array_diff_recursive(
-            $authorizedAddress,
-            $this->_getAddress()
-        ));
-
-        return (
-            count($this->_array_diff_recursive(
-                $authorizedAddress,
-                $this->_getAddress()
-            )) == 0 && count($this->_array_diff_recursive(
-                $authorizedAddress,
-                $this->_getAddress('shipping')
-            )) == 0
-        );
-    }
-
-    protected function _array_diff_recursive($arr1, $arr2)
-    {
-        $outputDiff = [];
-
-        foreach ($arr1 as $key => $value)
-        {
-            if (array_key_exists($key, $arr2))
-            {
-                if (is_array($value))
-                {
-                    $recursiveDiff = $this->_array_diff_recursive($value, $arr2[$key]);
-
-                    if (count($recursiveDiff))
-                    {
-                        $outputDiff[$key] = $recursiveDiff;
-                    }
-                }
-                else if (!in_array($value, $arr2))
-                {
-                    $outputDiff[$key] = $value;
-                }
-            }
-            else if (!in_array($value, $arr2))
-            {
-                $outputDiff[$key] = $value;
-            }
-        }
-        return $outputDiff;
-    }
-
-    public function saveAddress() {
-        Shopware()->Session()->EasyCredit['authorized_address'] = $this->_getAddress();
-    }
-
-    protected function _getAddress($type = 'billing') {
-        $quote = new \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Classes_Quote();
-        $address = ($type == 'billing') ? $quote->getBillingAddress() : $quote->getShippingAddress();
-
-        return array(
-            $address->getStreet(),
-            $address->getCity(),
-            $address->getPostcode(),
-            $address->getCountryId()
-        );
-    }
-
-    protected function _debug($msg) {
-        if (self::DEBUG) {
-
-            if (is_array($msg)) {
-                $msg = print_r($msg,true);
-            }
-            file_put_contents('/shopware/debug.log',$msg.PHP_EOL,FILE_APPEND);
-        }
     }
 }
