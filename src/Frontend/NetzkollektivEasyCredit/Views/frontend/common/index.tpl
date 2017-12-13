@@ -95,6 +95,7 @@
                     return;
                 }
 
+                $(target).parent().find("[id^=easycredit-pp-plugin-placeholder]").remove();
                 $(target).after('<div id="' + elementId + '"></div>');
 
                 $('#'+elementId).rkPaymentPage({
