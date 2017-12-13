@@ -8,6 +8,27 @@ if (typeof define === 'function' && define.amd) {
 }
 }(function ($) {
 
+    var verifyStyle = function(selector) {
+        var rules;
+        var haveRule = false;
+        if (typeof document.styleSheets != "undefined") {
+            var cssSheets = document.styleSheets;
+            outerloop:
+            for (var i = 0; i < cssSheets.length; i++) {
+                rules =  (typeof cssSheets[i].cssRules != "undefined") ? cssSheets[i].cssRules : cssSheets[i].rules;
+                if (rules) {
+                    for (var j = 0; j < rules.length; j++) {
+                        if (rules[j].selectorText == selector) {
+                             haveRule = true;
+                            break outerloop;
+                        }
+                    }
+                }
+            }
+        }
+        return haveRule;
+    }
+
     window.easycreditBootstrapLoaded = false;
     var bootstrapModal = {
         bootstrapJs: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
@@ -38,6 +59,14 @@ if (typeof define === 'function' && define.amd) {
                 success: cb,
                 async: true
             });
+
+            if (!verifyStyle('modal-sm')) {
+                var link = document.createElement('link');
+                link.setAttribute("rel", "stylesheet");
+                link.setAttribute("type", "text/css");
+                link.setAttribute("href", 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css');
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
         },
         handleModal: function(element, content) {
             var modal = $(this.template);
@@ -147,9 +176,9 @@ if (typeof define === 'function' && define.amd) {
             opts.amount = $(this).data('easycredit-amount');
         }
 
-        if (isNaN(opts.amount) || opts.amount < 200 || opts.amount > 3000) {
+        if (isNaN(opts.amount) || opts.amount < 200 || opts.amount > 5000) {
             if (opts.debug) {
-                console.log(opts.amount+' is not between 200 and 3000');
+                console.log(opts.amount+' is not between 200 and 5000');
             }
             return;
         }
