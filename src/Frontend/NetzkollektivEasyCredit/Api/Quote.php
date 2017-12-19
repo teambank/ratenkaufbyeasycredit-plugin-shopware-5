@@ -75,12 +75,13 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     protected function _getItems($items) {
         $_items = array();
         foreach ($items as $item) {
-            $_items[] = new Quote\Item(
+            $quoteItem = new Quote\Item(
                 $item
             );
             if ($quoteItem->getPrice() == 0) {
                 continue;
             }
+            $_items[] = $quoteItem;
         }
         return $_items;
     }
