@@ -1,22 +1,9 @@
 {if $EasyCreditError}
+
     <div id="easycredit-error"> 
         {$EasyCreditError}
     </div>
 
-    {if $EasyCreditThemeVersion == 2}
-    <script>
-    (function(){
-
-        {include file="frontend/common/payment_error_js.tpl"}
-
-        if (typeof document.asyncReady !== 'undefined') {
-            document.asyncReady(checkEasycreditAvailable);
-        } else {
-            checkEasycreditAvailable();
-        }
-    })();
-    </script>
-    {/if}
 {else}
 
     <div id="easycredit-description">
@@ -29,46 +16,4 @@
 
     </div>
 
-    {if $EasyCreditThemeVersion == 2}
-    <script>
-        jQuery(function($){
-            var ecDesc = $('#easycredit-description');
-            var ecVal = ecDesc.closest('.method, .method_last').find('input.radio').val();
-            var toggleEasycreditDescription = function(){
-                if ($('input[name="register[payment]"]:checked').val() == ecVal) {
-                    ecDesc.show().attr('required','required');
-                } else {
-                    ecDesc.hide().find('input').attr('required',null);
-                }
-            };
-
-            $('input.radio[name="register[payment]"]')
-                .each(toggleEasycreditDescription)
-                .change(toggleEasycreditDescription);
-        });
-    </script>
-    {/if}
-
 {/if}
-
-<style>
-#easycredit-description>img {
- width: 46px;
- height: 35px;
-}
-#easycredit-description label {
- display:table;
- width: auto;
- font-weight: normal;
-}
-#easycredit-description label>input, #easycredit-description label>span {
- display:table-cell;
-}
-#easycredit-description label>input {
- margin-right:15px;
-}
-img.easycredit-disabled {
- -webkit-filter:grayscale(100%); 
- filter:grayscale(100%);
-}
-</style>

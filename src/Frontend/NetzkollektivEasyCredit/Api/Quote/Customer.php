@@ -42,6 +42,10 @@ class Customer implements \Netzkollektiv\EasyCreditApi\Rest\CustomerInterface
         return $dob;
     }
 
+    public function getCompany() {
+        return $this->_userData['billingaddress']['company'];
+    }
+
     public function getTelephone() {
         return $this->_userData['billingaddress']['phone'];
     }

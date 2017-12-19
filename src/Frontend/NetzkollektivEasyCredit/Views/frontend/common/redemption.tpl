@@ -1,11 +1,7 @@
 {if $EasyCreditPaymentShowRedemption}
     <div class="tos--panel panel has--border dispatch-methods">
         <div class="panel--title primary is--underline">
-            {if $EasyCreditThemeVersion == 2}
-            <h3 class="underline">ratenkauf by easyCredit Tilgungsplan</h3>
-            {else}
-            ratenkauf by easyCredit Tilgungsplan 
-            {/if}
+            ratenkauf by easyCredit Tilgungsplan
         </div>
         <div class="panel--body is--wide">
             {$EasyCreditPaymentRedemptionPlan}

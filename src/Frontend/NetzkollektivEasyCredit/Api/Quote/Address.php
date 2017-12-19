@@ -10,6 +10,14 @@ class Address implements \Netzkollektiv\EasyCreditApi\Rest\AddressInterface {
         $this->_address = $address;
     }
 
+    public function getFirstname() {
+        return $this->_address['firstname'];
+    }
+
+    public function getLastname() {
+        return $this->_address['lastname'];
+    }
+
     public function getStreet() {
         /* Shopware 4 saves street number with index 'streetnumber' */
         if (isset($this->_address['streetnumber']) && $this->_address['streetnumber'] != '') {

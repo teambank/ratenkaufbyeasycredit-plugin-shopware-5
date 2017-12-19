@@ -45,13 +45,15 @@ class Frontend implements SubscriberInterface
     public function addJsFiles() {
         $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
         return new ArrayCollection(array(
-            $jsDir . 'easycredit-widget.js'
+            $jsDir . 'easycredit-widget.js',
+            $jsDir . 'easycredit.js'
         ));
     }
 
     public function addCssFiles(\Enlight_Event_EventArgs $args) {
         return new ArrayCollection(array(
-            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css'
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
         ));
     }
 
@@ -211,18 +213,12 @@ class Frontend implements SubscriberInterface
         $error = false;
 
         try {
-            $checkout->getInstallmentValues(round($this->_getAmount(), 2));
+            $checkout->isAvailable(new Api\Quote());
         } catch(\Exception $e) {
-            $error = str_replace('ratenkauf by easyCredit: ','',$e->getMessage());
-        }
-
-        $user = $this->_getUser();
-        if (isset($user['billingaddress']['company']) && !empty($user['billingaddress']['company'])) {
-            $error = 'Ein Ratenkauf ist nur für Privatpersonen möglich.';
+            $error = $e->getMessage();
         }
 
         $agreement = '';
-
         if (!$error) {
             try {
                 $agreement = $checkout->getAgreement();
@@ -234,7 +230,6 @@ class Frontend implements SubscriberInterface
         }
 
         $view->assign('EasyCreditError', $error)
-            ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
             ->assign('EasyCreditAgreement', $agreement);
     }
 
@@ -276,7 +271,6 @@ class Frontend implements SubscriberInterface
 
     protected function _extendConfirmTemplate($view) {
         $view->assign('EasyCreditPaymentShowRedemption', true)
-            ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
             ->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"])
             ->assign(
                 'EasyCreditPaymentPreContractInformationUrl',

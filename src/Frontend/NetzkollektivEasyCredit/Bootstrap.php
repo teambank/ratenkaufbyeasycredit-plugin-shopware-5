@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.4.1';
+        return '1.4.2';
     }
 
     public function getInfo()
@@ -162,27 +162,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'action' => 'payment_easycredit',
                 'active' => 0,
                 'position' => 0,
-                'additionalDescription' => $this->_getPaymentLogo(). ' <a href="https://www.easycredit.de/Ratenkauf.htm" onclick="javascript:window.open(\'https://www.easycredit.de/Ratenkauf.htm\',\'whatiseasycredit\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600\'); return false;" class="easycredit-tooltip" style="color:#000000;">Was ist '.$this->getLabel().'?</a>',
+                'additionalDescription' => '',
                 'template' => 'easycredit.tpl',
                 'class' => 'easycredit',
             )
         );
-    }
-
-    protected function _getPaymentLogo($enabled = true)
-    {
-        $this->Application()->Template()->addTemplateDir(
-            $this->Path() . 'Views/'
-        );
-
-        $logo = array('<img id="rk_easycredit_logo"');
-        if (!$enabled) {
-            $logo[] = 'style="filter: grayscale(100%); -webkit-filter: grayscale(100%)"';
-        }
-        $logo[] = 'src="https://static.easycredit.de/content/image/logo/ratenkauf_42_55.png"';
-        $logo[] = 'alt="easycredit Logo" style="display:inline;">';
-
-        return implode(' ',$logo);
     }
 
     /**

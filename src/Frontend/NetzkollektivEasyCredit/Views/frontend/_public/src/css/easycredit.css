@@ -1,0 +1,34 @@
+.easycredit-method  label span {
+    background-image:url(https://www.easycredit-ratenkauf.de/download/200x43_Ratenkauf_Logo_mitSubline.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    text-indent: -10000px;
+    overflow: hidden;
+    display: inline-block;
+    height: 30px;
+    width:145px;
+    margin-bottom: 8px;
+}
+.easycredit-method .easycredit-tooltip {
+    position:absolute;
+    font-weight:normal;
+}
+#easycredit-description>img {
+ width: 46px;
+ height: 35px;
+}
+#easycredit-description label {
+ display:table;
+ width: auto;
+ font-weight: normal;
+}
+#easycredit-description label>input, #easycredit-description label>span {
+ display:table-cell;
+}
+#easycredit-description label>input {
+ margin-right:15px;
+}
+img.easycredit-disabled {
+ -webkit-filter:grayscale(100%);
+ filter:grayscale(100%);
+}
