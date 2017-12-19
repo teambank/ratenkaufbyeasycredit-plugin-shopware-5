@@ -78,6 +78,9 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
             $_items[] = new Quote\Item(
                 $item
             );
+            if ($quoteItem->getPrice() == 0) {
+                continue;
+            }
         }
         return $_items;
     }
