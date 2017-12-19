@@ -275,7 +275,7 @@ class Frontend implements SubscriberInterface
             ->assign(
                 'EasyCreditPaymentPreContractInformationUrl',
                 Shopware()->Session()->EasyCredit["pre_contract_information_url"]
-            );
+            )->assign('EasyCreditPaymentPlan',Shopware()->Session()->EasyCredit["payment_plan"]);
     }
     
     public function getPlugin() {
