@@ -17,7 +17,7 @@
 #easycredit-description label>input {
  margin-right:15px;
 }
-img.easycredit-disabled {
+span.easycredit-disabled {
  -webkit-filter:grayscale(100%);
  filter:grayscale(100%);
 }

@@ -5,7 +5,7 @@ var checkEasycreditAvailable = function() {
         var radio = method.find('input.radio').get(0);
         radio.disabled = true;
         radio.checked = false;
-        method.find('img').addClass('easycredit-disabled');
+        method.find('span').addClass('easycredit-disabled');
         method.find('.is--hidden').removeClass('is--hidden');
     }
 }
