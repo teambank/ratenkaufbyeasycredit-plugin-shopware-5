@@ -35,6 +35,7 @@ class Backend implements SubscriberInterface
             return;
         }
         $orderData = $orderData[0]['shipping'];
+        $postData = $postData['shipping'][0];
 
         foreach (array('firstName','lastName','street','zipCode','city','country_id') as $attribute) {
             if ($orderData[$attribute] != $postData[$attribute]) {

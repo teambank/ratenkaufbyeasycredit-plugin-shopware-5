@@ -119,7 +119,7 @@
 
 
     var addSubscriber =  function(){
-        $.subscribe('plugin/swAjaxProductNavigation/onProductNavigationFinished', addPpToDetailPage);
+        $.subscribe('plugin/swAjaxProductNavigation/onInit', addPpToDetailPage);
         $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
     }
     if (typeof document.asyncReady !== 'undefined' && typeof $('#main-script').attr('async') != 'undefined') {
