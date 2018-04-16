@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/dev/Debian) (preloaded format=xelatex 2018.4.4)  4 APR 2018 12:28
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/dev/Debian) (preloaded format=xelatex 2018.4.4)  4 APR 2018 15:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1382,175 +1382,145 @@ File: config-open.png Graphic file (type QTm)
 <use  "config-open.png" >
 
 Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 248.
+less on input line 252.
 
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 248.
+(babel)             in language  on input line 252.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 248.
+(babel)             in language  on input line 252.
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 248.
+(babel)             in language  on input line 252.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 248.
+(babel)             in language  on input line 252.
 [6
 
 ]
 File: config-dialog.png Graphic file (type QTm)
  <use  "config-dialog.png" >
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 Zeige
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 Modellrechner-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 Widget neben
- []
-
-
-Overfull \hbox (4.84863pt too wide) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 Bestellungsstatus| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 easyCredit Zu-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 gangsdaten
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 Zeige
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 Modellrechner-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 Widget neben
- []
-
-
-Overfull \hbox (4.84863pt too wide) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 Bestellungsstatus| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-[]|\EU1/DejaVuSerif(0)/m/n/10 easyCredit Zu-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 297--297
-\EU1/DejaVuSerif(0)/m/n/10 gangsdaten
- []
-
-
-Overfull \hbox (60.49098pt too wide) in paragraph at lines 297--298
- [][] 
- []
-
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 302.
+(babel)             in language  on input line 256.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 302.
+(babel)             in language  on input line 256.
+Package babel Info: Redefining ngerman shorthand "|
+(babel)             in language  on input line 261.
+Package babel Info: Redefining ngerman shorthand "~
+(babel)             in language  on input line 261.
 File: config-payment-active.png Graphic file (type QTm)
-<use  "config-payment-active.png" >
+ <use  "config-payment-active.png" >
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 314.
+(babel)             in language  on input line 267.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 314.
+(babel)             in language  on input line 267.
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 314.
+(babel)             in language  on input line 267.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 314.
+(babel)             in language  on input line 267.
  [7]
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 314.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 314.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 314.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 314.
- [8]
 File: config-payment-country.png Graphic file (type QTm)
 
 <use  "config-payment-country.png" >
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 321.
+(babel)             in language  on input line 272.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 321.
+(babel)             in language  on input line 272.
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 321.
+(babel)             in language  on input line 272.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 321.
- [9
+(babel)             in language  on input line 272.
+ [8]
+Package babel Info: Redefining ngerman shorthand "|
+(babel)             in language  on input line 272.
+Package babel Info: Redefining ngerman shorthand "~
+(babel)             in language  on input line 272.
 
-]
-Kapitel 4.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 321.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 321.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 324.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 324.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 335.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 335.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 349.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 349.
-Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 357.
-Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 357.
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 Zeige
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 Modellrechner-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 Widget neben
+ []
+
+
+Overfull \hbox (4.84863pt too wide) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 Bestellungsstatus| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 easyCredit Zu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 gangsdaten
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 Zeige
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 Modellrechner-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 Widget neben
+ []
+
+
+Overfull \hbox (4.84863pt too wide) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 Bestellungsstatus| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+[]|\EU1/DejaVuSerif(0)/m/n/10 easyCredit Zu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 320--320
+\EU1/DejaVuSerif(0)/m/n/10 gangsdaten
+ []
+
+
+Overfull \hbox (60.49098pt too wide) in paragraph at lines 320--321
+ [] 
+ []
+
 (./sw-easycredit.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 368.
-
-
-Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 368.
-
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 328.
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 368.
+(babel)             in language  on input line 328.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 368.
+(babel)             in language  on input line 328.
 Package babel Info: Redefining ngerman shorthand "|
-(babel)             in language  on input line 368.
+(babel)             in language  on input line 328.
 Package babel Info: Redefining ngerman shorthand "~
-(babel)             in language  on input line 368.
-[10
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 368.
+(babel)             in language  on input line 328.
+ [9]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 328.
  (./sw-easycredit.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 368.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 368.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 368.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 328.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 328.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 328.
  ) 
 Here is how much of TeX's memory you used:
- 24967 strings out of 493727
+ 24962 strings out of 493727
  447198 string characters out of 6147891
- 509848 words of memory out of 5000000
- 27970 multiletter control sequences out of 15000+600000
+ 510103 words of memory out of 5000000
+ 27965 multiletter control sequences out of 15000+600000
  9118 words of font info for 76 fonts, out of 8000000 for 9000
  1329 hyphenation exceptions out of 8191
- 46i,11n,59p,10400b,467s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 46i,12n,59p,10400b,467s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on sw-easycredit.pdf (12 pages).
+Output written on sw-easycredit.pdf (11 pages).

@@ -4,10 +4,10 @@ Konfiguration
 
 Die Konfiguration teilt sich auf in die Plugin-Konfiguration und die Zahlarten-Konfiguration. 
 
-Plugin konfigurieren
---------------------------
+Plugin-Einstellungen
+--------------------------------------
 
-.. image:: ./_static/config-open.png
+.. figure:: ./_static/config-open.png
            :scale: 50%
 
 * Öffnen Sie im Backend den Plugin-Manager. :menuselection:`Einstellungen -> Plugin-Manager`
@@ -19,6 +19,25 @@ Testen Sie die Zugangsdaten mit Klick auf **Zugangsdaten testen**.
 Nach dem erfolgreichen Test klicken Sie auf **Speichern**
 
 .. image:: ./_static/config-dialog.png
+
+Bezahlmethode für Versandarten aktivieren
+-----------------------------------------
+
+Im Shopware Backend können Sie unter :menuselection:`Einstellungen -> Versandkosten -> Versandart -> Zahlart Auswahl` die **ratenkauf by easyCredit** Bezahlmethode für eine bestimmte Versandmethode aktivieren.
+
+Allgemeine Bezahlmethodeneinstellungen
+--------------------------------------
+
+Allgemeine Einstellungen für **ratenkauf by easyCredit** finden Sie im Shopware Backend unter :menuselection:`Einstellungen -> Zahlungsarten -> easyCredit`. Hier können Sie unter anderem die Bezahlmethode für das gesamte Shopware System aktivieren/dekativieren oder nur für einzelne Länder bzw. Subshops zur Verfügung stellen.
+
+.. image:: ./_static/config-payment-active.png
+
+Aktivieren Sie hier im Reiter *Länder-Auswahl* das Land Deutschland, damit **ratenkauf by easyCredit** für Kunden aus Deutschland angezeigt wird.
+
+.. image:: ./_static/config-payment-country.png
+
+weitere Plugin-Einstellungen
+--------------------------------------
 
 .. tabularcolumns:: |p{85pt}|J|
 
@@ -39,23 +58,3 @@ Nach dem erfolgreichen Test klicken Sie auf **Speichern**
 +-----------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | easyCredit Zugangsdaten überprüfen            | Ein Klick auf diesen Button überprüft die Kombination von API-Key und -Token auf Gültigkeit. Bitte vergessen Sie nicht nach einem erfolgreichen Test noch auf Speichern zu klicken.                                                                                             |
 +-----------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
-Zahlungsart Einstellungen
--------------------------
-
-Im Shopware Backend öffnen Sie den Zahlungsarten Eintrag für **ratenkauf by easyCredit**
-
-    :menuselection:`System -> Konfiguration -> Zahlungsarten -> ratenkauf by easyCredit`
-
-Im ersten Reiter '*Generell*' stellen Sie sicher, dass **ratenkauf by easyCredit** aktiviert ist.
-
-.. image:: ./_static/config-payment-active.png
-
-.. raw:: latex
-
-    \clearpage
-
-Aktivieren Sie weiterhin im Reiter *Länder-Auswahl* das Land Deutschland.
-
-.. image:: ./_static/config-payment-country.png

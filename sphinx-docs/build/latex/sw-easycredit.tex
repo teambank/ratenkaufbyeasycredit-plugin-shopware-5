@@ -227,9 +227,13 @@ Fahren Sie anschließend mit der Konfiguration fort.
 Die Konfiguration teilt sich auf in die Plugin-Konfiguration und die Zahlarten-Konfiguration.
 
 
-\section{Plugin konfigurieren}
-\label{\detokenize{configuration:plugin-konfigurieren}}
+\section{Plugin-Einstellungen}
+\label{\detokenize{configuration:plugin-einstellungen}}
+\begin{figure}[htbp]
+\centering
+
 \noindent\sphinxincludegraphics[scale=0.5]{{config-open}.png}
+\end{figure}
 \begin{itemize}
 \item {} 
 Öffnen Sie im Backend den Plugin-Manager. \sphinxmenuselection{Einstellungen -\textgreater{} Plugin-Manager}
@@ -248,6 +252,25 @@ Nach dem erfolgreichen Test klicken Sie auf \sphinxstylestrong{Speichern}
 
 \noindent\sphinxincludegraphics{{config-dialog}.png}
 
+
+\section{Bezahlmethode für Versandarten aktivieren}
+\label{\detokenize{configuration:bezahlmethode-fur-versandarten-aktivieren}}
+Im Shopware Backend können Sie unter \sphinxmenuselection{Einstellungen -\textgreater{} Versandkosten -\textgreater{} Versandart -\textgreater{} Zahlart Auswahl} die \sphinxstylestrong{ratenkauf by easyCredit} Bezahlmethode für eine bestimmte Versandmethode aktivieren.
+
+
+\section{Allgemeine Bezahlmethodeneinstellungen}
+\label{\detokenize{configuration:allgemeine-bezahlmethodeneinstellungen}}
+Allgemeine Einstellungen für \sphinxstylestrong{ratenkauf by easyCredit} finden Sie im Shopware Backend unter \sphinxmenuselection{Einstellungen -\textgreater{} Zahlungsarten -\textgreater{} easyCredit}. Hier können Sie unter anderem die Bezahlmethode für das gesamte Shopware System aktivieren/dekativieren oder nur für einzelne Länder bzw. Subshops zur Verfügung stellen.
+
+\noindent\sphinxincludegraphics{{config-payment-active}.png}
+
+Aktivieren Sie hier im Reiter \sphinxstyleemphasis{Länder-Auswahl} das Land Deutschland, damit \sphinxstylestrong{ratenkauf by easyCredit} für Kunden aus Deutschland angezeigt wird.
+
+\noindent\sphinxincludegraphics{{config-payment-country}.png}
+
+
+\section{weitere Plugin-Einstellungen}
+\label{\detokenize{configuration:weitere-plugin-einstellungen}}
 
 \begin{savenotes}\sphinxattablestart
 \centering
@@ -297,69 +320,6 @@ Ein Klick auf diesen Button überprüft die Kombination von API-Key und -Token a
 \end{tabulary}
 \par
 \sphinxattableend\end{savenotes}
-
-
-\section{Zahlungsart Einstellungen}
-\label{\detokenize{configuration:zahlungsart-einstellungen}}
-Im Shopware Backend öffnen Sie den Zahlungsarten Eintrag für \sphinxstylestrong{ratenkauf by easyCredit}
-\begin{quote}
-
-\sphinxmenuselection{System -\textgreater{} Konfiguration -\textgreater{} Zahlungsarten -\textgreater{} ratenkauf by easyCredit}
-\end{quote}
-
-Im ersten Reiter ‚\sphinxstyleemphasis{Generell}‘ stellen Sie sicher, dass \sphinxstylestrong{ratenkauf by easyCredit} aktiviert ist.
-
-\noindent\sphinxincludegraphics{{config-payment-active}.png}
-
-\clearpage
-
-Aktivieren Sie weiterhin im Reiter \sphinxstyleemphasis{Länder-Auswahl} das Land Deutschland.
-
-\noindent\sphinxincludegraphics{{config-payment-country}.png}
-
-
-\chapter{Changelog}
-\label{\detokenize{changelog::doc}}\label{\detokenize{changelog:changelog}}
-
-\section{v1.3.0}
-\label{\detokenize{changelog:v1-3-0}}\begin{itemize}
-\item {} 
-Shopware 5.3.x Kompatibilität
-
-\item {} 
-kein Support mehr für Shopware 4.x
-
-\end{itemize}
-
-
-\section{v1.2}
-\label{\detokenize{changelog:v1-2}}\begin{itemize}
-\item {} 
-Shopware 5.2.x Kompatibilität
-
-\item {} 
-Rechtliche API-Übertragungsnachricht wird vom easyCredit Server dynamisch abgerufen
-
-\item {} 
-easyCredit API v4
-
-\end{itemize}
-
-
-\section{v1.1}
-\label{\detokenize{changelog:v1-1}}\begin{itemize}
-\item {} 
-Kompatibilitättests
-
-\end{itemize}
-
-
-\section{v1.0}
-\label{\detokenize{changelog:v1-0}}\begin{itemize}
-\item {} 
-erstes öffentliches Release
-
-\end{itemize}
 
 
 

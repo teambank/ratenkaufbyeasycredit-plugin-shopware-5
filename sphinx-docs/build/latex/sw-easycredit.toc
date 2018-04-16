@@ -7,10 +7,7 @@
 \contentsline {section}{\numberline {2.2}Installation über Datei-Upload}{4}{section.2.2}
 \contentsline {section}{\numberline {2.3}Installation über Kommandozeile}{4}{section.2.3}
 \contentsline {chapter}{\numberline {3}Konfiguration}{6}{chapter.3}
-\contentsline {section}{\numberline {3.1}Plugin konfigurieren}{6}{section.3.1}
-\contentsline {section}{\numberline {3.2}Zahlungsart Einstellungen}{7}{section.3.2}
-\contentsline {chapter}{\numberline {4}Changelog}{10}{chapter.4}
-\contentsline {section}{\numberline {4.1}v1.3.0}{10}{section.4.1}
-\contentsline {section}{\numberline {4.2}v1.2}{10}{section.4.2}
-\contentsline {section}{\numberline {4.3}v1.1}{10}{section.4.3}
-\contentsline {section}{\numberline {4.4}v1.0}{10}{section.4.4}
+\contentsline {section}{\numberline {3.1}Plugin-Einstellungen}{6}{section.3.1}
+\contentsline {section}{\numberline {3.2}Bezahlmethode für Versandarten aktivieren}{7}{section.3.2}
+\contentsline {section}{\numberline {3.3}Allgemeine Bezahlmethodeneinstellungen}{7}{section.3.3}
+\contentsline {section}{\numberline {3.4}weitere Plugin-Einstellungen}{9}{section.3.4}
