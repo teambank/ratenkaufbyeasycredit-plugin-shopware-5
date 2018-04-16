@@ -1,9 +1,12 @@
 {extends file='parent:frontend/checkout/confirm.tpl'}
-{block name='frontend_checkout_confirm_tos_panel' append}
+{block name='frontend_checkout_confirm_tos_panel'}
+    {$smarty.block.parent}
+
     {include file="frontend/common/redemption.tpl"}
 {/block}
 
-{block name='frontend_checkout_confirm_left_payment_method' append}
+{block name='frontend_checkout_confirm_left_payment_method'}
+    {$smarty.block.parent}
 
     {if $EasyCreditPaymentPlan}
     <p class="easycredit-info-description">

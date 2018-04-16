@@ -1,50 +1,22 @@
-.. role:: latex(raw)
-   :format: latex
-
 ============= 
 Konfiguration 
 =============
 
-Zu erst muss das Plugin konfiguriert werden und 
-danach noch als Zahlungsmethode für den deutschen Shop aktiviert werden.
+Die Konfiguration teilt sich auf in die Plugin-Konfiguration und die Zahlarten-Konfiguration. 
 
-Konfigurations Menü öffnen
+Plugin konfigurieren
 --------------------------
 
-.. image:: ./_static/config-open.png  
+.. image:: ./_static/config-open.png
            :scale: 50%
 
-Zu erst müssen Sie sich im Backend Ihrer Shopware 5 Installation anmelden, 
-der Link dafür ist:
+* Öffnen Sie im Backend den Plugin-Manager. :menuselection:`Einstellungen -> Plugin-Manager`
+* In der Liste der installierten Plugins sollte nun **ratenkauf by easyCredit** erscheinen. 
+* Öffnen Sie die Plugin-Konfiguration über das Stifte Icon (ganz rechts).
 
-.. only:: latex
-
-    :latex:`{{\color{easyorange} \texttt{http(s)://IHRE-SHOPWARE-URL.de/backend}}`
-
-.. only:: html
-
-    ``http(s)://IHRE-SHOPWARE-URL.de/backend``
-
-
-Öffnen Sie im Backend nun den Plugin-Manager. 
-Klicken Sie dazu entweder die drei Tasten `STRG + ALT + P` gleichzeitig 
-oder öffnen Sie den Manager mit der Maus über folgende Menü-Punkte: 
-
-.. only:: latex
-
-    :latex:`{{\color{easyorange} \texttt{Einstellungen -> Plugin-Manager}}`
-
-.. only:: html
-
-    ``Einstellungen -> Plugin-Manager``
-
-
-In der Liste der installierten Plugins sollte nun **ratenkauf by easyCredit** 
-mit aufgelistet sein. In dieser Zeile klicken Sie das Stifte Icon (roter Kasten (1)) 
-um die Plugin Konfiguration zu öffnen.
-
-Plugin Konfigurieren
---------------------
+Für eine Grundkonfiguration tragen Sie zumindest die Zugangsdaten (API Key & API Token) ein.
+Testen Sie die Zugangsdaten mit Klick auf **Zugangsdaten testen**.
+Nach dem erfolgreichen Test klicken Sie auf **Speichern**
 
 .. image:: ./_static/config-dialog.png
 
@@ -68,23 +40,15 @@ Plugin Konfigurieren
 | easyCredit Zugangsdaten überprüfen            | Ein Klick auf diesen Button überprüft die Kombination von API-Key und -Token auf Gültigkeit. Bitte vergessen Sie nicht nach einem erfolgreichen Test noch auf Speichern zu klicken.                                                                                             |
 +-----------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-**Bitte vergessen Sie nicht nach einem erfolgreichen Test noch auf Speichern zu klicken.**
 
 Zahlungsart Einstellungen
 -------------------------
 
-Im Shopware 5 Backend öffnen Sie den Zahlungsarten Eintrag für **ratenkauf by easyCredit**
+Im Shopware Backend öffnen Sie den Zahlungsarten Eintrag für **ratenkauf by easyCredit**
 
-.. only:: latex
+    :menuselection:`System -> Konfiguration -> Zahlungsarten -> ratenkauf by easyCredit`
 
-    :latex:`{{\color{easyorange} \texttt{System -> Konfiguration -> Zahlungsarten -> ratenkauf by easyCredit}}`
-
-.. only:: html
-
-    ``System -> Konfiguration -> Zahlungsarten -> ratenkauf by easyCredit``
-
-
-Im ersten Reiter '*Generell*' muss sichergestellt werden das **ratenkauf by easyCredit** aktiviert (gelbe Markierung (1)) ist:
+Im ersten Reiter '*Generell*' stellen Sie sicher, dass **ratenkauf by easyCredit** aktiviert ist.
 
 .. image:: ./_static/config-payment-active.png
 
@@ -92,6 +56,6 @@ Im ersten Reiter '*Generell*' muss sichergestellt werden das **ratenkauf by easy
 
     \clearpage
 
-Als letzter Schritt muss im Reiter '*Länder-Auswahl*' Deutschland aktiviert (gelber Kasten (1)) werden:
+Aktivieren Sie weiterhin im Reiter *Länder-Auswahl* das Land Deutschland.
 
 .. image:: ./_static/config-payment-country.png

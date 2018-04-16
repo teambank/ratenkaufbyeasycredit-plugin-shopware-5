@@ -3,14 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-easyCredit Shopware Extension
+ratenkauf by easyCredit für Shopware 5.x
 =========================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Inhaltsverzeichnis
-   
-   requirements.md
+  
+   requirements.rst 
    installation.rst
    configuration.rst
    changelog.rst

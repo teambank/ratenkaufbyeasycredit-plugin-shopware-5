@@ -1,0 +1,16 @@
+\select@language {ngerman}
+\contentsline {chapter}{\numberline {1}Voraussetzungen}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Versionskompatibilität}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}Zugangsdaten für „ratenkauf by easyCredit“}{1}{section.1.2}
+\contentsline {chapter}{\numberline {2}Installation}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}Installation über Shopware Community Store}{3}{section.2.1}
+\contentsline {section}{\numberline {2.2}Installation über Datei-Upload}{4}{section.2.2}
+\contentsline {section}{\numberline {2.3}Installation über Kommandozeile}{4}{section.2.3}
+\contentsline {chapter}{\numberline {3}Konfiguration}{6}{chapter.3}
+\contentsline {section}{\numberline {3.1}Plugin konfigurieren}{6}{section.3.1}
+\contentsline {section}{\numberline {3.2}Zahlungsart Einstellungen}{7}{section.3.2}
+\contentsline {chapter}{\numberline {4}Changelog}{10}{chapter.4}
+\contentsline {section}{\numberline {4.1}v1.3.0}{10}{section.4.1}
+\contentsline {section}{\numberline {4.2}v1.2}{10}{section.4.2}
+\contentsline {section}{\numberline {4.3}v1.1}{10}{section.4.3}
+\contentsline {section}{\numberline {4.4}v1.0}{10}{section.4.4}

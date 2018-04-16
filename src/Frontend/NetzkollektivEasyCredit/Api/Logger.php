@@ -42,7 +42,7 @@ class Logger implements \Netzkollektiv\EasyCreditApi\LoggerInterface {
         return $this;
     }
 
-    public function logWarning($msg) {
+    public function logWarn($msg) {
         $this->_logger->warning(
             $this->_format($msg)
         );

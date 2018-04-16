@@ -3,8 +3,8 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = python3 -msphinx
-SPHINXPROJ    = easyCreditShopwareExtension
+SPHINXBUILD   = sphinx-build
+SPHINXPROJ    = easycreitshopware
 SOURCEDIR     = source
 BUILDDIR      = build
 
