@@ -26,15 +26,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     public function get($name)
     {
-        if (version_compare(Shopware::VERSION, '4.2.0', '<') && Shopware::VERSION != '___VERSION___') {
-            if ($name == 'pluginlogger') {
-                $name = 'log';
-            }
-            $name = ucfirst($name);
-
-            return Shopware()->Bootstrap()->getResource($name);
-        }
-
         return Shopware()->Container()->get($name);
     }
 

@@ -8,7 +8,10 @@ class System implements \Netzkollektiv\EasyCreditApi\SystemInterface {
     }
 
     public function getSystemVersion() {
-        return \Shopware::VERSION;
+        if (defined('\Shopware::VERSION')) {
+            return \Shopware::VERSION;
+        }
+        return Shopware()->Container()->get('shopware.release.version');
     }
 
     public function getModuleVersion() {
