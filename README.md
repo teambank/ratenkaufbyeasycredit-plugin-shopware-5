@@ -1,7 +1,7 @@
 # easyCredit Shopware Extension
 
 Das easyCredit Zahlungsmodul für Shopware 4./5. ermöglicht es Ihnen durch einfache Installation Ratenkauf by easyCredit in Ihrem Shopware-Store anbieten zu können.
-Weitere Informationen zu easyCredit finden Sie unter  [Ratenkauf by easyCredit](https://www.easycredit.de/Ratenkauf.htm)
+Weitere Informationen zu easyCredit finden Sie unter  [Ratenkauf by easyCredit](https://www.easycredit-ratenkauf.de/haendler.htm)
 
 ## Installation
 

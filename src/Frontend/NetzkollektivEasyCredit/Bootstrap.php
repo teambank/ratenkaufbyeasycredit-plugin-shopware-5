@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.4.6';
+        return '1.4.7';
     }
 
     public function getInfo()
@@ -31,7 +31,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'author' => 'Teambank AG',
             'description' => 'Dieses Plugin ermöglicht die Zahlung mittels '.$this->getLabel(),
             'support' => 'service@easycredit.de',
-            'link' => 'https://www.easycredit.de/Ratenkauf.htm',
+            'link' => 'https://www.easycredit-ratenkauf.de/haendler.htm',
         );
     }
 
