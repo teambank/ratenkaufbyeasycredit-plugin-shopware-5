@@ -36,7 +36,7 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
-            'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget',
+            'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
             'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
             'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent'
@@ -92,6 +92,8 @@ class Frontend implements SubscriberInterface
         $config = $this->config;
         $widgetActive = $config->get('easycreditModelWidget');
 
+        $this->_registerTemplateDir();
+
         if (!$request->isDispatched()
             || $response->isException()
             || $request->getModuleName() != 'frontend'
@@ -101,8 +103,6 @@ class Frontend implements SubscriberInterface
         ) {
             return;
         }
-
-        $this->_registerTemplateDir();
 
         $this->extendIndexTemplate($view, $config);
     }
