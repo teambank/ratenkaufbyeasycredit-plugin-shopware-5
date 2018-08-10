@@ -17,16 +17,16 @@ Ext.Ajax.request({
     jsonData: true,
     success: function (response) {
         var data = Ext.decode(response.responseText),
-            title = '<span style=\"font-weight: bold;\">Ratenkauf by easyCredit</span>',
+            title = '<span style=\"font-weight: bold;\">ratenkauf by easyCredit</span>',
             text;
 
         if (!data.status) {
-            text = 'Bitte geben Sie den API-Key und den API-Token ein!'
+            text = 'Bitte geben Sie die Webshop-ID und das API-Kennwort ein!'
         } else {
             if (data.valid) {
                 text = 'Zugangsdaten korrekt. Plugin ist einsatzbereit!';
             } else {
-                text = 'Die Zugangsdaten sind inkorrekt. Bitte überprüfen Sie Ihre Eingaben.';
+                text = 'Die Zugangsdaten sind inkorrekt oder Ihr Webshop ist noch nicht aktiviert. <br><br>Bitte überprüfen Sie Ihre Eingaben oder wenden Sie sich an Ihren Ansprechpartner von ratenkauf by easyCredit.';
             }
         }
 

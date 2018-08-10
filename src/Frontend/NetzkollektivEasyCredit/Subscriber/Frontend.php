@@ -38,8 +38,29 @@ class Frontend implements SubscriberInterface
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatch_Frontend'                           => 'addEasyCreditModelWidget',
             'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
-            'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles'
+            'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
+            'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent'
         );
+    }
+
+
+    public function sInsertSurchargePercent(\Enlight_Hook_HookArgs $arguments) {
+
+        // remove interest from basket, so that the surcharge is not calculated based on amount including interest
+
+        $this->getPlugin()->removeInterest(false);
+
+        $arguments->setReturn(
+            $arguments->getSubject()->executeParent(
+                $arguments->getMethod(),
+                $arguments->getArgs()
+            )
+        );
+
+        // readd the interest, so that it is shown to the user
+
+        $this->getPlugin()->addInterest(false);
+        
     }
 
     public function addJsFiles() {

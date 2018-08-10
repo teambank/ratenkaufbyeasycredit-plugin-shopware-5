@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.4.7';
+        return '1.4.8';
     }
 
     public function getInfo()
@@ -216,8 +216,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditModelWidget',
             array(
                 'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
-                'value' => false,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Für den größten Erfolg mit dem ratenkauf by Easycredit empfehlen wir, das Widget zu aktivieren.'
             )
         );
 
@@ -257,10 +258,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'text',
             'easycreditApiKey',
             array(
-                'label' => 'API-Key',
+                'label' => 'Webshop-ID',
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'stripCharsRe' => ' '
+                'stripCharsRe' => ' ',
+                'description' => 'Ihre Webshop-ID finden Sie nach erfolgreicher Anmeldung im easyCredit Händlerinterface im Unterpunkt Shopadministration (z.B. 1.de.xxxx.1).'                
             )
         );
 
@@ -268,10 +270,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'text',
             'easycreditApiToken',
             array(
-                'label' => 'API-Token',
+                'label' => 'API-Kennwort',
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'stripCharsRe' => ' '
+                'stripCharsRe' => ' ',
+                'description' => 'Ihr API-Kennwort legen Sie im easyCredit Händlerinterface im Unterpunkt Shopadministration selbst fest.'
             )
         );
 
@@ -344,13 +347,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return $paymentId == $this->getPayment()->getId();
     }
 
-    public function addInterest() {
+    public function addInterest($refresh = true) {
         $interestAmount = Shopware()->Session()->EasyCredit['interest_amount'];
         if (empty($interestAmount)) {
             return;
         }
 
-        $this->removeInterest();
+        $this->removeInterest($refresh);
 
         $this->get('db')->insert(
             's_order_basket',
@@ -368,13 +371,16 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'currencyFactor' => 1
             )
         );
-        Shopware()->Modules()->Basket()->sRefreshBasket();
+
+        if ($refresh) {
+            Shopware()->Modules()->Basket()->sRefreshBasket();
+        }
     }
 
     /**
      * remove interest from basket via DB call
      */
-    public function removeInterest()
+    public function removeInterest($refresh = true)
     {
         $session = Shopware()->Session();
 
@@ -385,6 +391,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'ordernumber = ?' => self::INTEREST_ORDERNUM
             )
         );
-        Shopware()->Modules()->Basket()->sRefreshBasket();
+
+        if ($refresh) {
+            Shopware()->Modules()->Basket()->sRefreshBasket();
+        }
     }
 }
