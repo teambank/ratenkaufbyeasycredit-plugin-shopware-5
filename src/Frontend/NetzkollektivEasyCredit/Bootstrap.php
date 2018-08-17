@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.4.9';
+        return '1.5.0';
     }
 
     public function getInfo()
