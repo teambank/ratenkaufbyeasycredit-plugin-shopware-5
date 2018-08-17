@@ -8,85 +8,23 @@ if (typeof define === 'function' && define.amd) {
 }
 }(function ($) {
 
-    var verifyStyle = function(selector) {
-        var rules;
-        var haveRule = false;
-        if (typeof document.styleSheets != "undefined") {
-            var cssSheets = document.styleSheets;
-            outerloop:
-            for (var i = 0; i < cssSheets.length; i++) {
-                rules =  (typeof cssSheets[i].cssRules != "undefined") ? cssSheets[i].cssRules : cssSheets[i].rules;
-                if (rules) {
-                    for (var j = 0; j < rules.length; j++) {
-                        if (rules[j].selectorText == selector) {
-                             haveRule = true;
-                            break outerloop;
-                        }
-                    }
-                }
-            }
-        }
-        return haveRule;
-    }
-
-    window.easycreditBootstrapLoaded = false;
-    var bootstrapModal = {
-        bootstrapJs: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
-        template: ['<div class="modal fade" tabindex="-1" role="dialog">',
-              '<div class="modal-dialog" role="document">',
-                '<div class="modal-content">',
-                  '<div class="modal-header">',
-                    '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-                    '<h4 class="modal-title" style="color:#0066b3;">ratenkauf by easyCredit</h4>',
-                  '</div>',
-                  '<div class="modal-body easycredit-embed-responsive"></div>',
-                '</div>',
-              '</div>',
+    var easycreditModal = {
+        template: [
+            '<div class="easycredit-modal">',
+            '<div class="easycredit-embed-responsive"></div>',
             '</div>'
         ].join('\n'),
-        checkBootstrap: function() {
-            return (typeof $().modal == 'function');
-        },
-        ensureBootstrap: function(cb) {
-            if (this.checkBootstrap() || window.easycreditBootstrapLoaded) {
-                return cb();
-            }
-
-            window.easycreditBootstrapLoaded = true;
-            jQuery.ajax({
-                url: this.bootstrapJs,
-                dataType: 'script',
-                success: cb,
-                async: true
-            });
-
-            if (!verifyStyle('modal-sm')) {
-                var link = document.createElement('link');
-                link.setAttribute("rel", "stylesheet");
-                link.setAttribute("type", "text/css");
-                link.setAttribute("href", 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css');
-                document.getElementsByTagName("head")[0].appendChild(link);
-            }
-        },
         handleModal: function(element, content) {
-            var modal = $(this.template);
-            modal.find('.modal-body').css({
-                'height': '700px',
-                'max-height':'100%'
-            }).append(content);
-            $(element).append(modal);
-
-            modal.modal({
-                keyboard: false,
-                backdrop : 'static'
-            }).on('hidden.bs.modal', function(){
-                modal.remove();
+            var modal = $(this.template)
+            modal.find('.easycredit-embed-responsive').append(content).css({
+                'height': '900px',
+                'max-height':'900px'
             });
+            $(element).append(modal);
+            modal.easycreditmodal();
         },
         init: function(element, content) {
-            this.ensureBootstrap(function(){
-                this.handleModal(element,content);
-            }.bind(this));
+            this.handleModal(element,content);
         }
     }
 
@@ -94,7 +32,7 @@ if (typeof define === 'function' && define.amd) {
         hostname: 'https://ratenkauf.easycredit.de',
         endpoint: '/ratenkauf-ws/rest/v1/modellrechnung/guenstigsterRatenplan',
         iframeSrc: '/ratenkauf/content/intern/paymentPageBeispielrechnung.jsf',
-        modal: bootstrapModal.init.bind(bootstrapModal),
+        modal: easycreditModal.init.bind(easycreditModal),
         webshopId: null,
         amount: null,
         debug: false,
