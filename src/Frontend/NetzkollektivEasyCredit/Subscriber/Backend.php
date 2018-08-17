@@ -31,6 +31,7 @@ class Backend implements SubscriberInterface
         $query = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')->getOrdersQuery(array(array('property' => 'orders.id', 'value' => $id)), array());
 
         $orderData = $query->getArrayResult();
+
         if (!isset($orderData[0]['shipping'])) {
             return;
         }
@@ -42,7 +43,7 @@ class Backend implements SubscriberInterface
 
                 $_this->View()->assign(array(
                     'success' => false,
-                    'data' => $_this->Request()->getParams(),
+                    'data' => $orderData[0],
                     'message' => 'Die Lieferadresse kann bei mit ratenkauf by easyCredit bezahlten Bestellungen nicht im Nachhinein geändert werden. Bitte stornieren Sie die Bestellung und Zahlung hierfür und legen Sie eine neue Bestellung an.'
                 ));
 
