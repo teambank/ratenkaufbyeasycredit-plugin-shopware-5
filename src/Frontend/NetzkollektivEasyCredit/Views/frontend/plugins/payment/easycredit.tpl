@@ -1,3 +1,4 @@
+{if $Controller == "checkout"}
 {if $EasyCreditError}
 
     <div id="easycredit-error"> 
@@ -16,4 +17,5 @@
 
     </div>
 
+{/if}
 {/if}
