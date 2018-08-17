@@ -331,7 +331,7 @@ class Frontend implements SubscriberInterface
                 $apiError.='.';
             }
 
-            $error = Shopware()->Snippets()->getSnippet()->get(
+            $error = Shopware()->Snippets()->getNamespace()->get(
                 'CheckoutSelectPremiumVariant',
                 $apiError.' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.',
                 true
