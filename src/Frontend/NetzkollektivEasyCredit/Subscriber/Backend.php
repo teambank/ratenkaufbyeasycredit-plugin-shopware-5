@@ -40,7 +40,6 @@ class Backend implements SubscriberInterface
         foreach (array('firstName','lastName','street','zipCode','city','country_id') as $attribute) {
             if ($orderData[$attribute] != $postData[$attribute]) {
 
-                $namespace = Shopware()->Snippets()->getNamespace('backend/order');
                 $_this->View()->assign(array(
                     'success' => false,
                     'data' => $_this->Request()->getParams(),
