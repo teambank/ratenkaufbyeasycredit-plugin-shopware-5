@@ -51,7 +51,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createEvents();
         $this->_createPaymentConfigForm();
         $this->_createPayment();
-        $this->_createAdditionalOrderAttributes();
 
         return true;
     }
@@ -64,15 +63,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->get('Loader')->registerNamespace(
             'Shopware\Plugins\NetzkollektivEasyCredit',
             $this->Path()
-        );
-    }
-
-    protected function _createAdditionalOrderAttributes() {
-        Shopware()->Models()->addAttribute('s_order_attributes','easycredit','transaction_uuid','varchar(255)');
-        $metaDataCache = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
-        $metaDataCache->deleteAll();
-        Shopware()->Models()->generateAttributeModels(
-            array('s_order_attributes')
         );
     }
 
