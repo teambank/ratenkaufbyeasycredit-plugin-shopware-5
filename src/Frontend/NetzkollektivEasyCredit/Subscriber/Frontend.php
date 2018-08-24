@@ -370,11 +370,7 @@ class Frontend implements SubscriberInterface
                 $apiError.='.';
             }
 
-            $error = Shopware()->Snippets()->getNamespace()->get(
-                'CheckoutSelectPremiumVariant',
-                $apiError.' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.',
-                true
-            );
+            $error = $apiError.' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.';
             Shopware()->Session()->EasyCredit["apiError"] = null;
             $this->getPlugin()->clear();
         }
