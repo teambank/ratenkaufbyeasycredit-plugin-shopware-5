@@ -81,8 +81,8 @@ class Frontend implements SubscriberInterface
             $this->db->query("UPDATE s_order o
                 INNER JOIN s_order_details od ON od.orderID = o.id AND articleordernumber = ?
                 SET
-                    o.invoice_amount = o.invoice_amount - od.price,
-                    o.invoice_amount_net = o.invoice_amount_net - od.price
+                    o.invoice_amount = ROUND(o.invoice_amount - od.price,2),
+                    o.invoice_amount_net = ROUND(o.invoice_amount_net - od.price,2)
                 WHERE o.ordernumber = ?", [self::INTEREST_ORDERNUM, $orderNumber]
             );
 
