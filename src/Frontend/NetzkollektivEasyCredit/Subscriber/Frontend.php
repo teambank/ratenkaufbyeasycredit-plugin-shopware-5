@@ -19,6 +19,8 @@ class Frontend implements SubscriberInterface
      */
     protected $config;
 
+    protected $db;
+
     /**
      * Frontend constructor.
      *
@@ -28,6 +30,7 @@ class Frontend implements SubscriberInterface
     {
         $this->bootstrap = $bootstrap;
         $this->config = $bootstrap->Config();
+        $this->db = Shopware()->Db();
     }
 
     public static function getSubscribedEvents() {
@@ -39,7 +42,8 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
             'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
             'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
-            'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent'
+            'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
+            'sOrder::sSaveOrder::after'                                                 => 'removeInterestFromOrder'
         );
     }
 
@@ -61,6 +65,41 @@ class Frontend implements SubscriberInterface
 
         $this->getPlugin()->addInterest(false);
         
+    }
+
+    public function removeInterestFromOrder(\Enlight_Hook_HookArgs $args) {
+        if (!$this->config->get('easycreditRemoveInterestFromOrder')) {
+            return;
+        }
+
+        $orderNumber = $args->getReturn();
+
+        try {
+            $this->db->beginTransaction();
+
+            // subtract interest from total amount
+            $this->db->query("UPDATE s_order o
+                INNER JOIN s_order_details od ON od.orderID = o.id AND articleordernumber = ?
+                SET
+                    o.invoice_amount = o.invoice_amount - od.price,
+                    o.invoice_amount_net = o.invoice_amount_net - od.price
+                WHERE o.ordernumber = ?", [self::INTEREST_ORDERNUM, $orderNumber]
+            );
+
+            // remove interest position
+            $this->db->query("DELETE s_order_details
+                FROM s_order_details
+                INNER JOIN s_order o ON s_order_details.orderID = o.id
+                WHERE o.ordernumber = ?
+                AND s_order_details.articleordernumber = ?;
+            ", [$orderNumber, self::INTEREST_ORDERNUM]);
+
+            $this->db->commit();
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw new Enlight_Exception("Removal of interest failed:" . $e->getMessage(), 0, $e);
+        }
+
     }
 
     public function addJsFiles() {

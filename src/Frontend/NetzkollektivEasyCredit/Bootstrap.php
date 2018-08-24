@@ -19,7 +19,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.5.0';
+        return '1.5.1';
     }
 
     public function getInfo()
@@ -51,6 +51,17 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createEvents();
         $this->_createPaymentConfigForm();
         $this->_createPayment();
+
+        return true;
+    }
+
+   /**
+     * @param $version string
+     * @return array
+     */
+    public function update($version)
+    {
+        $this->_createPaymentConfigForm();
 
         return true;
     }
@@ -231,6 +242,17 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'value' => -1, // do nothing
                 'store' => $this->getPaymentStates(),
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditRemoveInterestFromOrder',
+            array(
+                'label' => 'Zinsen nach Bestellabschluss aus Bestellung entfernen',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Die Ausweisung der beim Ratenkauf anfallenden Zinsen ggü. dem Kunden ist rechtlich erforderlich. Für die Klärung, wie Sie die Zinsen mit in Ihre Buchhaltung übernehmen, empfehlen wir Ihnen sich mit Ihrem Steuerberater abzustimmen.'
             )
         );
 
