@@ -34,3 +34,15 @@ span.easycredit-disabled {
     width:145px; 
     overflow:hidden;
 }
+
+body.is--ctl-checkout.is--act-shippingpayment .panel--footer {
+   position: fixed;
+   bottom: 70px;
+   background: #fff;
+   width: 100%;
+   padding: 15px;
+   border-top: 1px solid @border-color;
+}
+body.is--ctl-checkout.is--act-shippingpayment .address-manager--modal.address-manager--editor .address-editor--body {
+   .unitize(padding-bottom, 50);
+}

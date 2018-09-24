@@ -1,4 +1,9 @@
 {if $Controller == "checkout"}
+
+{if $EasyCreditAddressError}
+<div data-easycredit-address-editor="true" data-sessionKey="checkoutShippingAddressId" data-id="{$EasyCreditActiveBillingAddressId}"></div>
+{/if}
+
 {if $EasyCreditError}
 
     <div id="easycredit-error"> 
