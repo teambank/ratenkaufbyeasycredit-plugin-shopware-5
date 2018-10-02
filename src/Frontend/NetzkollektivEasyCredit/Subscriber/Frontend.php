@@ -353,7 +353,7 @@ class Frontend implements SubscriberInterface
             
     }
 
-    public function onFrontendAddressPostDispatch(\Enlight_Hook_HookArgs $args) {
+    public function onFrontendAddressPostDispatch(\Enlight_Event_EventArgs $args) {
         $action = $args->getSubject();
         $request = $action->Request();
         $view = $action->View();
