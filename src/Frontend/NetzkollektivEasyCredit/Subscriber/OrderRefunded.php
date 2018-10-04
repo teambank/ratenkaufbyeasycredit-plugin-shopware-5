@@ -14,8 +14,25 @@ class OrderRefunded extends OrderStatusChanged
     }
 
     public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
-file_put_contents('/tmp/bla','refunded'.PHP_EOL,FILE_APPEND);
 
+        try {
+            $order = $eventArgs->getEntity();
+            if (empty($order->getTransactionId())) {
+                throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
+            }
 
+           $merchantClient = Shopware()->Container()->get('easyCreditMerchant');
+           $transactions = $merchantClient->search($order->getTransactionId());
+           if (count($transactions) != 1) {
+                throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion existiert nicht.');
+            }
+            $merchantClient->cancelOrder($order->getTransactionId(),'WIDERRUF_VOLLSTAENDIG');
+
+        } catch (\Exception $e) {
+            $error = $e->getMessage().' '; 
+            $error.= "Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Händler-Interface (https://app.easycredit.de/).";
+
+            $GLOBALS['easycreditMerchantStatusChangedError'] = $error;
+        }
     }
 }

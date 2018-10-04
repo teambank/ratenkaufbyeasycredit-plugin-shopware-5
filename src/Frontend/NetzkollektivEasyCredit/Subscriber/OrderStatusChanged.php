@@ -28,11 +28,10 @@ abstract class OrderStatusChanged implements EventSubscriber
         ) {
             return;
         }
-file_put_contents('/tmp/bla',$this->config($this->getConfigKey().'Status').'=='.$eventArgs->getNewValue('orderStatus')->getId().PHP_EOL,FILE_APPEND);
+
         $orderStatus = $eventArgs->getNewValue('orderStatus')->getId();
         if ($this->config($this->getConfigKey())
-            && $this->config($this->getConfigKey().'Status') 
-                == $eventArgs->getNewValue('orderStatus')->getId()
+            && $this->config($this->getConfigKey().'Status') == $eventArgs->getNewValue('orderStatus')->getId()
         ) {
             $this->_onOrderStatusChanged($eventArgs);
         }
