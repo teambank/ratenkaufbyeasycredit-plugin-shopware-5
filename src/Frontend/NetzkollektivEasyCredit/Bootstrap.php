@@ -127,6 +127,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
+        $this->subscribeEvent(
+            'Enlight_Bootstrap_InitResource_EasyCreditMerchant',
+            'onInitResourceMerchant'
+        );
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
@@ -155,6 +159,19 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return new EasyCreditApi\Checkout(
             $client,
             $storage
+        );
+    }
+
+    public function onInitResourceMerchant()
+    {
+        $logger = new Api\Logger();
+        $config = new Api\Config();
+        $clientFactory = new EasyCreditApi\Client\HttpClientFactory();
+
+        return new EasyCreditApi\Merchant(
+            $config,
+            $clientFactory,
+            $logger
         );
     }
 
