@@ -52,7 +52,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createPaymentConfigForm();
         $this->_createPayment();
 
-        return true;
+        return array(
+            'success' => true,
+            'invalidateCache' => array('config', 'backend', 'proxy', 'frontend'),
+        );
     }
 
    /**
@@ -63,7 +66,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     {
         $this->_createPaymentConfigForm();
 
-        return true;
+        return array(
+            'success' => true,
+            'invalidateCache' => array('config', 'backend', 'proxy', 'frontend'),
+        );
     }
 
     public function afterInit()
