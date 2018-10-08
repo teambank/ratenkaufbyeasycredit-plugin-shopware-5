@@ -35,6 +35,10 @@ span.easycredit-disabled {
     overflow:hidden;
 }
 
+body.is--ctl-checkout.is--act-shippingpayment .js--modal.sizing--content {
+    top: auto !important;
+    bottom: 10%;
+}
 body.is--ctl-checkout.is--act-shippingpayment .panel--footer {
    position: fixed;
    bottom: 10%;
@@ -44,6 +48,19 @@ body.is--ctl-checkout.is--act-shippingpayment .panel--footer {
    border-top: 1px solid @border-color;
    max-width:650px;
 }
+body.is--ctl-checkout.is--act-shippingpayment .js--modal.sizing--auto.is--fullscreen .panel--footer {
+    bottom: 0;
+}
 body.is--ctl-checkout.is--act-shippingpayment .address-manager--modal.address-manager--editor .address-editor--body {
    .unitize(padding-bottom, 50);
+}
+
+@media only screen and (max-width: 47.9em) {
+    body.is--ctl-checkout.is--act-shippingpayment .easycredit-method .method--name a {
+        position: static;
+        display: block;
+    }
+    body.is--ctl-checkout.is--act-shippingpayment .easycredit-method .method--name br {
+        display: none;
+    }
 }
