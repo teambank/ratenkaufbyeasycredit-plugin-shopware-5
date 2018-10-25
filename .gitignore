@@ -3,3 +3,6 @@
 /tools/tmp
 shopware/*
 .idea/*
+/build
+/dist
+/.db
