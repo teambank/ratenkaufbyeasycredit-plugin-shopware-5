@@ -280,7 +280,8 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _getActiveBillingAddressId() {
-        if (empty($activeBillingAddressId = Shopware()->Session()->offsetGet('checkoutBillingAddressId'))) {
+        $activeBillingAddressId = Shopware()->Session()->offsetGet('checkoutBillingAddressId');
+        if (empty($activeBillingAddressId)) {
             $user = $this->_getUser();
             $activeBillingAddressId = (is_array($user) && isset($user['additional']['user']['default_billing_address_id'])) ? $user['additional']['user']['default_billing_address_id'] : '';
         }
