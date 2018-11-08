@@ -329,7 +329,7 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _getAgreement() {
-        $cacheId = 'easycredit_agreement';
+        $cacheId = 'easycredit_agreement_'.Shopware()->Shop()->getId();
         $cache = $this->container->get('shopware.cache_manager')->getCoreCache();
         
         if ($agreement = $cache->load($cacheId)) {
