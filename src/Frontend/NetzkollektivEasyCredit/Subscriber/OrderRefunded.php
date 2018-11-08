@@ -26,7 +26,7 @@ class OrderRefunded extends OrderStatusChanged
            if (count($transactions) != 1) {
                 throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion existiert nicht.');
             }
-            $merchantClient->cancelOrder($order->getTransactionId(),'WIDERRUF_VOLLSTAENDIG');
+            $merchantClient->cancelOrder($order->getTransactionId(),'WIDERRUF_VOLLSTAENDIG', new \DateTime());
 
         } catch (\Exception $e) {
             $error = $e->getMessage().' '; 
