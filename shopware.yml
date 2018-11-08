@@ -1,0 +1,11 @@
+shopware-base:
+  image: dnhsoft/shopware:5.4.6
+  volumes:
+    - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
+    - ./module-api/EasyCreditApi:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Library/Netzkollektiv/EasyCreditApi
+    - ./tools:/tools
+    - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
+  environment:
+    SMTP_HOST: smtp
+    SWDB_DATABASE: shopware
+    SWDB_USER: root
