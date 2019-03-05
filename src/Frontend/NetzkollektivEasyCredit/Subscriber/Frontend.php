@@ -48,7 +48,7 @@ class Frontend implements SubscriberInterface
             'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
             'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
-            'sOrder::sSaveOrder::after'                                                 => 'removeInterestFromOrder',
+            'sOrder::sSaveOrder::after'                                                 => 'onOrderSave',
         );
     }
 
@@ -72,7 +72,24 @@ class Frontend implements SubscriberInterface
         
     }
 
-    public function removeInterestFromOrder(\Enlight_Hook_HookArgs $args) {
+    public function onOrderSave(\Enlight_Hook_HookArgs $args) {
+        $this->updateInterestModus($args);
+        $this->removeInterestFromOrder($args);
+    }
+
+    protected function updateInterestModus($args) {
+        $orderNumber = $args->getReturn();
+
+        // update interest modus to "premium article" for correct tax handling (otherwise shopware overwrites tax)
+        $this->db->query("UPDATE s_order_details od
+            INNER JOIN s_order o ON od.orderID = o.id
+            Set od.modus = 1
+            WHERE o.ordernumber = ?
+            AND od.articleordernumber = ?;
+        ", [$orderNumber, self::INTEREST_ORDERNUM]);
+    }
+
+    protected function removeInterestFromOrder(\Enlight_Hook_HookArgs $args) {
         if (!$this->config->get('easycreditRemoveInterestFromOrder')) {
             return;
         }

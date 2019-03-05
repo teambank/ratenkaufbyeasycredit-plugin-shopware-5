@@ -176,42 +176,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getOrderStates() {
-        /**@var $repository \Shopware\Models\Order\Repository*/
-        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
-        $orderStatusRaw = $repository->getOrderStatusQuery($filters)->getArrayResult();
-        $orderStates = array(
-            array(-1, '(Shopware-Standard)') // default: do nothing
-        );
-        foreach ($orderStatusRaw as $o) {
-            $orderStates[] = array($o['id'], $o['description']);
-        }
-        return  $orderStates;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPaymentStates() {
-        /**@var $repository \Shopware\Models\Order\Repository*/
-        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
-
-        $paymentStatusRaw = $repository->getPaymentStatusQuery($filters)->getArrayResult();
-
-        $paymentStates = array(
-            array(-1, '(Shopware-Standard)') // default: do nothing
-        );
-        foreach ($paymentStatusRaw as $o) {
-            $paymentStates[] = array($o['id'], $o['description']);
-        }
-        return  $paymentStates;
-    }
-
     protected function _createPaymentConfigForm()
     {
         $form = $this->Form();
@@ -234,9 +198,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditOrderStatus',
             array(
                 'label' => 'Bestellungsstatus',
-                'value' => -1, // do nothing
-                'store' => $this->getOrderStates(),
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'value' => 0,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.OrderStatus',
+                'displayField' => 'description',
+                'valueField' => 'id',
             )
         );
 
@@ -245,9 +211,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditPaymentStatus',
             array(
                 'label' => 'Zahlungsstatus',
-                'value' => -1, // do nothing
-                'store' => $this->getPaymentStates(),
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'value' => 12,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.PaymentStatus',
+                'displayField' => 'description',
+                'valueField' => 'id',
             )
         );
 
