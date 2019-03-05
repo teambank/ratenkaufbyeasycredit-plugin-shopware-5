@@ -24,14 +24,6 @@ abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends S
 
         $this->View()->assign(array('status' => true, 'valid' => $valid, 'errorMessage' => ''));
     }
-
-    public function testAction() {
-        /**@var $repository \Shopware\Models\Order\Repository*/
-        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        $filters = array(array('property' => 'status.id', 'expression' => '!=', 'value' => '-1'));
-        $orderStatus = $repository->getOrderStatusQuery($filters)->getArrayResult();
-        $this->View()->assign(array('success' => true, 'data' => $orderStatus));
-    }
 }
 
 if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
