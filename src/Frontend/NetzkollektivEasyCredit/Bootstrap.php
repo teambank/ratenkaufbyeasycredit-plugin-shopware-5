@@ -308,8 +308,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function clear() {
-        $this->removeInterest();
         $this->getCheckout()->clear();
+        $this->removeInterest();
     }
 
     protected function _getUser()
