@@ -1,11 +1,22 @@
-shopware-base:
-  image: dnhsoft/shopware:5.4.6
-  volumes:
-    - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
-    - ./module-api/EasyCreditApi:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Library/Netzkollektiv/EasyCreditApi
-    - ./tools:/tools
-    - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
-  environment:
-    SMTP_HOST: smtp
-    SWDB_DATABASE: shopware
-    SWDB_USER: root
+version: "2"
+services: 
+  shopware-base:
+    image: dnhsoft/shopware:5.4.6
+    volumes:
+      - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
+      - ./module-api/EasyCreditApi:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Library/Netzkollektiv/EasyCreditApi
+      - ./tools:/tools
+      - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
+    environment:
+      SMTP_HOST: smtp
+      SWDB_DATABASE: shopware
+      SWDB_USER: root
+    labels:
+      - "traefik.enable=true"
+      - "traefik.web.backend=web"
+      - "traefik.web.protocol=http"
+      - "traefik.web.headers.forceSTSHeader=true"
+      - "traefik.docker.network=web"
+    networks:
+      - web
+      - default
