@@ -314,8 +314,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditMarkShippedStatus',
             array(
                 'label' => 'Lieferung bei folgendem Bestellstatus melden',
-                'value' => -1, // do nothing
-                'store' => $this->getOrderStates(),
+                'value' => 0,
+                'store' => 'base.OrderStatus',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
             )
         );
@@ -336,8 +336,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'easycreditMarkRefundedStatus',
             array(
                 'label' => 'Rückabwicklung bei folgendem Bestellstatus durchführen',
-                'value' => -1, // do nothing
-                'store' => $this->getOrderStates(),
+                'value' => 0,
+                'store' => 'base.OrderStatus',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
             )
         );
