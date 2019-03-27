@@ -8,8 +8,31 @@ class Backend implements SubscriberInterface
     public static function getSubscribedEvents() {
         return array(
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit' => 'onGetControllerPathPaymentEasycredit',
-            'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange'
+            'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave'
         );
+    }
+
+    public function afterOrderSave(\Enlight_Event_EventArgs $args) {
+        if ($args->getSubject()->Request()->getActionName() != 'save') {
+            return;
+        }
+        $this->handleMerchantStatusChangedError($args);
+    }
+
+    public function handleMerchantStatusChangedError(\Enlight_Event_EventArgs $args) {
+        $key = 'easycreditMerchantStatusChangedError';
+        if ($GLOBALS[$key]) {
+
+            $_this = $args->get('subject');
+            $_this->View()->assign(array(
+                'success' => false,
+                'data' => $_this->View()->data,                
+                'message' => $GLOBALS[$key]
+            ));            
+
+            unset($GLOBALS[$key]);
+        }
     }
 
     public function preventShippingAddressChange(\Enlight_Event_EventArgs $args) {

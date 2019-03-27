@@ -127,9 +127,18 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
+        $this->subscribeEvent(
+            'Enlight_Bootstrap_InitResource_EasyCreditMerchant',
+            'onInitResourceMerchant'
+        );
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
+
+        $modelEventManager = Shopware()->Container()->get('model_event_manager');
+        $modelEventManager->addEventSubscriber(new Subscriber\OrderShipped());
+        $modelEventManager->addEventSubscriber(new Subscriber\OrderRefunded());
+
         $this->get('events')->addSubscriber(new Subscriber\Frontend($this));
         $this->get('events')->addSubscriber(new Subscriber\Backend($this));
     }
@@ -150,6 +159,19 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return new EasyCreditApi\Checkout(
             $client,
             $storage
+        );
+    }
+
+    public function onInitResourceMerchant()
+    {
+        $logger = new Api\Logger();
+        $config = new Api\Config();
+        $clientFactory = new EasyCreditApi\Client\HttpClientFactory();
+
+        return new EasyCreditApi\Merchant(
+            $config,
+            $clientFactory,
+            $logger
         );
     }
 
@@ -189,7 +211,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem ratenkauf by Easycredit empfehlen wir, das Widget zu aktivieren.'
+                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.'
             )
         );
 
@@ -275,6 +297,50 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 )
             );
         }
+
+        $form->setElement(
+            'boolean',
+            'easycreditMarkShipped',
+            array(
+                'label' => '„Lieferung melden“ automatisch durchführen?',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.'
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditMarkShippedStatus',
+            array(
+                'label' => 'Lieferung bei folgendem Bestellstatus melden',
+                'value' => -1, // do nothing
+                'store' => $this->getOrderStates(),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditMarkRefunded',
+            array(
+                'label' => 'Rückabwicklung automatisch durchführen?',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.'
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditMarkRefundedStatus',
+            array(
+                'label' => 'Rückabwicklung bei folgendem Bestellstatus durchführen',
+                'value' => -1, // do nothing
+                'store' => $this->getOrderStates(),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
     }
 
     public function getCheckout() {
