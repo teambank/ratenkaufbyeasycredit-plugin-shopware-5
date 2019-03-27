@@ -95,7 +95,12 @@ class Item implements \Netzkollektiv\EasyCreditApi\Rest\ItemInterface
 
     public function getSku()
     {
-        return $this->sku;
+        return array_filter(array(
+            'shopware-id'           => $this->rawItem['articleID'],
+            'shopware-bestell-nr'   => $this->rawItem['ordernumber'],
+            'ean'                   => $this->rawItem['ean'],
+            'suppliernumber'        => $this->rawItem['suppliernumber']
+        ));
     }
 
 }
