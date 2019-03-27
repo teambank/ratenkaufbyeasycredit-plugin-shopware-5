@@ -315,8 +315,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             array(
                 'label' => 'Lieferung bei folgendem Bestellstatus melden',
                 'value' => 0,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'store' => 'base.OrderStatus',
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'displayField' => 'description',
+                'valueField' => 'id',
             )
         );
 
@@ -337,8 +339,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             array(
                 'label' => 'Rückabwicklung bei folgendem Bestellstatus durchführen',
                 'value' => 0,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'store' => 'base.OrderStatus',
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'displayField' => 'description',
+                'valueField' => 'id',
             )
         );
     }
