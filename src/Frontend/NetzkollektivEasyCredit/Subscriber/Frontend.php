@@ -439,12 +439,7 @@ class Frontend implements SubscriberInterface
 
     protected function _extendConfirmTemplate($view) {
         $view->assign('EasyCreditDisableAddressChange', true)
-            ->assign('EasyCreditPaymentShowRedemption', true)
-            ->assign('EasyCreditPaymentRedemptionPlan', Shopware()->Session()->EasyCredit["redemption_plan"])
-            ->assign(
-                'EasyCreditPaymentPreContractInformationUrl',
-                Shopware()->Session()->EasyCredit["pre_contract_information_url"]
-            )->assign('EasyCreditPaymentPlan',Shopware()->Session()->EasyCredit["payment_plan"]);
+            ->assign('EasyCreditPaymentPlan',Shopware()->Session()->EasyCredit["payment_plan"]);
     }
     
     public function getPlugin() {
