@@ -45,8 +45,6 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Address'             => 'onFrontendAddressPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
-            'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
-            'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
             'sOrder::sSaveOrder::after'                                                 => 'onOrderSave',
         );
@@ -122,22 +120,6 @@ class Frontend implements SubscriberInterface
             throw new Enlight_Exception("Removal of interest failed:" . $e->getMessage(), 0, $e);
         }
 
-    }
-
-    public function addJsFiles() {
-        $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
-        return new ArrayCollection(array(
-            $jsDir . 'jquery.easycredit-address-editor.js',
-            $jsDir . 'easycredit-widget.js',
-            $jsDir . 'easycredit.js'
-        ));
-    }
-
-    public function addCssFiles(\Enlight_Event_EventArgs $args) {
-        return new ArrayCollection(array(
-            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
-            $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
-        ));
     }
 
     public function onGetControllerPathFrontend() {

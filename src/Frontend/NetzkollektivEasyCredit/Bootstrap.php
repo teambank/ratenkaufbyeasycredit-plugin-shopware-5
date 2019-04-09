@@ -1,6 +1,7 @@
 <?php
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Netzkollektiv\EasyCreditApi;
 
@@ -120,6 +121,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     protected function _createEvents()
     {
         $this->subscribeEvent(
+            'Theme_Compiler_Collect_Plugin_Css',
+            'addCssFiles'
+        );
+        $this->subscribeEvent(
+            'Theme_Compiler_Collect_Plugin_Javascript',
+            'addJsFiles'
+        );
+
+        $this->subscribeEvent(
             'Enlight_Controller_Front_DispatchLoopStartup',
             'onDispatchLoopStartup'
         );
@@ -131,6 +141,22 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditMerchant',
             'onInitResourceMerchant'
         );
+    }
+
+    public function addJsFiles() {
+        $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
+        return new ArrayCollection(array(
+            $jsDir . 'jquery.easycredit-address-editor.js',
+            $jsDir . 'easycredit-widget.js',
+            $jsDir . 'easycredit.js'
+        ));
+    }
+
+    public function addCssFiles() {
+        return new ArrayCollection(array(
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
+        ));
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
