@@ -8,13 +8,27 @@ class Logger implements \Netzkollektiv\EasyCreditApi\LoggerInterface {
     protected $debug = false;
 
     public function __construct() {
-        $this->_logger = Shopware()->PluginLogger();
+        $this->_logger = Shopware()->Container()->get('pluginlogger');
+        $this->_logger->getHandlers()[0]->getFormatter()->allowInlineLineBreaks(true);
 
         if (Shopware()->Config()->get('easycreditDebugLogging')) {
             $this->debug = true;
+            $this->allowLineBreaks(true); // allow line breaks in log globally, when easycredit Debug Logging is active
         }
     }
 
+    protected function allowLineBreaks($bool) {
+        $handler = $this->_logger->getHandlers();
+        if (
+            is_array($handlers) 
+            && isset($handlers[0]) 
+            && $handlers[0] instanceof Monolog\Logger\StreamHandler
+            && $handlers[0]->getFormatter() instanceof Monolog\Logger\LineFormatter
+        ) {
+            $handlers[0]->getFormatter()->allowInlineLineBreaks($bool); 
+        }
+    }
+    
     public function log($msg) {
         $this->logInfo($msg);
         return $this;
