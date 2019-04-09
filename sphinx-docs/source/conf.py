@@ -20,15 +20,15 @@
 # -- Project information -----------------------------------------------------
 
 project = u'ratenkauf by easyCredit für Shopware 5.x'
-copyright = u'2018, Teambank AG'
+copyright = u'2019, NETZKOLLEKTIV GmbH'
 author = u'Teambank AG'
 
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'1.3.0'
+release = u'1.6.0'
 
-
+html_show_sphinx = False
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -74,7 +74,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -97,6 +98,9 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+html_show_sourcelink = False
+html_logo = '_static/50_ratenkauf_Logo_1240x824_easyCredit.png'
+html_favicon = '_static/favicon.ico'
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

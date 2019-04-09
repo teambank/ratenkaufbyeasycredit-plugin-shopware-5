@@ -51,7 +51,7 @@
 
 
 \title{ratenkauf by easyCredit für Shopware}
-\date{04.04.2018}
+\date{28.03.2019}
 \release{1.3.0}
 \author{Teambank AG}
 \newcommand{\sphinxlogo}{\sphinxincludegraphics{50_ratenkauf_Logo_1240x824_easyCredit.png}\par}
@@ -98,6 +98,9 @@ Das Plugin hat neben Shopware 5.x keine weiteren Abhängigkeiten. Es wurde für 
 \item {} 
 5.4.x
 
+\item {} 
+5.5.x
+
 \end{itemize}
 
 Das Emotion Template und Shopware Versionen \textless{} 5.0 werden von der aktuellen Version nicht unterstützt.
@@ -127,150 +130,92 @@ und wir setzen uns mit Ihnen in Verbindung.
 
 \chapter{Installation}
 \label{\detokenize{installation:installation}}\label{\detokenize{installation::doc}}
-Das Plugin kann im Plugin-Manager entweder über den direkten Download aus dem \sphinxstylestrong{Community Store} oder über den \sphinxstylestrong{Datei-Upload „Plugin Hochladen“} der gepackten Extension installiert werden.
-Alternativ ist auch die Installation über die Kommandozeile oder FTP möglich.
-
-Zur Installation melden Sie sich im Backend Ihrer Shopware Installation an. Sie finden das Backend unter:
-\begin{quote}
-
-\sphinxcode{\sphinxupquote{http(s)://mein-shop.de/backend}}
-\end{quote}
-
-Öffnen Sie im Backend nun den Plugin-Manager. Klicken Sie dazu auf den folgenden Menüpunkt:
-\begin{quote}
-
-\sphinxmenuselection{Einstellungen \(\rightarrow\) Plugin-Manager}
-\end{quote}
+Die Extension für ratenkauf by easyCredit kann im Plugin-Manager entweder über den direkten Download aus dem \sphinxstyleemphasis{Shopware Community Store} oder über den Datei-Upload des bereitgestellten Archives über \sphinxstyleemphasis{Plugin Hochladen} installiert werden.
+Alternativ ist auch die Installation über die Kommandozeile möglich.
 
 
-\section{Installation über Shopware Community Store}
-\label{\detokenize{installation:installation-uber-shopware-community-store}}
+\section{Shopware Community Store}
+\label{\detokenize{installation:shopware-community-store}}
+Zu Installation melden Sie sich im Backend Ihrer Shopware Installation an. Sie finden das Backend unter der folgenden URL: \sphinxcode{\sphinxupquote{http(s)://mein-shop.tld/backend}}.
+Öffnen Sie im Backend nun den Plugin-Manager durch Klick im Menü auf \sphinxmenuselection{Einstellungen \(\rightarrow\) Plugin-Manager}.
+
+\begin{sphinxadmonition}{note}{Bemerkung:}
+Als Shortcut verwenden Sie die Tastenkombination \sphinxtitleref{Strg + Alt + P}.
+\end{sphinxadmonition}
+
+Sie finden das Plugin, indem Sie in Suche oben links \sphinxstylestrong{easyCredit} eingeben:
+
 \noindent\sphinxincludegraphics{{installation-community_store}.png}
-\begin{itemize}
-\item {} 
-Zur Installation über den Shopware Community Store suchen Sie das Plugin im Community Store.
 
-\item {} 
-Klicken Sie nach Auswahl des Plugins den Button \sphinxstylestrong{Installieren}.
+Das Plugin wird Ihnen nun zur Installation angezeigt. Installieren Sie das Plugin nun durch Klick auf \sphinxstylestrong{Installieren}.
+Die Extension wird automatisch heruntergeladen und installiert.
 
-\item {} 
-Die Extension wird nun heruntergeladen und installiert.
-
-\item {} 
-Fahren Sie anschließend mit der \sphinxstyleemphasis{Konfiguration} fort.
-
-\end{itemize}
+Fahren Sie anschließend mit der {\hyperref[\detokenize{configuration:configuration}]{\sphinxcrossref{\DUrole{std,std-ref}{Konfiguration}}}} fort.
 
 
-\section{Installation über Datei-Upload}
-\label{\detokenize{installation:installation-uber-datei-upload}}
+\section{manueller Datei-Upload}
+\label{\detokenize{installation:manueller-datei-upload}}
+Gehen Sie analog zur Installation aus dem Shopware Community Store vor. Im Plugin-Manager wählen Sie im linken Menü \sphinxmenuselection{Verwaltung \(\rightarrow\) Installiert}. Klicken Sie nun auf den Button \sphinxstyleemphasis{Plugin hochladen}. Wählen Sie den lokalen Pfad aus, unter dem sich das ZIP-Archiv des Shopware Plugins befindet und klicken Sie anschließend auf \sphinxstyleemphasis{Plugin hochladen}.
+
+Fahren Sie anschließend mit der {\hyperref[\detokenize{configuration:configuration}]{\sphinxcrossref{\DUrole{std,std-ref}{Konfiguration}}}} fort.
+
 \noindent\sphinxincludegraphics{{installation-file_upload}.png}
-\begin{itemize}
-\item {} 
-Zur Installation über den Plugin-Upload wählen Sie im Plugin-Manager den Menu-Punkt \sphinxmenuselection{Verwaltung \(\rightarrow\) Installiert}
-
-\item {} 
-Klicken Sie dort den Button \sphinxstylestrong{Plugin hochladen}.
-
-\item {} 
-Wählen Sie nun das Zip-Archiv, dass Sie von unserer Website heruntergeladen haben aus
-
-\item {} 
-und klicken Sie auf \sphinxstyleemphasis{Plugin hochladen}.
-
-\end{itemize}
-
-Beispiel:
-\begin{quote}
-
-\sphinxcode{\sphinxupquote{C:\textbackslash{}easycredit-shopware-1.3.0.zip}}
-\end{quote}
-\begin{itemize}
-\item {} 
-Fahren Sie anschließend mit der \sphinxstyleemphasis{Konfiguration} fort.
-
-\end{itemize}
 
 
-\section{Installation über Kommandozeile}
-\label{\detokenize{installation:installation-uber-kommandozeile}}
-Entpacken Sie das Zip-Archive
+\section{Kommandozeile}
+\label{\detokenize{installation:kommandozeile}}
+Um das Plugin über die Kommandozeile zu installieren, führen Sie die folgenden Befehle aus:
 
 \fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nv}{\PYGZdl{} }cp easycredit\PYGZhy{}shopware\PYGZhy{}x.x.zip /shopware/engine/Shopware/Plugins/
-\PYG{n+nv}{\PYGZdl{} }\PYG{n+nb}{cd} /shopware/engine/Shopware/Plugins/
-\PYG{n+nv}{\PYGZdl{} }unzip easycredit\PYGZhy{}shopware\PYGZhy{}x.x.zip
-\PYG{n+nv}{\PYGZdl{} }rm easycredit\PYGZhy{}shopware\PYGZhy{}x.x.zip
+\PYG{g+gp}{\PYGZdl{}} wget https://www.easycredit\PYGZhy{}ratenkauf.de/download/easycredit\PYGZhy{}shopware\PYGZhy{}1.3.0.zip
+\PYG{g+gp}{\PYGZdl{}} cp easycredit\PYGZhy{}shopware\PYGZhy{}1.3.0.zip /sw\PYGZhy{}base\PYGZhy{}dir/engine/Shopware/Plugins/
+\PYG{g+gp}{\PYGZdl{}} \PYG{n+nb}{cd} /sw\PYGZhy{}base\PYGZhy{}dir/engine/Shopware/Plugins/
+\PYG{g+gp}{\PYGZdl{}} unzip easycredit\PYGZhy{}shopware\PYGZhy{}1.3.0.zip
+\PYG{g+gp}{\PYGZdl{}} rm easycredit\PYGZhy{}shopware\PYGZhy{}1.3.0.zip
 \end{sphinxVerbatim}
 
-Anschließend überprüfen Sie ob das folgende Verzeichnis existiert:
-\begin{quote}
-
-\sphinxcode{\sphinxupquote{engine/Shopware/Plugins/Netzkollektiv/EasyCredit}}
-\end{quote}
-
-Führen Sie nun folgende Befehle aus:
+Um sicher zu gehen, überprüfen Sie, ob das folgende Verzeichnis existiert: \sphinxcode{\sphinxupquote{engine/Shopware/Plugins/Netzkollektiv/EasyCredit}}. Im Anschluss installieren und aktivieren Sie das Plugin mit den folgenden Befehlen:
 
 \fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nv}{\PYGZdl{} }/shopware/bin/console sw:plugin:refresh
-\PYG{n+nv}{\PYGZdl{} }/shopware/bin/console sw:plugin:install NetzkollektivEasyCredit
-\PYG{n+nv}{\PYGZdl{} }/shopware/bin/console sw:plugin:activate NetzkollektivEasyCredit
+\PYG{g+gp}{\PYGZdl{}} \PYG{n+nb}{cd} /sw\PYGZhy{}base\PYGZhy{}dir
+\PYG{g+gp}{\PYGZdl{}} ./bin/console sw:plugin:refresh
+\PYG{g+gp}{\PYGZdl{}} ./bin/console sw:plugin:install NetzkollektivEasyCredit
+\PYG{g+gp}{\PYGZdl{}} ./bin/console sw:plugin:activate NetzkollektivEasyCredit
 \end{sphinxVerbatim}
 
-Fahren Sie anschließend mit der Konfiguration fort.
+Fahren Sie anschließend mit der {\hyperref[\detokenize{configuration:configuration}]{\sphinxcrossref{\DUrole{std,std-ref}{Konfiguration}}}} fort.
+
+Sollten Ihnen die Zugangsdaten bereits vorliegen, können Sie diese gleich bei der Installation mit den folgenden Befehlen setzen:
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZdl{}} ./bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiKey 1.de.1234.4321
+\PYG{g+gp}{\PYGZdl{}} ./bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiToken abc\PYGZhy{}def\PYGZhy{}ghi
+\end{sphinxVerbatim}
 
 
 \chapter{Konfiguration}
-\label{\detokenize{configuration:konfiguration}}\label{\detokenize{configuration::doc}}
-Die Konfiguration teilt sich auf in die Plugin-Konfiguration und die Zahlarten-Konfiguration.
+\label{\detokenize{configuration:konfiguration}}\label{\detokenize{configuration:configuration}}\label{\detokenize{configuration::doc}}
+Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie ratenkauf by easyCredit als Zahlungsmethode für den deutschen Store.
 
 
-\section{Plugin-Einstellungen}
-\label{\detokenize{configuration:plugin-einstellungen}}
-\begin{figure}[htbp]
-\centering
+\section{Konfigurations Menü öffnen}
+\label{\detokenize{configuration:konfigurations-menu-offnen}}
+Zur Konfiguration öffnen Sie im Backend erneut den Plugin-Manager. In der Liste der installierten Plugins sollte nun \sphinxstylestrong{ratenkauf by easyCredit} enthalten sein.
+In dieser Zeile klicken Sie das Stifte Icon, um die Plugin Konfiguration zu öffnen.
 
 \noindent\sphinxincludegraphics[scale=0.5]{{config-open}.png}
-\end{figure}
-\begin{itemize}
-\item {} 
-Öffnen Sie im Backend den Plugin-Manager. \sphinxmenuselection{Einstellungen -\textgreater{} Plugin-Manager}
 
-\item {} 
-In der Liste der installierten Plugins sollte nun \sphinxstylestrong{ratenkauf by easyCredit} erscheinen.
 
-\item {} 
-Öffnen Sie die Plugin-Konfiguration über das Stifte Icon (ganz rechts).
-
-\end{itemize}
-
-Für eine Grundkonfiguration tragen Sie zumindest die Zugangsdaten (API Key \& API Token) ein.
-Testen Sie die Zugangsdaten mit Klick auf \sphinxstylestrong{Zugangsdaten testen}.
-Nach dem erfolgreichen Test klicken Sie auf \sphinxstylestrong{Speichern}
+\section{Plugin konfigurieren}
+\label{\detokenize{configuration:plugin-konfigurieren}}
+Die Konfigurationsmöglichkeiten sind im Folgenden gezeigt und in der Tabelle im einzelnen beschrieben. Als Mindestkonfiguration geben Sie hier Ihren API-Key und Ihren API-Token an.
+Sollten Sie Einstellungen vorgenommen habem, so speichern Sie die Einstellungen mit einem Klick auf \sphinxstylestrong{Speichern}.
 
 \noindent\sphinxincludegraphics{{config-dialog}.png}
 
-
-\section{Bezahlmethode für Versandarten aktivieren}
-\label{\detokenize{configuration:bezahlmethode-fur-versandarten-aktivieren}}
-Im Shopware Backend können Sie unter \sphinxmenuselection{Einstellungen -\textgreater{} Versandkosten -\textgreater{} Versandart -\textgreater{} Zahlart Auswahl} die \sphinxstylestrong{ratenkauf by easyCredit} Bezahlmethode für eine bestimmte Versandmethode aktivieren.
-
-
-\section{Allgemeine Bezahlmethodeneinstellungen}
-\label{\detokenize{configuration:allgemeine-bezahlmethodeneinstellungen}}
-Allgemeine Einstellungen für \sphinxstylestrong{ratenkauf by easyCredit} finden Sie im Shopware Backend unter \sphinxmenuselection{Einstellungen -\textgreater{} Zahlungsarten -\textgreater{} easyCredit}. Hier können Sie unter anderem die Bezahlmethode für das gesamte Shopware System aktivieren/dekativieren oder nur für einzelne Länder bzw. Subshops zur Verfügung stellen.
-
-\noindent\sphinxincludegraphics{{config-payment-active}.png}
-
-Aktivieren Sie hier im Reiter \sphinxstyleemphasis{Länder-Auswahl} das Land Deutschland, damit \sphinxstylestrong{ratenkauf by easyCredit} für Kunden aus Deutschland angezeigt wird.
-
-\noindent\sphinxincludegraphics{{config-payment-country}.png}
-
-
-\section{weitere Plugin-Einstellungen}
-\label{\detokenize{configuration:weitere-plugin-einstellungen}}
 
 \begin{savenotes}\sphinxattablestart
 \centering
@@ -320,6 +265,269 @@ Ein Klick auf diesen Button überprüft die Kombination von API-Key und -Token a
 \end{tabulary}
 \par
 \sphinxattableend\end{savenotes}
+
+\begin{sphinxadmonition}{note}{Bemerkung:}
+Nach einem erfgolreichen Test der API-Zugangsdaten, vergessen Sie bitte nicht auf \sphinxstylestrong{Speichern} zu klicken.
+\end{sphinxadmonition}
+
+
+\section{Zahlungsart Einstellungen}
+\label{\detokenize{configuration:zahlungsart-einstellungen}}
+Um die Zahlungsart \sphinxstylestrong{ratenkauf by easyCredit} im Frontend anzuzeigen, muss die Zahlungsart aktiviert sein, und dem Land \sphinxstyleemphasis{Deutschland} zugewiesen werden. Navigieren Sie hierzu zu den Zahlungsart Einstellungen: \sphinxmenuselection{System -\textgreater{} Konfiguration -\textgreater{} Zahlungsarten -\textgreater{} ratenkauf by easyCredit}
+Im ersten Reiter \sphinxstylestrong{Generell} stellen Sie sicher, dass \sphinxstylestrong{ratenkauf by easyCredit} aktiviert ist.
+
+\noindent\sphinxincludegraphics{{config-payment-active}.png}
+
+\clearpage
+
+Aktivieren Sie als letzten Schritt nun im Reiter \sphinxstylestrong{Länder-Auswahl} das Land \sphinxstylestrong{Deutschland}.
+
+\noindent\sphinxincludegraphics{{config-payment-country}.png}
+
+
+\chapter{Frequently Asked Questions}
+\label{\detokenize{faq::doc}}\label{\detokenize{faq:frequently-asked-questions}}
+
+\section{Nach Auswahl der Zahlungsart im Frontend, wird die Zustimmungserklärung nicht angezeigt}
+\label{\detokenize{faq:nach-auswahl-der-zahlungsart-im-frontend-wird-die-zustimmungserklarung-nicht-angezeigt}}
+Wird die Zahlungsart in der Zahlartenauswahl durch Klick auf den Radio-Button ausgewählt, erscheint bei korrekter Funktionalität eine Zustimmungserklärung, in der der Kunde seine Zustimmung zur Übermittlung seiner p
+ersönlichen Daten an die Server der Teambank AG zustimmt. Diese Übermittlung ist notwendig, um den Kunden an das Zahlungsterminal weiterzuleiten, um ihm seinen Ratenwunsch zu berechnen.
+\begin{description}
+\item[{Wird diese Zustimmungserklärung nicht angezeigt, ist der Fehler meist im verwendeten Template zu finden. Im Template \sphinxcode{\sphinxupquote{themes/Frontend/MeinTheme/frontend/checkout/shipping\_payment.tpl}} muss an erster Stelle stehen:}] \leavevmode
+\sphinxcode{\sphinxupquote{\{extends file="parent:frontend/checkout/shipping\_payment.tpl"\}}}. Nur so erbt das Template vom für die confirm-Seite vorgesehenen Template.
+
+\end{description}
+
+\begin{sphinxadmonition}{note}{Bemerkung:}
+Beginnt das Template mit \sphinxcode{\sphinxupquote{\{extends file="frontend/index/index.tpl"\}}} so erbt das Template von allgemeinen Standardtemplate. In diesem Fall wird die Zustimmungserklärung nicht angezeigt.
+\end{sphinxadmonition}
+
+
+\section{Nach Aktivieren der Debug Logging Option in den Plugin-Einstellungen, wird kein Debug Output geloggt}
+\label{\detokenize{faq:nach-aktivieren-der-debug-logging-option-in-den-plugin-einstellungen-wird-kein-debug-output-geloggt}}
+Das Log Level im Production Modus von Shopware ist standardmäßig so eingestellt, dass nur kritische Fehler in den Logfiles erscheinen.
+Durch folgende Anpassung des Log Levels in der \sphinxtitleref{config.php} werden auch weniger kritische Nachricht geloggt:
+
+\fvset{hllines={, ,}}%
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{x}{\PYGZsq{}logger\PYGZsq{} =\PYGZgt{} [}
+\PYG{x}{   \PYGZsq{}level\PYGZsq{} =\PYGZgt{} 100}
+\PYG{x}{]}
+\end{sphinxVerbatim}
+
+
+\section{Nach Auswahl der Zahlungsart im Frontend, wird der Tilgungsplan auf der Bestellbestätigungsseite nicht angezeigt}
+\label{\detokenize{faq:nach-auswahl-der-zahlungsart-im-frontend-wird-der-tilgungsplan-auf-der-bestellbestatigungsseite-nicht-angezeigt}}
+\begin{sphinxadmonition}{note}{Bemerkung:}
+Dieser Hinweis gilt nur für ältere Versionen des Plugins (\textless{}= v1.5.x)
+\end{sphinxadmonition}
+
+Wurde die Zahlungsart vom Kunden augewählt und der Ratenwunsch über das Ratenkaufterminal bestätigt, wird dem Kunden der Tilgungsplan auf der Bestätigungsseite angezeigt.
+
+Wird der Tilgungsplan nicht angezeigt, ist der Fehler meist im verwendeten Template zu finden. Im Template \sphinxtitleref{themes/Frontend/MeinTheme/frontend/checkout/confirm.tpl} muss an erster Stelle stehen: \sphinxcode{\sphinxupquote{\{extends file="par
+ent:frontend/checkout/confirm.tpl"\}}}. Nur so erbt das Template vom für die confirm-Seite vorgesehenen Template.
+
+\begin{sphinxadmonition}{note}{Bemerkung:}
+Beginnt das Template mit \sphinxcode{\sphinxupquote{\{extends file="frontend/index/index.tpl"\}}} so erbt das Template von allgemeinen Standardtemplate. In diesem Fall wird der Tilgungsplan nicht angezeigt.
+\end{sphinxadmonition}
+
+
+\chapter{Changelog}
+\label{\detokenize{changelog::doc}}\label{\detokenize{changelog:changelog}}
+
+\section{v1.5.3}
+\label{\detokenize{changelog:v1-5-3}}\begin{itemize}
+\item {} 
+die Zinsen werden nun nach einem Abbruch der Bestellung / Wechsel der Zahlungsart zuverlässig entfernt (siehe \#3594)
+
+\item {} 
+Bestellstatus und Zahlungsstatus Dropdown zeigen ihre Werte nun zuverlässig an (siehe \#3592)
+
+\item {} 
+der „Modus“ (Artikeltyp) der Zinsen wird nach Bestellung angepasst, um ein korrektes Steuerhandling in Rechnung zu erreichen
+
+\item {} 
+die Zustimmungserklärung wird nun pro Store gecacht (Multi-Store Kompatibilität)
+
+\end{itemize}
+
+
+\section{v1.5.2}
+\label{\detokenize{changelog:v1-5-2}}\begin{itemize}
+\item {} 
+Möglichkeit der Änderung der Adresse bei nicht akzeptierten Adressen oder Adresskombinationen über konditional eingeblendete Lightbox (\#3526)
+
+\item {} 
+Angabe einer abweichenden Lieferadresse im Bestätigungsschritt ist nicht mehr möglich bei Zahlart ratenkauf by easyCredit
+
+\item {} 
+die statische Zustimmungserklärung wird einen Tag im Shop des Händlers gecacht, bevor ein neuer Request an die API erfolgt (Performance)
+
+\end{itemize}
+
+
+\section{v1.5.1}
+\label{\detokenize{changelog:v1-5-1}}\begin{itemize}
+\item {} 
+Möglichkeit hinzugefügt, Ratenkaufzinsen im Backend automatisch aus Bestellungen und in Rechnungen zu entfernen
+
+\item {} 
+Fehlermeldungen werden nicht mehr als Snippets ausgegeben
+
+\end{itemize}
+
+
+\section{v1.5.0}
+\label{\detokenize{changelog:v1-5-0}}\begin{itemize}
+\item {} 
+Anpassungen zur Kompatibilität mit Shopware 5.5 RC 1
+
+\item {} 
+das Widget-Plugin wurde durch eine neue Version ersetzt (Entfernung von Bootstrap zur Reduzierung des Konfliktpotentials)
+
+\item {} 
+die Fehlermeldung bei Ändern der Lieferadresse im Backend wird nun zuverlässig angezeigt
+
+\item {} 
+bei Anpassung der Standard-Zahlungsmethode im Kundenaccount wird die Zustimmungserklärung nicht mehr angezeigt
+
+\item {} 
+obsolete Funktionen wurden entfernt
+
+\end{itemize}
+
+
+\section{v1.4.9}
+\label{\detokenize{changelog:v1-4-9}}\begin{itemize}
+\item {} 
+das Widget kann nun, ohne Leeren des Caches, zuverlässig deaktiviert/aktiviert werden
+
+\end{itemize}
+
+
+\section{v1.4.8}
+\label{\detokenize{changelog:v1-4-8}}\begin{itemize}
+\item {} 
+Verbesserung der Kompatibilität mit aktuellen und zukünftigen Versionen von Shopware
+
+\item {} 
+Verbessertes Handling von Zahlartenabschlägen in Verbindung mit dem ratenkauf by easyCredit
+
+\item {} 
+Angleichung des Wordings zum easyCredit Händlerinterface
+
+\end{itemize}
+
+
+\section{v1.4.7}
+\label{\detokenize{changelog:v1-4-7}}\begin{itemize}
+\item {} 
+Anpassung von Links wegen Website Relaunch
+
+\end{itemize}
+
+
+\section{v1.4.6}
+\label{\detokenize{changelog:v1-4-6}}\begin{itemize}
+\item {} 
+Verbesserung der Kompatibilität mit aktuellen und zukünftigen Versionen von Shopware
+
+\end{itemize}
+
+
+\section{v1.4.4}
+\label{\detokenize{changelog:v1-4-4}}\begin{itemize}
+\item {} 
+behebt ein Problem, dass das Speichern von ratenkauf by easyCredit Bestellungen im Backend verhindert hat
+
+\item {} 
+zuverlässigere Anzeige des Ratenkauf-Widgets durch Verwendung eines anderen Events
+
+\end{itemize}
+
+
+\section{v1.4.3}
+\label{\detokenize{changelog:v1-4-3}}\begin{itemize}
+\item {} 
+behebt fehlerhaftes Verhalten in bestimmten Umgebungen (Checkout zeigt weisse Seite, \#3418)
+
+\item {} 
+optimierte Darstellung der Zahlungsart (Payment Selection \& Confirm-Seite)
+
+\item {} 
+Anpassung zur Verwendung mit Custom Products Plugin (Produkte ohne Preis werden nicht an API gesendet)
+
+\item {} 
+Code Cleanup: entfernt Verweise auf altes Emotion Template
+
+\item {} 
+Widget wird auch bei deaktiviertem asynchronem JS-Loading angezeigt
+
+\item {} 
+Performance-Optimierung Widget
+
+\end{itemize}
+
+
+\section{v1.4.1}
+\label{\detokenize{changelog:v1-4-1}}\begin{itemize}
+\item {} 
+\#3408: Upgrade Anzeige in Shopware Marketplace ist für dieses Modul korrekt
+
+\item {} 
+\#3408: JS Fehler, wenn Modul als Letztes in Zahlungsarten-Auswahl
+
+\item {} 
+doppelte Anzeige des Widgets in manchen Umgebungen
+
+\item {} 
+Upgrade der API-Library
+
+\item {} 
+behebt ein Fehlverhalten, wenn API Warning zurückliefert
+
+\end{itemize}
+
+
+\section{v1.3.0}
+\label{\detokenize{changelog:v1-3-0}}\begin{itemize}
+\item {} 
+Shopware 5.3.x Kompatibilität
+
+\item {} 
+kein Support mehr für Shopware 4.x
+
+\end{itemize}
+
+
+\section{v1.2}
+\label{\detokenize{changelog:v1-2}}\begin{itemize}
+\item {} 
+Shopware 5.2.x Kompatibilität
+
+\item {} 
+Rechtliche API-Übertragungsnachricht wird vom easyCredit Server dynamisch abgerufen
+
+\item {} 
+easyCredit API v4
+
+\end{itemize}
+
+
+\section{v1.1}
+\label{\detokenize{changelog:v1-1}}\begin{itemize}
+\item {} 
+Kompatibilitättests
+
+\end{itemize}
+
+
+\section{v1.0}
+\label{\detokenize{changelog:v1-0}}\begin{itemize}
+\item {} 
+erstes öffentliches Release
+
+\end{itemize}
 
 
 
