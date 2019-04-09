@@ -1,6 +1,7 @@
 <?php
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Netzkollektiv\EasyCreditApi;
 
