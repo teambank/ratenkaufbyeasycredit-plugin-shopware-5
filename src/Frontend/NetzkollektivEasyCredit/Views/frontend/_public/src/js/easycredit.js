@@ -106,11 +106,9 @@
             amount: amount,
             modal: function(element, content, opts) {
                 content = '<div class="easycredit-embed-responsive">'+content+'</div>';
-                $.modal.open(content, {
-                    title: 'ratenkauf by easyCredit'
-                });
+                $.modal.open(content});
                 $.modal._$content.find('.easycredit-embed-responsive')
-                    .css('height','700px')
+                    .css('height','100%')
                     .closest('.modal-inner-wrap')
                     .css('max-width','600px');
             }
