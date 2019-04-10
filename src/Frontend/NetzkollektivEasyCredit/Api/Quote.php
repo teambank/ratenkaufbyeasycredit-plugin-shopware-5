@@ -7,6 +7,9 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
         $this->basket = Shopware()->Modules()->Basket();
         $this->session = Shopware()->Session();
         $this->container = Shopware()->Container();
+        $this->setView(new \Enlight_View_Default(
+            Shopware()->Container()->get('Template')
+        ));
     }
     
     public function getSelectedPayment() {
