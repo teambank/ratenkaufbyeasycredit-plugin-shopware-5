@@ -137,10 +137,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'Enlight_Bootstrap_InitResource_EasyCreditCheckout',
             'onInitResourceCheckout'
         );
-        $this->subscribeEvent(
-            'Enlight_Bootstrap_InitResource_EasyCreditMerchant',
-            'onInitResourceMerchant'
-        );
     }
 
     public function addJsFiles() {
