@@ -71,12 +71,26 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatusId);
+        $this->setPaymentClearedDate($transactionId);
 
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'finish',
             'sUniqueID' => $paymentUniqueId
         ));
+    }
+
+    protected function setPaymentClearedDate($transactionId) {
+        $sql = "
+            UPDATE s_order as o
+            INNER JOIN s_core_states AS s
+                   ON s.id = o.cleared
+            SET o.cleareddate = NOW()
+            WHERE o.cleareddate IS NULL
+            AND s.name = 'completely_paid'
+            AND o.transactionID = ?;
+        ";
+        $this->get('db')->query($sql, array($transactionId));
     }
 
     public function addInterestSurcharge() {
