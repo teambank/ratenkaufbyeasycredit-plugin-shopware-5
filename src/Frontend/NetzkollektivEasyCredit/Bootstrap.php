@@ -160,8 +160,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
-
-        $modelEventManager = Shopware()->Container()->get('model_event_manager');
+        $modelEventManager = Shopware()->Container()->get('models')->getConnection()->getEventManager();
         $modelEventManager->addEventSubscriber(new Subscriber\OrderShipped());
         $modelEventManager->addEventSubscriber(new Subscriber\OrderRefunded());
 
