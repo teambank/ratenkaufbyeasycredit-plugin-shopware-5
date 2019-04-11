@@ -45,6 +45,8 @@ class Frontend implements SubscriberInterface
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Address'             => 'onFrontendAddressPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
+            'Theme_Compiler_Collect_Plugin_Javascript'                                  => 'addJsFiles',
+            'Theme_Compiler_Collect_Plugin_Css'                                         => 'addCssFiles',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
             'sOrder::sSaveOrder::after'                                                 => 'onOrderSave',
         );
@@ -120,6 +122,14 @@ class Frontend implements SubscriberInterface
             throw new Enlight_Exception("Removal of interest failed:" . $e->getMessage(), 0, $e);
         }
 
+    }
+
+    public function addJsFiles() {
+        return $this->getPlugin()->addJsFiles();
+    }
+
+    public function addCssFiles() {
+        return $this->getPlugin()->addCssFiles();
     }
 
     public function onGetControllerPathFrontend() {
