@@ -139,31 +139,20 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    protected $jsFilesAdded = false;
-    protected $cssFilesAdded = false;
-
     public function addJsFiles() {
-        if (!$this->jsFilesAdded) {
-            $this->jsFilesAdded = true;
-            $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
-            return new ArrayCollection(array(
-                $jsDir . 'jquery.easycredit-address-editor.js',
-                $jsDir . 'easycredit-widget.js',
-                $jsDir . 'easycredit.js'
-            ));
-        }
-        return new ArrayCollection(array());
+        $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
+        return new ArrayCollection(array(
+            $jsDir . 'jquery.easycredit-address-editor.js',
+            $jsDir . 'easycredit-widget.js',
+            $jsDir . 'easycredit.js'
+        ));
     }
 
     public function addCssFiles() {
-        if (!$this->cssFilesAdded) {
-            $this->cssFilesAdded = true;
-            return new ArrayCollection(array(
-                $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
-                $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
-            ));
-        }
-        return new ArrayCollection(array());
+        return new ArrayCollection(array(
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
+            $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
+        ));
     }
 
     public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
