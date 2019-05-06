@@ -65,6 +65,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function update($version)
     {
+        $this->_createEvents();
         $this->_createPaymentConfigForm();
 
         return array(
