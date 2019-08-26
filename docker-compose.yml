@@ -1,0 +1,110 @@
+version: "2"
+d:
+networks:
+  web:
+    external: true
+
+services:
+  shopware:
+    extends:
+      file: shopware.yml
+      service: shopware-base
+
+  shopware56:
+    extends: shopware
+    build: .
+    ports:
+     - "127.0.0.1:30356:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware56
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware56.dev.netzkollektiv.com"
+
+  shopware55:
+    extends: shopware
+    image: dnhsoft/shopware:5.5.6
+    ports:
+     - "127.0.0.1:30355:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware55
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware55.dev.netzkollektiv.com"
+
+  shopware54:
+    extends: shopware
+    image: dnhsoft/shopware:5.4.6
+    ports:
+     - "127.0.0.1:30354:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware54
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware54.dev.netzkollektiv.com"
+
+  shopware53:
+    extends: shopware
+    image: dnhsoft/shopware:5.3.7
+    ports:
+     - "127.0.0.1:30353:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware53
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware53.dev.netzkollektiv.com"
+
+  shopware52:
+    extends: shopware
+    image: dnhsoft/shopware:5.2.27
+    ports:
+     - "127.0.0.1:30352:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware52
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware52.dev.netzkollektiv.com"
+
+  shopware51:
+    extends: shopware
+    image: dnhsoft/shopware:5.1.6
+    ports:
+     - "127.0.0.1:30351:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware51
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware51.dev.netzkollektiv.com"
+
+  shopware50:
+    extends: shopware
+    image: dnhsoft/shopware:5.0.4
+    ports:
+     - "127.0.0.1:30350:80"
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware50
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware50.dev.netzkollektiv.com"
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "127.0.0.1:30360:3306"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=shopware
+    volumes:
+      - ".db:/var/lib/mysql"
+    networks:
+      - default

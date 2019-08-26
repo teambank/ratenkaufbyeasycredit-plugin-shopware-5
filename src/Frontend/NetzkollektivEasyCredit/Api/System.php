@@ -11,7 +11,7 @@ class System implements \Netzkollektiv\EasyCreditApi\SystemInterface {
         if (defined('\Shopware::VERSION')) {
             return \Shopware::VERSION;
         }
-        return Shopware()->Container()->get('shopware.release.version');
+        return Shopware()->Container()->getParameter('shopware.release.version');
     }
 
     public function getModuleVersion() {
