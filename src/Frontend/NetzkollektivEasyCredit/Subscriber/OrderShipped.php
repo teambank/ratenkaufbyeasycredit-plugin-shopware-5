@@ -16,7 +16,8 @@ class OrderShipped extends OrderStatusChanged
     public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
         try {
             $order = $eventArgs->getEntity();
-            if (empty($order->getTransactionId())) {
+            $transactionId = $order->getTransactionId();
+            if (empty($transactionId)) {
                 throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
             }
 
