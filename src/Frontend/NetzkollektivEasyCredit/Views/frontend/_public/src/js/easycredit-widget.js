@@ -114,9 +114,9 @@ if (typeof define === 'function' && define.amd) {
             opts.amount = $(this).data('easycredit-amount');
         }
 
-        if (isNaN(opts.amount) || opts.amount < 200 || opts.amount > 5000) {
+        if (isNaN(opts.amount) || opts.amount < 200 || opts.amount > 10000) {
             if (opts.debug) {
-                console.log(opts.amount+' is not between 200 and 5000');
+                console.log(opts.amount+' is not within allowed range');
             }
             return;
         }
