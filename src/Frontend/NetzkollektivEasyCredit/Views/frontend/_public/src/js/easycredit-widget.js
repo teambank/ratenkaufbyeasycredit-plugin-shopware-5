@@ -32,6 +32,7 @@ if (typeof define === 'function' && define.amd) {
         hostname: 'https://ratenkauf.easycredit.de',
         endpoint: '/ratenkauf-ws/rest/v1/modellrechnung/guenstigsterRatenplan',
         iframeSrc: '/ratenkauf/content/intern/paymentPageBeispielrechnung.jsf',
+        iframeSrc: '/widget/app/#/ratenwunsch',
         modal: easycreditModal.init.bind(easycreditModal),
         webshopId: null,
         amount: null,
