@@ -78,6 +78,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     protected function setPaymentClearedDate($transactionId) {
+        if (version_compare(Shopware::VERSION,'5.1.0') == -1) {
+            return;
+        }
+
         $sql = "
             UPDATE s_order as o
             INNER JOIN s_core_states AS s
