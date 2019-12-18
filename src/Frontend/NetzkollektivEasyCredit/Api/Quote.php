@@ -42,7 +42,7 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     public function getShippingMethod() {
         $order = Shopware()->Session()->sOrderVariables;
         if (isset($order['sDispatch']['name'])) {
-            return $order['sDispatch']['name'];
+            return strip_tags($order['sDispatch']['name']);
         }
     }
 

@@ -50,34 +50,31 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function indexAction()
     {
-        $checkout = $this->get('easyCreditCheckout');
-
         try{
-            $captureResult = $checkout->capture();
+            $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
+            $paymentUniqueId = $this->createPaymentUniqueId();
+            $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
+
+            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId);
+
+            $checkout = $this->get('easyCreditCheckout');
+            $captureResult = $checkout->capture(null, $orderNumber);
+
+            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId);
+            $this->setPaymentClearedDate($transactionId);
+
+            $this->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'finish',
+                'sUniqueID' => $paymentUniqueId
+            ));
+
         } catch (Exception $e) {
+
             Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
             $this->redirectCheckoutConfirm();
             return;
         }
-
-        $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
-        $paymentUniqueId = $this->createPaymentUniqueId();
-
-        $paymentStatusId = null;
-        $configPaymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
-
-        if ($configPaymentStatusId && $configPaymentStatusId > -1 && is_numeric($configPaymentStatusId)) {
-            $paymentStatusId = $configPaymentStatusId;
-        }
-
-        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatusId);
-        $this->setPaymentClearedDate($transactionId);
-
-        $this->redirect(array(
-            'controller' => 'checkout',
-            'action' => 'finish',
-            'sUniqueID' => $paymentUniqueId
-        ));
     }
 
     protected function setPaymentClearedDate($transactionId) {

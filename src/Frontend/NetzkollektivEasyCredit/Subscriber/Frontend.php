@@ -226,6 +226,12 @@ class Frontend implements SubscriberInterface
                 $this->_extendConfirmTemplate($view);
                 break;
 
+            case 'cart':
+                if ($error = $this->_displayError($action)) {
+                    $view->sBasketInfo = $error;
+                }
+                break;
+
             case 'shippingPayment':
                 if ($error = $this->_displayError($action)) {
                     $view->sBasketInfo = $error;

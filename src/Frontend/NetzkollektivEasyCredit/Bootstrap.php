@@ -20,7 +20,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.6.3';
+        return '1.6.4';
     }
 
     public function getInfo()
@@ -55,7 +55,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         return array(
             'success' => true,
-            'invalidateCache' => array('config', 'backend', 'proxy', 'frontend'),
+            'invalidateCache' => array('config', 'backend', 'proxy', 'template','frontend', 'theme'),
         );
     }
 
@@ -69,7 +69,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         return array(
             'success' => true,
-            'invalidateCache' => array('config', 'backend', 'proxy', 'frontend'),
+            'invalidateCache' => array('config', 'backend', 'proxy', 'template','frontend', 'theme'),
         );
     }
 
@@ -227,6 +227,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     {
         $form = $this->Form();
 
+        $position = 10;
         // Frontend settings
 
         $form->setElement(
@@ -236,7 +237,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.'
+                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.',
+                'position' => $position++
             )
         );
 
@@ -250,6 +252,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'store' => 'base.OrderStatus',
                 'displayField' => 'description',
                 'valueField' => 'id',
+                'position' => $position++
             )
         );
 
@@ -263,6 +266,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'store' => 'base.PaymentStatus',
                 'displayField' => 'description',
                 'valueField' => 'id',
+                'position' => $position++
             )
         );
 
@@ -273,7 +277,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Zinsen nach Bestellabschluss aus Bestellung entfernen',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Die Ausweisung der beim Ratenkauf anfallenden Zinsen ggü. dem Kunden ist rechtlich erforderlich. Für die Klärung, wie Sie die Zinsen mit in Ihre Buchhaltung übernehmen, empfehlen wir Ihnen sich mit Ihrem Steuerberater abzustimmen.'
+                'description' => 'Die Ausweisung der beim Ratenkauf anfallenden Zinsen ggü. dem Kunden ist rechtlich erforderlich. Für die Klärung, wie Sie die Zinsen mit in Ihre Buchhaltung übernehmen, empfehlen wir Ihnen sich mit Ihrem Steuerberater abzustimmen.',
+                'position' => $position++
             )
         );
 
@@ -283,7 +288,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             array(
                 'label' => 'API Debug Logging',
                 'value' => false,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'position' => $position++
             )
         );
 
@@ -295,7 +301,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Ihre Webshop-ID finden Sie nach erfolgreicher Anmeldung im easyCredit Händlerinterface im Unterpunkt Shopadministration (z.B. 1.de.xxxx.1).'                
+                'description' => 'Ihre Webshop-ID finden Sie nach erfolgreicher Anmeldung im easyCredit Händlerinterface im Unterpunkt Shopadministration (z.B. 1.de.xxxx.1).',
+                'position' => $position++
             )
         );
 
@@ -307,7 +314,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Ihr API-Kennwort legen Sie im easyCredit Händlerinterface im Unterpunkt Shopadministration selbst fest.'
+                'description' => 'Ihr API-Kennwort legen Sie im easyCredit Händlerinterface im Unterpunkt Shopadministration selbst fest.',
+                'position' => $position++
             )
         );
 
@@ -318,7 +326,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 array(
                     'label' => '<strong>Jetzt API-Zugangsdaten testen<strong>',
                     'handler' => "function(btn) {"
-                        . file_get_contents(__DIR__ . '/Views/backend/plugins/easycredit/test.js') . "}"
+                        . file_get_contents(__DIR__ . '/Views/backend/plugins/easycredit/test.js') . "}",
+                    'position' => $position++
                 )
             );
         }
@@ -330,7 +339,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => '„Lieferung melden“ automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.'
+                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.',
+                'position' => $position++
             )
         );
 
@@ -344,6 +354,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'store' => 'base.OrderStatus',
                 'displayField' => 'description',
                 'valueField' => 'id',
+                'position' => $position++
             )
         );
 
@@ -354,7 +365,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Rückabwicklung automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.'
+                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.',
+                'position' => $position++
             )
         );
 
@@ -368,6 +380,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'store' => 'base.OrderStatus',
                 'displayField' => 'description',
                 'valueField' => 'id',
+                'position' => $position++
             )
         );
     }
