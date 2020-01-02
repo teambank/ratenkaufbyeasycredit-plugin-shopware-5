@@ -78,7 +78,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     protected function setPaymentClearedDate($transactionId) {
-        if (version_compare(Shopware::VERSION,'5.1.0') == -1) {
+        if (defined('\Shopware::VERSION') && version_compare(\Shopware::VERSION,'5.1.0') == -1) {
             return;
         }
 
