@@ -46,7 +46,7 @@ class Frontend implements SubscriberInterface
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
-            'sOrder::sSaveOrder::after'                                                 => 'onOrderSave',
+            'Shopware_Modules_Order_SendMail_BeforeSend'                                => 'onOrderSave'
         );
     }
 
@@ -70,13 +70,19 @@ class Frontend implements SubscriberInterface
         
     }
 
-    public function onOrderSave(\Enlight_Hook_HookArgs $args) {
-        $this->updateInterestModus($args);
-        $this->removeInterestFromOrder($args);
+    public function onOrderSave(\Enlight_Event_EventArgs $args) {
+
+        $context = $args->get('context');
+        $orderNumber = $context['sOrderNumber'];
+        if (empty($orderNumber)) {
+            return;
+        }
+
+        $this->updateInterestModus($orderNumber);
+        $this->removeInterestFromOrder($orderNumber);
     }
 
-    protected function updateInterestModus($args) {
-        $orderNumber = $args->getReturn();
+    protected function updateInterestModus($orderNumber) {
 
         // update interest modus to "premium article" for correct tax handling (otherwise shopware overwrites tax)
         $this->db->query("UPDATE s_order_details od
@@ -87,12 +93,10 @@ class Frontend implements SubscriberInterface
         ", [$orderNumber, self::INTEREST_ORDERNUM]);
     }
 
-    protected function removeInterestFromOrder(\Enlight_Hook_HookArgs $args) {
+    protected function removeInterestFromOrder($orderNumber) {
         if (!$this->config->get('easycreditRemoveInterestFromOrder')) {
             return;
         }
-
-        $orderNumber = $args->getReturn();
 
         try {
             $this->db->beginTransaction();
