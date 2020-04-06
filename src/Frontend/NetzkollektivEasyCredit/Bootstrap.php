@@ -52,6 +52,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createEvents();
         $this->_createPaymentConfigForm();
         $this->_createPayment();
+        $this->_createMenuItem();
+
 
         return array(
             'success' => true,
@@ -166,6 +168,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         $this->get('events')->addSubscriber(new Subscriber\Frontend($this));
         $this->get('events')->addSubscriber(new Subscriber\Backend($this));
+        $this->get('events')->addSubscriber(new Subscriber\BackendMerchant($this));
     }
 
     public function onInitResourceCheckout()
@@ -200,6 +203,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
+    public function registerTemplateDir($viewDir = 'Views') {
+        $template = $this->get('template');
+        $template->addTemplateDir($this->Path() . $viewDir.'/');
+    }
+
     public function getPayment()
     {
         return $this->Payments()->findOneBy(
@@ -219,6 +227,21 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'additionalDescription' => '',
                 'template' => 'easycredit.tpl',
                 'class' => 'easycredit',
+            )
+        );
+    }
+
+    protected function _createMenuItem()
+    {
+        $parent = $this->Menu()->findOneBy(array('label' => 'Zahlungen'));
+        $this->createMenuItem(
+            array(
+                'label' => 'ratenkauf by easyCredit',
+                'controller' => 'EasycreditMerchant',
+                'action' => 'Index',
+                'class' => 'easycredit--icon',
+                'active' => 1,
+                'parent' => $parent,
             )
         );
     }

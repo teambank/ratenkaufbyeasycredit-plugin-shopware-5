@@ -4,9 +4,14 @@ services:
     image: dnhsoft/shopware:5.4.6
     volumes:
       - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
+      - ./merchant-interface/dist:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Views/backend/_resources/merchant
       - ./module-api/EasyCreditApi:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Library/Netzkollektiv/EasyCreditApi
       - ./tools:/tools
       - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
+      - /opt/gocode/bin/mhsendmail:/usr/local/bin/mhsendmail
+      - /opt/global/conf/mailhog.ini:/usr/local/etc/php/conf.d/mailhog.ini
+      - /opt/global/conf/mailhog.ini:/etc/php/7.3/apache2/conf.d/50-mailhog.ini
+
     environment:
       SMTP_HOST: smtp
       SWDB_DATABASE: shopware
