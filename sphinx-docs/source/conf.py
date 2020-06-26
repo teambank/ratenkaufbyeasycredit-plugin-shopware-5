@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'ratenkauf by easyCredit für Shopware 5.x'
-copyright = u'2019, NETZKOLLEKTIV GmbH'
+copyright = u'2020, NETZKOLLEKTIV GmbH'
 author = u'Teambank AG'
 
 # The short X.Y version
