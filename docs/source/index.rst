@@ -13,5 +13,7 @@ ratenkauf by easyCredit für Shopware 5.x
    requirements.rst 
    installation.rst
    configuration.rst
+   usage-customer.rst
+   usage-merchant.rst
    faq.rst
    changelog.rst

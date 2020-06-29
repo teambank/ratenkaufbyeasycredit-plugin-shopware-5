@@ -40,11 +40,11 @@ Um das Plugin über die Kommandozeile zu installieren, führen Sie die folgenden
 
 .. code-block:: console
 
-    $ wget https://www.easycredit-ratenkauf.de/download/easycredit-shopware-1.3.0.zip
-    $ cp easycredit-shopware-1.3.0.zip /sw-base-dir/engine/Shopware/Plugins/
+    $ wget https://www.easycredit-ratenkauf.de/download/easycredit-shopware-x.x.x.zip
+    $ cp easycredit-shopware-x.x.x.zip /sw-base-dir/engine/Shopware/Plugins/
     $ cd /sw-base-dir/engine/Shopware/Plugins/
-    $ unzip easycredit-shopware-1.3.0.zip
-    $ rm easycredit-shopware-1.3.0.zip
+    $ unzip easycredit-shopware-x.x.x.zip
+    $ rm easycredit-shopware-x.x.x.zip
 
 
 Um sicher zu gehen, überprüfen Sie, ob das folgende Verzeichnis existiert: ``engine/Shopware/Plugins/Netzkollektiv/EasyCredit``. Im Anschluss installieren und aktivieren Sie das Plugin mit den folgenden Befehlen:

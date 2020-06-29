@@ -1,9 +1,60 @@
 Changelog
 =========
 
+v1.7.1
+------
+* Schriftart in Merchant-Interface wurde ausgetauscht
+* kleinere Fehlerbehebungen in Transaktionsmanager
+
+v1.7.0
+------
+* Integration des Merchant-Interfaces zur Transaktionsverwaltung
+* der vormals integrierte Tilgunsplan wurde vollständig entfernt
+
+v1.6.6
+------
+* durch Pickware generierte Rechnungen enthalten nun keine MwSt. mehr
+
+v1.6.5
+------
+* Konstante \Shopware::VERSION wird nun auf Existenz geprüft (führte zu Fehler in Shopware > 5.6)
+
+v1.6.4
+------
+* die Bestellnummer wird bei der Zahlungsbestätigung an API übergeben
+* es wird nun die v2 der easyCredit API verwendet (ausgenommen "Zugangsdaten testen")
+* HTML Tags werden vor Übermittlung an die API aus Versandart entfernt (verhindert API Fehler bei img-Tag in Versandart)
+* Erweitere Cache-Invalidierung bei Plugin-Update
+* die Zahlartenfelder werden nun immer in definierter Reihenfolge dargestellt
+* Fehlerbehebung SW 5.0: Zahlungsdatum führt zu Column not found 'name', Zahlungsdatum entfernt
+* wenn die Bestellung nicht bestätigt werden kann, z.B. durch Timeout, wird eine entsprechende Fehlermeldung angezeigt; der Zahlungsstatus bleibt "offen"
+
+v1.6.3
+------
+* Anpassung der Merchant Interface URL für Transaktionssuche (z.B. /transaktionen/TKTW2J)
+* Optimierung des Loggings für die Merchant API
+* Anpassung der Widget URL auf neue Version
+
+v1.6.2
+------
+* das Widget wird nun auch bei Beträgen bis 10.000 EUR angezeigt
+
+v1.6.1
+------
+* behebt einen Fehler beim Auslesen der System-Version in Shopware 5.6.0
+
 v1.6.0
 ------
+* Integration von Transaktions-Statusänderung bei Status für "Lieferung melden" & "Rückabwicklung melden"
 
+v1.5.5
+------
+* behebt ein Problem beim Plugin-Update, dass dazu führte dass Ressourcen ohne Neuinstallation nicht mehr korrekt angezeigt wurden
+
+v1.5.4
+------
+* CSS- und JS-Ressourcen werden nun auch über die Konsole (sw:theme:cache:generate) korrekt kompiliert (umgeht einen Fehler in Shopware, Widget-Anzeige)
+* durch eine Änderung in Shopware 5.5.8 kam es zu einem Fehler im Checkout. Das Plugin wurde entsprechend angepasst, damit dieser Fehler nicht mehr auftritt
 
 v1.5.3
 ------
@@ -14,7 +65,6 @@ v1.5.3
 
 v1.5.2
 ------
-
 * Möglichkeit der Änderung der Adresse bei nicht akzeptierten Adressen oder Adresskombinationen über konditional eingeblendete Lightbox (#3526)
 * Angabe einer abweichenden Lieferadresse im Bestätigungsschritt ist nicht mehr möglich bei Zahlart ratenkauf by easyCredit
 * die statische Zustimmungserklärung wird einen Tag im Shop des Händlers gecacht, bevor ein neuer Request an die API erfolgt (Performance)
@@ -55,7 +105,6 @@ v1.4.4
 * behebt ein Problem, dass das Speichern von ratenkauf by easyCredit Bestellungen im Backend verhindert hat
 * zuverlässigere Anzeige des Ratenkauf-Widgets durch Verwendung eines anderen Events
 
-
 v1.4.3
 ------
 * behebt fehlerhaftes Verhalten in bestimmten Umgebungen (Checkout zeigt weisse Seite, #3418)
@@ -78,18 +127,16 @@ v1.3.0
 * Shopware 5.3.x Kompatibilität
 * kein Support mehr für Shopware 4.x
 
-v1.2
-----
+v1.2.0
+------
 * Shopware 5.2.x Kompatibilität
 * Rechtliche API-Übertragungsnachricht wird vom easyCredit Server dynamisch abgerufen
 * easyCredit API v4
 
-v1.1
-----
+v1.1.0
+------
 * Kompatibilitättests
 
-
-v1.0
-----
-
+v1.0.0
+------
 * erstes öffentliches Release

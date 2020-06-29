@@ -26,9 +26,8 @@ author = u'Teambank AG'
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'1.6.0'
+release = u'1.7.1'
 
-html_show_sphinx = False
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -39,6 +38,7 @@ html_show_sphinx = False
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autosectionlabel'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -77,17 +77,25 @@ pygments_style = 'sphinx'
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 
+html_show_sphinx = False
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+  'display_version': True,
+  'style_nav_header_background': 'white'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = [
+    'custom.css',
+]
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
@@ -131,12 +139,12 @@ latex_elements = {
 latex_engine = 'xelatex'
 latex_elements = {
     'classoptions': ',openany,oneside', 
-    'babel' : '\\usepackage[ngerman]{babel}',
+#    'babel' : '\\usepackage[ngerman]{babel}',
     'papersize' : 'a4paper',
     'fontpkg': r'''
-\setmainfont{DejaVu Serif}
-\setsansfont{DejaVu Sans}
-\setmonofont{DejaVu Sans Mono}
+\setmainfont{DejaVuSerif}
+\setsansfont{DejaVuSans}
+\setmonofont{DejaVuSansMono}
 ''',
     'preamble': r'''
 \usepackage[titles]{tocloft}
@@ -155,7 +163,7 @@ latex_logo = '_static/50_ratenkauf_Logo_1240x824_easyCredit.png'
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'sw-easycredit.tex', u'ratenkauf by easyCredit für Shopware',
+    (master_doc, 'sw-easycredit.tex', u'ratenkauf by easyCredit für Shopware 5.x',
      u'Teambank AG', 'manual'),
 ]
 
@@ -165,7 +173,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware',
+    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware 5.x',
      [author], 1)
 ]
 
@@ -176,7 +184,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware',
+    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware 5.x',
      author, 'sw-easycredit', 'One line description of project.',
      'Miscellaneous'),
 ]

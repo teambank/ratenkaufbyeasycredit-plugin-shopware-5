@@ -1,7 +1,7 @@
 .. role:: latex(raw)
    :format: latex
 
-Frequently Asked Questions
+Häufige Fragen
 ============================
 
 Nach Auswahl der Zahlungsart im Frontend, wird die Zustimmungserklärung nicht angezeigt
