@@ -4,9 +4,9 @@ Voraussetzungen
 
 Zu Nutzung von **ratenkauf by easyCredit für Shopware** benötigen Sie:
 
-* eine funktionierende **Shopware 5.x** Installation 
+* eine funktionierende **Shopware 5.x** Installation
 * valide API-Zugangsdaten zu *ratenkauf by easyCredit*
-* die aktuelle Version der Shopware 5.x Extension für ratenkauf by easyCredit (siehe https://www.easycredit-ratenkauf.de/system/magento/)
+* die aktuelle Version der Shopware 5.x Extension für ratenkauf by easyCredit (siehe https://www.easycredit-ratenkauf.de/system/shopware/)
 
 Versionskompatibilität
 ----------------------
@@ -22,7 +22,7 @@ Das Plugin hat neben Shopware 5.x keine weiteren Abhängigkeiten. Es wurde für 
 * 5.6.x
 
 Das Emotion Template und Shopware Versionen < 5.0 werden von der aktuellen Version nicht unterstützt.
-Verwenden Sie für solche Installationen bitte das ältere Release v1.2.5 für Shopware 4. 
+Verwenden Sie für solche Installationen bitte das ältere Release v1.2.5 für Shopware 4.
 
 Zugangsdaten für "ratenkauf by easyCredit"
 ------------------------------------------
@@ -45,11 +45,11 @@ Um ratenkauf by easycredit nutzen zu können, benötigen Sie gültige API-Zugang
 
 Nehmen Sie einfach Kontakt mit uns auf unter:
 
-    sales.ratenkauf@easycredit.de 
+    sales.ratenkauf@easycredit.de
 
     +49(0)911/5390 2726
 
-Oder registrieren Sie sich direkt unter: 
+Oder registrieren Sie sich direkt unter:
 
     https://www.easycredit-ratenkauf.de/registrierung.htm
 

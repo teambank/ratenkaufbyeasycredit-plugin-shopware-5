@@ -12,7 +12,6 @@ Transaktionsmanager
 Der Transaktionsmanager in der Detailansicht einer mit ratenkauf by easyCredit bezahlten Bestellung zeigt eine Übersicht über die zur Bestellung gehörende Zahlungstransaktion und deren Historie. Über den Transaktionsmanager kann der Transaktionsstatus aus dem Shopware Backend heraus direkt an ratenkauf by easyCredit gemeldet werden.
 
 .. image:: ./_static/merchant-tx-manager.png
-           :scale: 50%
 
 Statusmeldung über den Transaktionsmanager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -22,25 +21,27 @@ Zur Meldung des Transaktionsstatus wählen Sie den gewünschten Status und sende
 Bei Rückabwicklung wählen Sie bitte den Grund und geben Sie bei einer Teil-Rückabwicklung den entsprechenden Betrag ein.
 
 .. image:: ./_static/merchant-tx-manager-options.png
-           :scale: 50%
 
 Statusmeldung über die Bestellverarbeitung
 ----------------------------------------------------
 
-Neben der expliziten Meldung über den :ref:`Transaktionsmanager` integriert die Extension die Statusmeldung auch in die Bestellverarbeitung von Shopware. Bei der Änderung des Bestellstatus meldet das Plugin den Status implizit je nach Einstellung im Plugin.
+Neben der expliziten Meldung über den :ref:`Transaktionsmanager` integriert die Extension die Statusmeldung auch in die Bestellverarbeitung von Shopware. Bei der Änderung des Bestellstatus meldet das Plugin den Status implizit je nach entsprechender Einstellung. Die Einstellungen sind unter :ref:`Plugin konfigurieren` zu finden.
+
+.. image:: ./_static/merchant-auto-settings.png
+
+.. warning:: Die Bestellung ist nicht direkt nach dem Bestelleingang als Transaktion vorhanden. Dies kann bis zu 24 Std. dauern. Die automatische Meldung des Transaktionsstatus funktioniert nur, wenn die Bestellung bereits bei ratenkauf by easyCredit vorhanden ist.
 
 Lieferung melden
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Wird der Bestellstatus vom Händler auf den eingestellten Status geändert, meldet das Plugin die Lieferung im Hintergrund automatisch.
 
 .. note:: Die Meldung entspricht dem Status "Lieferung melden" über den Transaktionsmanager.
 
 Rückabwicklung
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Wird eine Rechnung über Shopware gutgeschrieben, wird die Transaktion widerrufen bzw. rückgängig gemacht und an ratenkauf by easyCredit gemeldet ("Refund" [#f1]_). Die Änderung ist im Transaktionsmanager ersichtlich.
-
-Die Erstattung muss über den Button "Erstatten" erfolgen. Bei einer "Erstattung (offline)" wird der Transaktionsstatus bei ratenkauf by easyCredit nicht aktualisiert. Dies kann aber über den :ref:`Transaktionsmanager` nachgeholt werden.
+Wird der Bestellstatus vom Händler auf den eingestellten Status geändert, meldet das Plugin die Rückabwicklung im Hintergrund automatisch.
 
 .. note:: Die Meldung entspricht dem Status "Widerruf vollständig" über den Transaktionsmanager.
 

@@ -13,8 +13,6 @@ services:
   shopware56:
     extends: shopware
     build: .
-    ports:
-     - "127.0.0.1:30356:80"
     links:
      - db
     environment:
@@ -25,8 +23,6 @@ services:
   shopware55:
     extends: shopware
     image: dnhsoft/shopware:5.5.6
-    ports:
-     - "127.0.0.1:30355:80"
     links:
      - db
     environment:
@@ -37,8 +33,6 @@ services:
   shopware54:
     extends: shopware
     image: dnhsoft/shopware:5.4.6
-    ports:
-     - "127.0.0.1:30354:80"
     links:
      - db
     environment:
@@ -49,8 +43,6 @@ services:
   shopware53:
     extends: shopware
     image: dnhsoft/shopware:5.3.7
-    ports:
-     - "127.0.0.1:30353:80"
     links:
      - db
     environment:
@@ -61,8 +53,6 @@ services:
   shopware52:
     extends: shopware
     image: dnhsoft/shopware:5.2.27
-    ports:
-     - "127.0.0.1:30352:80"
     links:
      - db
     environment:
@@ -73,8 +63,6 @@ services:
   shopware51:
     extends: shopware
     image: dnhsoft/shopware:5.1.6
-    ports:
-     - "127.0.0.1:30351:80"
     links:
      - db
     environment:
@@ -85,14 +73,25 @@ services:
   shopware50:
     extends: shopware
     image: dnhsoft/shopware:5.0.4
-    ports:
-     - "127.0.0.1:30350:80"
     links:
      - db
     environment:
       SWDB_DATABASE: shopware50
     labels:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware50.dev.netzkollektiv.com"
+
+  docs:
+    image: nginx
+    volumes:
+      - ./docs/build/html:/usr/share/nginx/html
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.web.port=80'
+      - 'traefik.docker.network=web'
+      - "traefik.web.frontend.rule=Host: sweasycredit.docs.dev.netzkollektiv.com"
+    networks:
+      - web
+      - default
 
   db:
     image: mysql:5.7

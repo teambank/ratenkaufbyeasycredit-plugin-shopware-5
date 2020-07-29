@@ -21,7 +21,7 @@ Nach Aktivieren der Debug Logging Option in den Plugin-Einstellungen, wird kein 
 Das Log Level im Production Modus von Shopware ist standardmäßig so eingestellt, dass nur kritische Fehler in den Logfiles erscheinen.
 Durch folgende Anpassung des Log Levels in der `config.php` werden auch weniger kritische Nachricht geloggt:
 
-.. code-block:: php 
+.. code-block:: php
 
     'logger' => [
        'level' => 100
@@ -34,7 +34,6 @@ Nach Auswahl der Zahlungsart im Frontend, wird der Tilgungsplan auf der Bestellb
 
 Wurde die Zahlungsart vom Kunden augewählt und der Ratenwunsch über das Ratenkaufterminal bestätigt, wird dem Kunden der Tilgungsplan auf der Bestätigungsseite angezeigt.
 
-Wird der Tilgungsplan nicht angezeigt, ist der Fehler meist im verwendeten Template zu finden. Im Template `themes/Frontend/MeinTheme/frontend/checkout/confirm.tpl` muss an erster Stelle stehen: ``{extends file="par
-ent:frontend/checkout/confirm.tpl"}``. Nur so erbt das Template vom für die confirm-Seite vorgesehenen Template.
+Wird der Tilgungsplan nicht angezeigt, ist der Fehler meist im verwendeten Template zu finden. Im Template `themes/Frontend/MeinTheme/frontend/checkout/confirm.tpl` muss an erster Stelle stehen: ``{extends file="parent:frontend/checkout/confirm.tpl"}``. Nur so erbt das Template vom für die confirm-Seite vorgesehenen Template.
 
 .. note:: Beginnt das Template mit ``{extends file="frontend/index/index.tpl"}`` so erbt das Template von allgemeinen Standardtemplate. In diesem Fall wird der Tilgungsplan nicht angezeigt.
