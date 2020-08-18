@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.7.2
+------
+
+* der Link zu "Was ist ratenkauf by easyCredit" wurde aktualisiert
+
 v1.7.1
 ------
 * Schriftart in Merchant-Interface wurde ausgetauscht
