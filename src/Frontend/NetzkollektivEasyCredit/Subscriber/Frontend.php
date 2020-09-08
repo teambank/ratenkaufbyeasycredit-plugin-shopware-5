@@ -170,6 +170,10 @@ class Frontend implements SubscriberInterface
 
         $paymentID = $orderParams['paymentID'];
 
+        if (empty($paymentID)) {
+            return $orderParams;
+        }
+
         /** @var $payment \Shopware\Models\Payment\Payment */
         $payment = Shopware()->Models()->find('Shopware\Models\Payment\Payment', $paymentID);
 
