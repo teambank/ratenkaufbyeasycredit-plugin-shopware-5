@@ -102,7 +102,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if ($payment !== null) {
             $payment->setActive(true);
             $this->get('models')->flush($payment);
-            $this->updateSpecialFieldTypes();
         }
 
         return array(
@@ -111,7 +110,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    protected function updateSpecialFieldTypes($type = 'easycreditIntro') {
+    public function updateSpecialFieldTypes($type = 'easycreditIntro') {
         $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easycreditBehavior','easycreditCredentials','easycreditMarketing','easycreditClickAndCollectIntro');", 
           array(
             $type
@@ -468,6 +467,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'helpText' => file_get_contents(dirname(__FILE__).'/Views/backend/easycredit_config/clickandcollect.html'),
+                'handler' => "function(btn) { Ext.Msg.alert('Click & Collect', btn.helpText); }",
                 'position' => $position++
             )
         );
