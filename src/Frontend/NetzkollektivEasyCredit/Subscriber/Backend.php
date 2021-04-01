@@ -93,6 +93,7 @@ class Backend implements SubscriberInterface
         $request = $controller->Request();
 
         if ($request->getActionName() == 'load') {
+            $this->bootstrap->updateSpecialFieldTypes();
             $this->bootstrap->registerTemplateDir();
             $view->Template()->template_resource .= PHP_EOL.'{include file="backend/plugin_manager/helper/easycredit_intro.js"}';
         }
