@@ -24,6 +24,7 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     public function __construct() {
         $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
         $this->_user = $this->_getUser();
+        $this->_config = Shopware()->Config();
     }
 
     protected function _getUser()
@@ -44,6 +45,14 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
         if (isset($order['sDispatch']['name'])) {
             return strip_tags($order['sDispatch']['name']);
         }
+    }
+
+    public function getIsClickAndCollect() {
+        $order = Shopware()->Session()->sOrderVariables;
+        return (
+            isset($order['sDispatch']['id'])
+            && $order['sDispatch']['id'] == $this->_config->get('easycreditClickAndCollectShippingMethod')
+        );
     }
 
     public function getGrandTotal() {

@@ -1,15 +1,24 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
+use Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap as Bootstrap;
 use Enlight\Event\SubscriberInterface;
 
 class Backend implements SubscriberInterface
 {
+    protected $bootstrap;
+
+    public function __construct(Bootstrap $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+    }
+
     public static function getSubscribedEvents() {
         return array(
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit' => 'onGetControllerPathPaymentEasycredit',
             'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields'
         );
     }
 
@@ -74,6 +83,21 @@ class Backend implements SubscriberInterface
             }
         }
     }
+
+    public function addConfigFields(\Enlight_Event_EventArgs $args)
+    {
+        /** @var \Shopware_Controllers_Backend_Customer $controller */
+        $controller = $args->getSubject();
+
+        $view = $controller->View();
+        $request = $controller->Request();
+
+        if ($request->getActionName() == 'load') {
+            $this->bootstrap->registerTemplateDir();
+            $view->Template()->template_resource .= PHP_EOL.'{include file="backend/plugin_manager/helper/easycredit_intro.js"}';
+        }
+    }
+
 
     public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
         return $this->Path() . 'Controllers/Backend/PaymentEasycredit.php';

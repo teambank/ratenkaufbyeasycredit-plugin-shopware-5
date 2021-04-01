@@ -5,6 +5,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Netzkollektiv\EasyCreditApi;
 
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     extends Shopware_Components_Plugin_Bootstrap
 {
@@ -98,11 +102,20 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if ($payment !== null) {
             $payment->setActive(true);
             $this->get('models')->flush($payment);
+            $this->updateSpecialFieldTypes();
         }
 
         return array(
             'success' => true,
             'invalidateCache' => array('config', 'backend', 'proxy', 'frontend')
+        );
+    }
+
+    protected function updateSpecialFieldTypes($type = 'easycreditIntro') {
+        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easycreditBehavior','easycreditCredentials','easycreditMarketing','easycreditClickAndCollectIntro');", 
+          array(
+            $type
+          )
         );
     }
 
@@ -112,6 +125,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if ($payment !== null) {
             $payment->setActive(false);
             $this->get('models')->flush($payment);
+            $this->updateSpecialFieldTypes('button');
         }
 
         return array(
@@ -254,64 +268,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         // Frontend settings
 
         $form->setElement(
-            'boolean',
-            'easycreditModelWidget',
+            'button',//'easycreditIntro',
+            'easycreditCredentials',
             array(
-                'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
+                'label' => 'Credentials',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.',
-                'position' => $position++
-            )
-        );
-
-        $form->setElement(
-            'select',
-            'easycreditOrderStatus',
-            array(
-                'label' => 'Bestellungsstatus',
-                'value' => 0,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'store' => 'base.OrderStatus',
-                'displayField' => 'description',
-                'valueField' => 'id',
-                'position' => $position++
-            )
-        );
-
-        $form->setElement(
-            'select',
-            'easycreditPaymentStatus',
-            array(
-                'label' => 'Zahlungsstatus',
-                'value' => 12,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'store' => 'base.PaymentStatus',
-                'displayField' => 'description',
-                'valueField' => 'id',
-                'position' => $position++
-            )
-        );
-
-        $form->setElement(
-            'boolean',
-            'easycreditRemoveInterestFromOrder',
-            array(
-                'label' => 'Zinsen nach Bestellabschluss aus Bestellung entfernen',
-                'value' => false,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Die Ausweisung der beim Ratenkauf anfallenden Zinsen ggü. dem Kunden ist rechtlich erforderlich. Für die Klärung, wie Sie die Zinsen mit in Ihre Buchhaltung übernehmen, empfehlen wir Ihnen sich mit Ihrem Steuerberater abzustimmen.',
-                'position' => $position++
-            )
-        );
-
-        $form->setElement(
-            'boolean',
-            'easycreditDebugLogging',
-            array(
-                'label' => 'API Debug Logging',
-                'value' => false,
-                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'helpText' => '<h2>API Credentials</h2>',
                 'position' => $position++
             )
         );
@@ -354,6 +317,71 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 )
             );
         }
+
+        $form->setElement(
+            'button',//'easycreditIntro',
+            'easycreditBehavior',
+            array(
+                'label' => 'Behavior',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'helpText' => '<h2>Behavior</h2>',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditDebugLogging',
+            array(
+                'label' => 'API Debug Logging',
+                'value' => false,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'position' => $position++
+            )
+        );
+
+
+
+        $form->setElement(
+            'select',
+            'easycreditOrderStatus',
+            array(
+                'label' => 'Bestellungsstatus',
+                'value' => 0,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.OrderStatus',
+                'displayField' => 'description',
+                'valueField' => 'id',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditPaymentStatus',
+            array(
+                'label' => 'Zahlungsstatus',
+                'value' => 12,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.PaymentStatus',
+                'displayField' => 'description',
+                'valueField' => 'id',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditRemoveInterestFromOrder',
+            array(
+                'label' => 'Zinsen nach Bestellabschluss aus Bestellung entfernen',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Die Ausweisung der beim Ratenkauf anfallenden Zinsen ggü. dem Kunden ist rechtlich erforderlich. Für die Klärung, wie Sie die Zinsen mit in Ihre Buchhaltung übernehmen, empfehlen wir Ihnen sich mit Ihrem Steuerberater abzustimmen.',
+                'position' => $position++
+            )
+        );
 
         $form->setElement(
             'boolean',
@@ -402,6 +430,57 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'store' => 'base.OrderStatus',
                 'displayField' => 'description',
+                'valueField' => 'id',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'button',//'easycreditIntro',
+            'easycreditMarketing',
+            array(
+                'label' => 'Marketing',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'helpText' => '<h2>Marketing</h2>',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditModelWidget',
+            array(
+                'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.',
+                'position' => $position++
+            )
+        );
+
+
+        $form->setElement(
+            'button',//'easycreditIntro',
+            'easycreditClickAndCollectIntro',
+            array(
+                'label' => 'Click & Collect',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'helpText' => file_get_contents(dirname(__FILE__).'/Views/backend/easycredit_config/clickandcollect.html'),
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditClickAndCollectShippingMethod',
+            array(
+                'label' => 'Shipping Method',
+                'value' => '',
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.Dispatch',
+                'displayField' => 'name',
                 'valueField' => 'id',
                 'position' => $position++
             )
