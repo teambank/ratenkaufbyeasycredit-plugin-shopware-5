@@ -1,9 +1,12 @@
 Changelog
 =========
 
+v1.7.3
+------
+* Verbesserung der Kompatibilität mit Drittanbieter-Zahlungsplugins
+
 v1.7.2
 ------
-
 * der Link zu "Was ist ratenkauf by easyCredit" wurde aktualisiert
 
 v1.7.1
