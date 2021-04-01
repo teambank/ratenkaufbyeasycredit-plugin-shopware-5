@@ -72,6 +72,13 @@ class Frontend implements SubscriberInterface
 
     public function onOrderSave(\Enlight_Event_EventArgs $args) {
 
+        $orderVariables = $args->get('variables');
+        if (!isset($orderVariables['additional']['payment']['name'])
+            || $orderVariables['additional']['payment']['name'] != 'easycredit'
+        ) {
+            return;
+        }
+
         $context = $args->get('context');
         $orderNumber = $context['sOrderNumber'];
         if (empty($orderNumber)) {
