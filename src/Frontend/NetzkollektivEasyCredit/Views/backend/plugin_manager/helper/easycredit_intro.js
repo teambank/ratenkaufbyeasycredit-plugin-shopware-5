@@ -1,3 +1,5 @@
+//{block name="backend/plugin_manager/view/detail/container" append}
+
 Ext.define('Netzkollektiv.EasyCredit.ClickAndCollect',{
   extend: 'Ext.panel.Panel',
   cls: 'easycredit-click-and-collect-intro-panel',
@@ -7,3 +9,5 @@ Ext.define('Netzkollektiv.EasyCredit.ClickAndCollect',{
       this.update(this.helpText);
   }
 });
+
+//{/block}
