@@ -270,10 +270,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'button',//'easycreditIntro',
             'easycreditCredentials',
             array(
-                'label' => 'Credentials',
+                'label' => 'API-Zugangsdaten',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'helpText' => '<h2>API Credentials</h2>',
+                'helpText' => '<h2>API-Zugangsdaten</h2>',
                 'position' => $position++
             )
         );
@@ -321,10 +321,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'button',//'easycreditIntro',
             'easycreditBehavior',
             array(
-                'label' => 'Behavior',
+                'label' => 'Verhalten',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'helpText' => '<h2>Behavior</h2>',
+                'helpText' => '<h2>Verhalten</h2>',
                 'position' => $position++
             )
         );
@@ -476,7 +476,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'select',
             'easycreditClickAndCollectShippingMethod',
             array(
-                'label' => 'Shipping Method',
+                'label' => 'Versandart',
                 'value' => '',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'store' => 'base.Dispatch',
