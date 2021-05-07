@@ -1,0 +1,8 @@
+{
+    "require": {
+        "ratenkaufbyeasycredit/php-sdk": "^1.4"
+    },
+    "config": {
+      "vendor-dir": "src/Frontend/NetzkollektivEasyCredit/vendor"
+    }
+}

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.8.1
+------
+
+* verbessert die Zuverlässigkeit im Zusammenspiel mit Drittanbieter-Plugins
+
 v1.8.0
 ------
 * eine Versandart kann für „Click & Collect“ definiert werden

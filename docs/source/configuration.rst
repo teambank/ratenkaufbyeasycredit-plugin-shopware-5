@@ -62,3 +62,11 @@ Im ersten Reiter **Generell** stellen Sie sicher, dass **ratenkauf by easyCredit
 Aktivieren Sie als letzten Schritt nun im Reiter **Länder-Auswahl** das Land **Deutschland**.
 
 .. image:: ./_static/config-payment-country.png
+
+Click & Collect konfigurieren
+------------------------------
+
+Um *Click & Collect* für eine Versandart zu aktivieren, kann diese als *Click & Collect*-Versandart ausgewählt werden. Wählt der Kunde diese Versandart im Bezahlvorgang aus, wird dies bei der Finanzierungsanfrage entsprechend übertragen. Weitere Informationen finden Sie unter `Click & Collect <https://www.easycredit-ratenkauf.de/click-und-collect/>`_
+
+.. image:: ./_static/config-clickandcollect.png
+           :scale: 50%
