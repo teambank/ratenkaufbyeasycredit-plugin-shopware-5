@@ -41,17 +41,19 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     }
 
     public function getShippingMethod() {
-        $order = Shopware()->Session()->sOrderVariables;
-        if (isset($order['sDispatch']['name'])) {
-            return strip_tags($order['sDispatch']['name']);
+        $controller = new FakeCheckoutController();
+        $dispatch = $controller->getSelectedDispatch();
+        if (isset($dispatch['name'])) {
+            return strip_tags($dispatch['name']);
         }
     }
 
     public function getIsClickAndCollect() {
-        $order = Shopware()->Session()->sOrderVariables;
+        $controller = new FakeCheckoutController();
+        $dispatch = $controller->getSelectedDispatch();
         return (
-            isset($order['sDispatch']['id'])
-            && $order['sDispatch']['id'] == $this->_config->get('easycreditClickAndCollectShippingMethod')
+            isset($dispatch['id'])
+            && $dispatch['id'] == $this->_config->get('easycreditClickAndCollectShippingMethod')
         );
     }
 

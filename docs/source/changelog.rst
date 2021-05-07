@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.8.2
+------
+
+* die Versandmethode wird nun bei Initialisierung zuverlässig übertragen
+
 v1.8.1
 ------
 
