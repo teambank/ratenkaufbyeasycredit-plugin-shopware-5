@@ -1,49 +1,58 @@
-[
-    {
-        "name": "ratenkaufbyeasycredit/php-sdk",
-        "version": "1.4.0",
-        "version_normalized": "1.4.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/netzkollektiv/ratenkaufbyeasycredit-php-sdk.git",
-            "reference": "cb74afd642c46f5906cf46a0738365a5f467ff38"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/netzkollektiv/ratenkaufbyeasycredit-php-sdk/zipball/cb74afd642c46f5906cf46a0738365a5f467ff38",
-            "reference": "cb74afd642c46f5906cf46a0738365a5f467ff38",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2021-03-29T10:01:24+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Netzkollektiv\\EasyCreditApi\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "NETZKOLLEKTIV GmbH",
-                "email": "kontakt@netzkollektiv.com"
-            }
-        ],
-        "description": "ratenkauf by easyCredit SDK (PHP)",
-        "keywords": [
-            "easycredit",
-            "payment",
-            "payments",
-            "ratenkauf",
-            "ratenkauf by easycredit",
-            "ratenzahlung",
-            "teambank"
-        ]
-    }
-]
+{
+    "packages": [
+        {
+            "name": "ratenkaufbyeasycredit/php-sdk",
+            "version": "1.6.0",
+            "version_normalized": "1.6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php.git",
+                "reference": "ca80c6c234b1bd561eef0cf93888a15676502f00"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/teambank/ratenkaufbyeasycredit-lib-php/zipball/ca80c6c234b1bd561eef0cf93888a15676502f00",
+                "reference": "ca80c6c234b1bd561eef0cf93888a15676502f00",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "2021-05-11T08:54:22+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Netzkollektiv\\EasyCreditApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "NETZKOLLEKTIV GmbH",
+                    "email": "kontakt@netzkollektiv.com"
+                }
+            ],
+            "description": "ratenkauf by easyCredit SDK (PHP)",
+            "keywords": [
+                "easycredit",
+                "payment",
+                "payments",
+                "ratenkauf",
+                "ratenkauf by easycredit",
+                "ratenzahlung",
+                "teambank"
+            ],
+            "support": {
+                "issues": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php/issues",
+                "source": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php/tree/1.6.0"
+            },
+            "install-path": "../ratenkaufbyeasycredit/php-sdk"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}

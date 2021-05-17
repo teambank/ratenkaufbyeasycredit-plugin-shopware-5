@@ -1,23 +1,23 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d8bd8223e8c808cc6683133b321f4ecf",
+    "content-hash": "ba79754ad13631c74a98a237ada837e9",
     "packages": [
         {
             "name": "ratenkaufbyeasycredit/php-sdk",
-            "version": "1.4.0",
+            "version": "1.6.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/netzkollektiv/ratenkaufbyeasycredit-php-sdk.git",
-                "reference": "cb74afd642c46f5906cf46a0738365a5f467ff38"
+                "url": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php.git",
+                "reference": "ca80c6c234b1bd561eef0cf93888a15676502f00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/netzkollektiv/ratenkaufbyeasycredit-php-sdk/zipball/cb74afd642c46f5906cf46a0738365a5f467ff38",
-                "reference": "cb74afd642c46f5906cf46a0738365a5f467ff38",
+                "url": "https://api.github.com/repos/teambank/ratenkaufbyeasycredit-lib-php/zipball/ca80c6c234b1bd561eef0cf93888a15676502f00",
+                "reference": "ca80c6c234b1bd561eef0cf93888a15676502f00",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,11 @@
                 "ratenzahlung",
                 "teambank"
             ],
-            "time": "2021-03-29T10:01:24+00:00"
+            "support": {
+                "issues": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php/issues",
+                "source": "https://github.com/teambank/ratenkaufbyeasycredit-lib-php/tree/1.6.0"
+            },
+            "time": "2021-05-11T08:54:22+00:00"
         }
     ],
     "packages-dev": [],
@@ -59,5 +63,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
 }

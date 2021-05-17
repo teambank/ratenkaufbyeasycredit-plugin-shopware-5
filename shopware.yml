@@ -5,7 +5,6 @@ services:
     volumes:
       - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
       - ./merchant-interface/dist:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Views/backend/_resources/merchant
-      - ./module-api/EasyCreditApi:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Library/Netzkollektiv/EasyCreditApi
       - ./tools:/tools
       - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
       - /opt/gocode/bin/mhsendmail:/usr/local/bin/mhsendmail

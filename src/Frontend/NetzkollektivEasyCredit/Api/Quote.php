@@ -63,6 +63,10 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
         return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
     }
 
+    public function getDuration() {
+        return null;
+    }
+
     public function getBillingAddress() {
         return new Quote\Address(
             $this->_user,

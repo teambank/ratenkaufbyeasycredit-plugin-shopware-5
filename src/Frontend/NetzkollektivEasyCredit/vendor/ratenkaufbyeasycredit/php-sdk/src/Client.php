@@ -252,7 +252,7 @@ class Client
                 'urlErfolg' => $returnUrl,
                 'urlAblehnung' => $rejectUrl
             ),
-            'laufzeit' => 36,
+            'laufzeit' => $quote->getDuration(),
             'personendaten' => array(
                 'anrede' => $this->convertCustomerPrefix($customer->getPrefix()),
                 'vorname' => $customer->getFirstname(),
@@ -357,14 +357,16 @@ class Client
 
         }
 
-        if (!$convertForCompare && $address instanceof Rest\ShippingAddressInterface) {
+        if ($address instanceof Rest\ShippingAddressInterface || $convertForCompare) {
             $_address = array_merge($_address, array(
                 'vorname' => $address->getFirstname(),
                 'nachname'  => $address->getLastname()
             ));
 
-            if ($address->getIsPackstation()) {
-                $_address['packstation'] = true;
+            if (!$convertForCompare) {
+                if ($address->getIsPackstation()) {
+                    $_address['packstation'] = true;
+                }
             }
         }
 

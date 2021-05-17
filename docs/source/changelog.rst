@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.8.3
+-------
+
+* Vor- und Nachname werden nun in die Adressüberprüfung einbezogen
+* die Ratenanzahl wird nun nicht mehr statisch übergeben
+* die API-Library wurde auf v.1.6 aktualisiert
+
 v1.8.2
 ------
 

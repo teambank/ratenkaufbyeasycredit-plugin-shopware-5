@@ -441,8 +441,16 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _extendConfirmTemplate($view) {
-        $view->assign('EasyCreditDisableAddressChange', true)
-            ->assign('EasyCreditPaymentPlan',Shopware()->Session()->EasyCredit["payment_plan"]);
+        $paymentPlan = json_decode(Shopware()->Session()->EasyCredit["payment_plan"]);
+
+        $view->assign('EasyCreditPaymentPlan', sprintf('%d Raten à %0.2f€ (%d x %0.2f€, %d x %0.2f€)',
+            (int)   $paymentPlan->anzahlRaten,
+            (float) $paymentPlan->betragRate,
+            (int)   $paymentPlan->anzahlRaten - 1,
+            (float) $paymentPlan->betragRate,
+            1,
+            (float) $paymentPlan->betragLetzteRate
+        ))->assign('EasyCreditDisableAddressChange', true);
     }
     
     public function getPlugin() {
