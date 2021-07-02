@@ -106,7 +106,9 @@
             amount: amount,
             modal: function(element, content, opts) {
                 content = '<div class="easycredit-embed-responsive">'+content+'</div>';
-                $.modal.open(content);
+                $.modal.open(content,{
+                  height: '700px'
+                });
                 $.modal._$content.find('.easycredit-embed-responsive')
                     .css('height','100%')
                     .closest('.modal-inner-wrap')

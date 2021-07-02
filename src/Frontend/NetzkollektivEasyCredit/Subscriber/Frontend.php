@@ -50,7 +50,6 @@ class Frontend implements SubscriberInterface
         );
     }
 
-
     public function sInsertSurchargePercent(\Enlight_Hook_HookArgs $arguments) {
 
         // remove interest from basket, so that the surcharge is not calculated based on amount including interest
@@ -496,9 +495,12 @@ class Frontend implements SubscriberInterface
             if (!in_array(substr($apiError, -1),array('.','!','?'))) {
                 $apiError.='.';
             }
-
-            $error = $apiError.' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.';
+            $error = $apiError;
             Shopware()->Session()->EasyCredit["apiError"] = null;
+
+            if (!isset(Shopware()->Session()->EasyCredit["apiErrorSkipSuffix"])) {
+                $error.= ' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.';
+            }
             $this->getPlugin()->clear();
         }
         return $error;

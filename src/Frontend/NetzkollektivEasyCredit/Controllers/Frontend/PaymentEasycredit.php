@@ -50,17 +50,17 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function indexAction()
     {
-        try{
+        try {
             $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
             $paymentUniqueId = $this->createPaymentUniqueId();
             $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
 
-            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId);
+            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
 
             $checkout = $this->get('easyCreditCheckout');
             $captureResult = $checkout->capture(null, $orderNumber);
 
-            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId);
+            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId, false);
             $this->setPaymentClearedDate($transactionId);
 
             $this->redirect(array(
@@ -69,12 +69,34 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 'sUniqueID' => $paymentUniqueId
             ));
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            $orderStatusId = $this->plugin->Config()->get('easycreditOrderErrorStatus');
+            $this->saveOrderStatus($transactionId, $paymentUniqueId, $orderStatusId, true, $e->getMessage());
 
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
-            $this->redirectCheckoutConfirm();
+            Shopware()->Container()->get('pluginlogger')->error($e->getMessage());
+            Shopware()->Session()->EasyCredit["apiError"] = 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.';
+            Shopware()->Session()->EasyCredit["apiErrorSkipSuffix"] = true;
+            $this->redirect(array(
+                'controller' => 'checkout',
+                'action' => 'cart'
+            ));
             return;
         }
+    }
+
+    public function saveOrderStatus($transactionId, $paymentUniqueId, $orderStatusId, $sendStatusMail = false, $comment)
+    {
+        $sql = '
+            SELECT id FROM s_order
+            WHERE transactionID=? AND temporaryID=?
+            AND status!=-1
+        ';
+        $orderId = (int) Shopware()->Db()->fetchOne($sql, [
+                $transactionId,
+                $paymentUniqueId,
+            ]);
+        $order = Shopware()->Modules()->Order();
+        $order->setOrderStatus($orderId, $orderStatusId, $sendStatusMail, $comment);
     }
 
     protected function setPaymentClearedDate($transactionId) {

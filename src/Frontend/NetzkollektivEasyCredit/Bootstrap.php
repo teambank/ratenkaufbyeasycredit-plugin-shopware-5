@@ -340,14 +340,26 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             )
         );
 
-
-
         $form->setElement(
             'select',
             'easycreditOrderStatus',
             array(
                 'label' => 'Bestellungsstatus',
                 'value' => 0,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'store' => 'base.OrderStatus',
+                'displayField' => 'description',
+                'valueField' => 'id',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'select',
+            'easycreditOrderErrorStatus',
+            array(
+                'label' => 'Bestellungsstatus bei Fehlern',
+                'value' => 4,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'store' => 'base.OrderStatus',
                 'displayField' => 'description',
@@ -369,6 +381,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'position' => $position++
             )
         );
+
 
         $form->setElement(
             'boolean',
