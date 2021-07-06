@@ -203,6 +203,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
+    public function getStorage() {
+        return new Api\Storage();
+    }
+
     public function onInitResourceMerchant()
     {
         $logger = new Api\Logger();

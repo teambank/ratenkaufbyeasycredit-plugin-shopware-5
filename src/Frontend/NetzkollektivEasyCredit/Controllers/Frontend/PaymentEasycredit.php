@@ -74,8 +74,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $this->saveOrderStatus($transactionId, $paymentUniqueId, $orderStatusId, true, $e->getMessage());
 
             Shopware()->Container()->get('pluginlogger')->error($e->getMessage());
-            Shopware()->Session()->EasyCredit["apiError"] = 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.';
-            Shopware()->Session()->EasyCredit["apiErrorSkipSuffix"] = true;
+            $this->getPlugin()->getStorage()->set('apiError', 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
+            $this->getPlugin()->getStorage()->set('apiErrorSkipSuffix', true);
             $this->redirect(array(
                 'controller' => 'checkout',
                 'action' => 'cart'
@@ -169,13 +169,13 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         try {
             $approved = $checkout->isApproved();
         } catch (Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             $this->_redirToPaymentSelection();
             return;
         }
 
         if (!$approved) {
-            Shopware()->Session()->EasyCredit["apiError"] = 'Ratenkauf by easyCredit wurde nicht genehmigt.';
+            $this->getPlugin()->getStorage()->set('apiError', 'ratenkauf by easyCredit wurde nicht genehmigt.');
             $this->_redirToPaymentSelection();
             return;
         }
@@ -183,7 +183,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         try{
             $checkout->loadFinancingInformation();
         } catch (Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             $this->_redirToPaymentSelection();
             return;
         }

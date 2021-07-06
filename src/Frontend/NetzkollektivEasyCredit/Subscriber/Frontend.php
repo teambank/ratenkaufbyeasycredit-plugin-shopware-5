@@ -273,13 +273,13 @@ class Frontend implements SubscriberInterface
                 exit;
             }
         } catch (AddressException $e) {
-            Shopware()->Session()->EasyCredit["addressError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
             $action->redirect(array(
                 'controller' => 'checkout',
                 'action' => 'confirm'
             ));
         } catch (\Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             $action->redirect(array(
                 'controller' => 'checkout',
                 'action' => 'confirm'
@@ -316,7 +316,7 @@ class Frontend implements SubscriberInterface
         try {
             $checkout->isAvailable($quote);
         } catch (AddressException $e) {
-            Shopware()->Session()->EasyCredit["addressError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -415,7 +415,7 @@ class Frontend implements SubscriberInterface
         }
 
         if (!$this->getPlugin()->isValid()) {
-            Shopware()->Session()->EasyCredit["apiError"] = self::INTEREST_REMOVED_ERROR;
+            $this->getPlugin()->getStorage()->set('apiError', self::INTEREST_REMOVED_ERROR);
             return $this->_redirToPaymentSelection($action);
         }
 
@@ -427,7 +427,7 @@ class Frontend implements SubscriberInterface
 
             $checkout->loadFinancingInformation();
         } catch (\Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             return $this->_redirToPaymentSelection($action);
         }
     }
@@ -472,10 +472,10 @@ class Frontend implements SubscriberInterface
             $checkout = $this->container->get('easyCreditCheckout');
             $checkout->isAvailable(new Api\Quote());
         } catch (AddressException $e) {
-            Shopware()->Session()->EasyCredit["addressError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
             return;
         } catch (Exception $e) {
-            Shopware()->Session()->EasyCredit["apiError"] = $e->getMessage();
+            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             return;
         }
 
@@ -496,7 +496,7 @@ class Frontend implements SubscriberInterface
                 $apiError.='.';
             }
             $error = $apiError;
-            Shopware()->Session()->EasyCredit["apiError"] = null;
+            $this->getPlugin()->getStorage()->set('apiError', null);
 
             if (!isset(Shopware()->Session()->EasyCredit["apiErrorSkipSuffix"])) {
                 $error.= ' Bitte wählen Sie erneut <strong>'.$this->getPlugin()->getLabel().'</strong> in der Zahlartenauswahl.';

@@ -4,10 +4,12 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 class Storage implements \Netzkollektiv\EasyCreditApi\StorageInterface {
 
     public function set($key,$value) {
-        if (!isset(Shopware()->Session()->EasyCredit)) {
-            Shopware()->Session()->EasyCredit = array();
+        if (!isset(Shopware()->Session()->EasyCredit) || !is_array(Shopware()->Session()->EasyCredit)) {
+            Shopware()->Session()->offsetSet('EasyCredit',array());
         }
-        Shopware()->Session()->EasyCredit[$key] = $value;
+        Shopware()->Session()->offsetSet('EasyCredit',array_merge(Shopware()->Session()->offsetGet('EasyCredit'),array(
+            $key => $value
+        )));
         return $this;
     }
 
