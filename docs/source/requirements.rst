@@ -20,6 +20,7 @@ Das Plugin hat neben Shopware 5.x keine weiteren Abhängigkeiten. Es wurde für 
 * 5.4.x
 * 5.5.x
 * 5.6.x
+* 5.7.x
 
 Das Emotion Template und Shopware Versionen < 5.0 werden von der aktuellen Version nicht unterstützt.
 Verwenden Sie für solche Installationen bitte das ältere Release v1.2.5 für Shopware 4.
