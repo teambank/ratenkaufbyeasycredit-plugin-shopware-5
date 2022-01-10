@@ -3,9 +3,7 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
 class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
     public function __construct() {
-        $this->admin = Shopware()->Modules()->Admin();
-        $this->basket = Shopware()->Modules()->Basket();
-        $this->session = Shopware()->Session();
+        $this->init();
         $this->container = Shopware()->Container();
         $this->setView(new \Enlight_View_Default(
             Shopware()->Container()->get('Template')
