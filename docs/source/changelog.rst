@@ -1,6 +1,23 @@
 Changelog
 =========
 
+v1.8.6
+------
+
+* die Zinsen werden nun statisch als "versandkostenfrei" markiert (behebt Probleme i.V.m. "Eigene Bedingung" & "Eigene Berechnung")
+
+v1.8.5
+------
+
+* Änderung zur Kompatibilität mit Shopware 5.7.7
+
+v1.8.4
+------
+
+* tritt beim Abschliessen der Bestellung ein Fehler in der Kommunikation auf, erhält die Bestellung den neuen Status "Bestellstatus bei Fehlern"
+* Änderungen zur Kompatibilität mit Shopware >= 5.7
+* der Ratenrechner wird nun so dargestellt, dass der Inhalt vollständig ohne Scrollen gezeigt wird
+
 v1.8.3
 -------
 
