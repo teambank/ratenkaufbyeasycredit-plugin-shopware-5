@@ -2,8 +2,10 @@
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Netzkollektiv\EasyCreditApi;
+use Teambank\RatenkaufByEasyCreditApiV3 as ApiV3;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\MessageFormatter;
 
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
@@ -185,39 +187,95 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->get('events')->addSubscriber(new Subscriber\BackendMerchant($this));
     }
 
-    public function onInitResourceCheckout()
-    {
-        $logger = new Api\Logger();
-        $config = new Api\Config();
-        $clientFactory = new EasyCreditApi\Client\HttpClientFactory();
+    protected function getLogger() {
+        $logger = Shopware()->Container()->get('pluginlogger');
 
-        $client = new EasyCreditApi\Client(
-            $config,
-            $clientFactory,
-            $logger
-        );
-        $storage = new Api\Storage();
-
-        return new EasyCreditApi\Checkout(
-            $client,
-            $storage
-        );
+        /*
+        if (Shopware()->Config()->get('easycreditDebugLogging')) {
+            $this->debug = true;
+            $this->allowLineBreaks(true); // allow line breaks in log globally, when easycredit Debug Logging is active
+            $handler = $this->_logger->getHandlers();
+            if (
+                is_array($handlers) 
+                && isset($handlers[0]) 
+                && $handlers[0] instanceof Monolog\Logger\StreamHandler
+                && $handlers[0]->getFormatter() instanceof Monolog\Logger\LineFormatter
+            ) {
+                $handlers[0]->getFormatter()->allowInlineLineBreaks($bool); 
+            }
+        }
+        */
+        return $logger;
     }
 
-    public function getStorage() {
-        return new Api\Storage();
+    protected function getClient () {
+        $stack = HandlerStack::create();
+        $stack->push(
+            Middleware::log(
+                $this->getLogger(),
+                new MessageFormatter(MessageFormatter::DEBUG)
+            )
+        );
+
+        return new \GuzzleHttp\Client([
+            'debug'=> false,
+            'handler' => $stack
+        ]);
+    }
+
+    public function getConfig() {
+        $config = Shopware()->Config();
+
+        return ApiV3\Configuration::getDefaultConfiguration()
+            ->setHost('https://ratenkauf.easycredit.de')
+            ->setUsername($config->get('easycreditApiKey'))
+            ->setPassword($config->get('easycreditApiPassword'))
+            ->setAccessToken($config->get('easycreditApiSignature'));
+    }
+
+    public function onInitResourceCheckout()
+    {
+        $client = $this->getClient();
+        $config = $this->getConfig();
+
+        $webshopApi = new ApiV3\Service\WebshopApi(
+            $client,
+            $config
+        );
+        $transactionApi = new ApiV3\Service\TransactionApi(
+            $client,
+            $config
+        );
+        $installmentplanApi = new ApiV3\Service\InstallmentplanApi(
+            $client,
+            $config
+        );
+
+        return new ApiV3\Integration\Checkout(
+            $webshopApi,
+            $transactionApi,
+            $installmentplanApi,
+            new Api\Storage(),
+			new ApiV3\Integration\Util\AddressValidator(),
+            new ApiV3\Integration\Util\PrefixConverter(),
+            $this->getLogger()
+        );
     }
 
     public function onInitResourceMerchant()
     {
-        $logger = new Api\Logger();
-        $config = new Api\Config();
-        $clientFactory = new EasyCreditApi\Client\HttpClientFactory();
+        $client = $this->getClient();
+        $config = $this->getConfig()
+            ->setHost('https://partner.easycredit-ratenkauf.de');
 
-        return new EasyCreditApi\Merchant(
-            $config,
-            $clientFactory,
-            $logger
+        $transactionApi = new Api\Service\TransactionApi(
+            $client,
+            $config
+        );
+
+        return new Api\Integration\Merchant(
+            $transactionApi,
+            $this->getLogger()
         );
     }
 

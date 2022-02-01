@@ -309,7 +309,8 @@ class Frontend implements SubscriberInterface
 
     protected function _extendPaymentTemplate($action, $view) {
         $checkout = $this->container->get('easyCreditCheckout');
-        $quote = new Api\Quote();
+        $quote = new Api\QuoteBuilder();
+        $quote->build();
 
         $error = false;
 
