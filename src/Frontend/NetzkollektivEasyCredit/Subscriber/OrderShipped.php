@@ -31,7 +31,7 @@ class OrderShipped extends OrderStatusChanged
 
         } catch (\Exception $e) {
             $error = $e->getMessage().' ';
-            $error.= "Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Händler-Interface (https://app.easycredit.de/).";
+            $error.= "Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Partnerportal (https://partner.easycredit-ratenkauf.de/portal/).";
 
             $GLOBALS['easycreditMerchantStatusChangedError'] = $error;
         }
