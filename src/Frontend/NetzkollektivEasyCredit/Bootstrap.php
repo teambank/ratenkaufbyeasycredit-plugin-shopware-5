@@ -24,7 +24,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.8.5';
+        return '1.8.6';
     }
 
     public function getInfo()
@@ -72,6 +72,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     public function update($version)
     {
         $this->_createPaymentConfigForm();
+        $this->_createMenuItem();
 
         return array(
             'success' => true,
@@ -250,7 +251,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     protected function _createMenuItem()
     {
+        Shopware()->Db()->delete('s_core_menu',['controller = ?' => 'EasycreditMerchant']);
         $parent = $this->Menu()->findOneBy(array('label' => 'Zahlungen'));
+
         $this->createMenuItem(
             array(
                 'label' => 'ratenkauf by easyCredit',
@@ -581,6 +584,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'tax_rate' => 0,
                 'datum' => new Zend_Date(),
                 'modus' => 4,
+                'shippingfree' => 0,
                 'currencyFactor' => 1
             )
         );
