@@ -60,6 +60,7 @@ docs/Model/WebshopResponse.md
 git_push.sh
 phpunit.xml.dist
 src/ApiException.php
+src/Client.php
 src/Configuration.php
 src/HeaderSelector.php
 src/Model/Address.php

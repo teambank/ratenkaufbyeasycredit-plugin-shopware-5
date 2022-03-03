@@ -62,7 +62,7 @@ class TransactionApiTest extends TestCase
             ->setPassword($_ENV['EASYCREDIT_PASSWORD']);
 
         $this->apiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\TransactionApi(
-            new \GuzzleHttp\Client(['debug'=>false]),
+            new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>false]),
             $config
         );
     }
@@ -93,7 +93,7 @@ class TransactionApiTest extends TestCase
 
         list($response, $statusCode, $headers) = $this->apiInstance
             ->apiPaymentV3TransactionPostWithHttpInfo($request);
-        
+            
         $this->assertSame(201, $statusCode);
         $this->assertNotEmpty($response->getTechnicalTransactionId());
     }

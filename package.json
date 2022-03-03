@@ -1,9 +1,13 @@
 {
   "scripts": {
+    "build:copy-easycredit-components": "(cd node_modules/@ratenkaufbyeasycredit/easycredit-components; yarn build); cp -r ./node_modules/@ratenkaufbyeasycredit/easycredit-components/dist/* src/Frontend/NetzkollektivEasyCredit/Views/frontend/_public/src/js/easycredit-components/",
     "docs:build:html" : "sudo docker run --rm -v ${PWD}/docs:/docs -v /opt/sphinx_rtd_theme/sphinx_rtd_theme:/docs/source/_themes/sphinx_rtd_theme sphinxdoc/sphinx make html",
     "docs:build:pdf" : "sudo docker run --rm -v ${PWD}/docs:/docs -v /opt/sphinx_rtd_theme/sphinx_rtd_theme:/docs/source/_themes/sphinx_rtd_theme sphinxdoc/sphinx-latexpdf make latexpdf",
     "docs:deploy" : "rsync -rvz --delete ${PWD}/docs/build/html/ nk:html/corporate-2019/web/docs/ratenkaufbyeasycredit-shopware5/",
     "docs": "yarn docs:build:html; yarn docs:deploy",
     "release" : "./bin/release.sh"
+  },
+  "dependencies": {
+    "@ratenkaufbyeasycredit/easycredit-components": "git+ssh://git@github.com:netzkollektiv/ratenkaufbyeasycredit-components.git#stencil"
   }
 }

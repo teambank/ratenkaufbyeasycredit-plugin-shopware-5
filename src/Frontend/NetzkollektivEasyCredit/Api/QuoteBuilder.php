@@ -1,7 +1,14 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
+use Teambank\RatenkaufByEasyCreditApiV3\Integration;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInitRequest;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
+use Teambank\RatenkaufByEasyCreditApiV3\Integration\TransactionInitRequestWrapper;
+
 class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
+
     public function __construct() {
         $this->init();
         $this->container = Shopware()->Container();
@@ -15,7 +22,7 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
     }
 }
 
-class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
+class QuoteBuilder {
 
     protected $basket = null;
 
@@ -23,6 +30,7 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
         $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
         $this->_user = $this->_getUser();
         $this->_config = Shopware()->Config();
+        $this->storage = new Storage();
     }
 
     protected function _getUser()
@@ -70,7 +78,8 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     }
 
     public function getInvoiceAddress() {
-        return $this->addressBuilder
+        $addressBuilder = new Quote\AddressBuilder();
+        return $addressBuilder
             ->setAddress(new InvoiceAddress())
             ->build(
                 $this->_user,
@@ -78,7 +87,8 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
             );
     }
     public function getShippingAddress() {
-        return $this->addressBuilder
+        $addressBuilder = new Quote\AddressBuilder();
+        return $addressBuilder
             ->setAddress(new ShippingAddress())
             ->build(
                 $this->_user,
@@ -87,11 +97,7 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     }
 
     public function getCustomer() {
-
-        return $this->customerBuilder->build(
-            $this->customer,
-            $this->customer->getActiveBillingAddress()
-        );
+        return new Quote\CustomerBuilder();
     }
 
     public function getItems() {
@@ -104,7 +110,8 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     {
         $_items = [];
         foreach ($items as $item) {
-            $quoteItem = $this->itemBuilder->build($item, $this->context);
+            $quoteItem = new Quote\ItemBuilder($item);
+            $quoteItem->build($item);
             if ($quoteItem->getPrice() <= 0) {
                 continue;
             }
@@ -115,18 +122,34 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
     }
 
     public function getSystem() {
-        return $this->systemBuilder->build();
+        $systemBuilder = new SystemBuilder();
+        return $systemBuilder->build();
     }
 
-    public function build($cart, SalesChannelContext $context): TransactionInitRequestWrapper {
+    protected function _getUrl($action) {
+        return Shopware()->Front()->Router()->assemble(array(
+            'controller' => 'payment_easycredit',
+            'action'    => $action,
+        ));
+    }
+
+    protected function getRedirectLinks() {
+        if (!$this->storage->get('sec_token')) {
+            $this->storage->set('sec_token', uniqid());
+        }
+        
+        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\RedirectLinks([
+            'urlSuccess' => $this->_getUrl('return'),
+            'urlCancellation' => $this->_getUrl('cancel'),
+            'urlDenial' => $this->_getUrl('reject'),
+            'urlAuthorizationCallback' =>  $this->_getUrl('authorize') . '?secToken='. $this->storage->get('sec_token')
+        ]);
+    }
+
+    public function build($cart): TransactionInitRequestWrapper {
         $this->cart = $cart;
-        $this->context = $context;
-        $this->customer = $context->getCustomer();
 
         if ($cart instanceof Cart && $cart->getDeliveries()->getAddresses()->first() === null) {
-            throw new QuoteInvalidException();
-        }
-        if (!$this->customer) {
             throw new QuoteInvalidException();
         }
 
@@ -141,11 +164,11 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
                 'shoppingCartInformation' => $this->getItems()
             ]),
             'shopsystem' => $this->getSystem(),
-            'customer' => $this->getCustomer(),
+            'customer' => $this->getCustomer()->build(),
             'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
-                'customerSince' => ($this->customer->getCreatedAt() instanceof \DateTimeImmutable) ? $this->customer->getCreatedAt()->format('Y-m-d') : null,
-                'orderDoneWithLogin' => !$this->customer->getGuest(),
-                'numberOfOrders' => $this->customer->getOrderCount(),
+                'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTimeImmutable) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
+                'orderDoneWithLogin' => !$this->getCustomer()->isLoggedIn(),
+                'numberOfOrders' => $this->getCustomer()->getOrderCount(),
                 'logisticsServiceProvider' => $this->getShippingMethod()      
             ]),
             'redirectLinks' => $this->getRedirectLinks()
@@ -153,8 +176,7 @@ class Quote implements \Netzkollektiv\EasyCreditApi\Rest\QuoteInterface {
 
         return new \Teambank\RatenkaufByEasyCreditApiV3\Integration\TransactionInitRequestWrapper([
             'transactionInitRequest' => $transactionInitRequest,
-            'company' => $this->customer->getActiveBillingAddress() ? $this->customer->getActiveBillingAddress()->getCompany() : null
+            'company' => $this->getCustomer()->getCompany() ? $this->getCustomer()->getCompany() : null
         ]);
     }
-
 }

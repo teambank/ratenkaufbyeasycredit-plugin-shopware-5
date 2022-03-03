@@ -44,7 +44,7 @@ use \Teambank\RatenkaufByEasyCreditApiV3\ObjectSerializer;
  */
 class TransactionInitRequest implements ModelInterface, ArrayAccess, \JsonSerializable
 {
-    public const DISCRIMINATOR = null;
+    const DISCRIMINATOR = null;
 
     /**
       * The original name of the model.

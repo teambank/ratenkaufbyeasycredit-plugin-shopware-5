@@ -7,6 +7,8 @@ use \Teambank\RatenkaufByEasyCreditApiV3\Service;
 
 $checkout->start($wrappedTransactionInitRequest);
 
+print_r($storage);
+
 echo 'Go to: '.$checkout->getRedirectUrl().PHP_EOL;
 
 waitForEnter();

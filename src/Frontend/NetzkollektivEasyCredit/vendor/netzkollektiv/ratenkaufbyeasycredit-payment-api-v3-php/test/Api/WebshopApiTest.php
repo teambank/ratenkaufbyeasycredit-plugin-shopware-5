@@ -61,7 +61,7 @@ class WebshopApiTest extends TestCase
             ->setPassword($_ENV['EASYCREDIT_PASSWORD']);
 
         $this->apiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\WebshopApi(
-            new \GuzzleHttp\Client(['debug'=>false]),
+            new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>false]),
             $config
         );
     }
@@ -115,7 +115,7 @@ class WebshopApiTest extends TestCase
             ->setPassword('wrong-password');
 
         $this->apiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\WebshopApi(
-            new \GuzzleHttp\Client(['debug'=>false]),
+            new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>false]),
             $config
         );
 

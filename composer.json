@@ -1,6 +1,12 @@
 {
     "require": {
-        "netzkollektiv/ratenkaufbyeasycredit-payment-api-v3-php": "*@dev"
+        "netzkollektiv/ratenkaufbyeasycredit-payment-api-v3-php": "dev-legacy-test"
+    },
+    "replace": {
+        "guzzlehttp/psr7": "*"
+    },
+    "platform": {
+        "php": "5.6"
     },
     "config": {
       "vendor-dir": "src/Frontend/NetzkollektivEasyCredit/vendor",

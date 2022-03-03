@@ -143,8 +143,7 @@ class Frontend implements SubscriberInterface
         $request = $action->Request();
         $response = $action->Response();
         $view = $action->View();
-        $config = $this->config;
-        $widgetActive = $config->get('easycreditModelWidget');
+        $widgetActive = $this->config->get('easycreditModelWidget');
 
         $this->_registerTemplateDir();
 
@@ -310,12 +309,11 @@ class Frontend implements SubscriberInterface
     protected function _extendPaymentTemplate($action, $view) {
         $checkout = $this->container->get('easyCreditCheckout');
         $quote = new Api\QuoteBuilder();
-        $quote->build();
 
         $error = false;
 
         try {
-            $checkout->isAvailable($quote);
+            $checkout->isAvailable($quote->build());
         } catch (AddressException $e) {
             $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
         } catch (Exception $e) {
@@ -326,6 +324,7 @@ class Frontend implements SubscriberInterface
             $error = 'ratenkauf by easyCredit zur Zeit nicht verfügbar.';
         }
 
+        $view->assign('EasyCreditApiKey', $this->config->get('easycreditApiKey'));
         $view->assign('EasyCreditError', $error);
 
         $selectedPaymentId = $view->sUserData['additional']['user']['paymentID'];
@@ -338,40 +337,6 @@ class Frontend implements SubscriberInterface
                 $view->assign('EasyCreditActiveBillingAddressId', $this->_getActiveBillingAddressId());
             }
         }
-
-        $agreement = '';
-        if (!$error) {
-            $agreement = $this->_getAgreement();
-            $view->assign('EasyCreditAgreement', $agreement);
-        }
-
-        $view->assign('EasyCreditAgreement', $agreement);
-    }
-
-    protected function _getAgreement() {
-        $cacheId = 'easycredit_agreement_'.Shopware()->Shop()->getId();
-        $cache = $this->container->get('shopware.cache_manager')->getCoreCache();
-        
-        if ($agreement = $cache->load($cacheId)) {
-            return $agreement;
-        }
-
-        try {
-            $agreement = $this->container
-                ->get('easyCreditCheckout')
-                ->getAgreement();
-
-            $cache->save(
-                $agreement,
-                $cacheId,
-                array(),
-                '86400' // 1 day
-            );
-
-            return $agreement;
-
-        } catch (\Exception $e) {}
-            
     }
 
     public function onFrontendAddressPostDispatch(\Enlight_Event_EventArgs $args) {

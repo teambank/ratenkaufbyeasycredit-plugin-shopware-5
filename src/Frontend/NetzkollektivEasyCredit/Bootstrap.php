@@ -165,7 +165,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
         return new ArrayCollection(array(
             $jsDir . 'jquery.easycredit-address-editor.js',
-            $jsDir . 'easycredit-widget.js',
+//            $jsDir . 'easycredit-widget.js',
             $jsDir . 'easycredit.js'
         ));
     }
@@ -209,6 +209,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     protected function getClient () {
+        /*
         $stack = HandlerStack::create();
         $stack->push(
             Middleware::log(
@@ -216,16 +217,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 new MessageFormatter(MessageFormatter::DEBUG)
             )
         );
-
-        return new \GuzzleHttp\Client([
+        */
+        return new ApiV3\Client([
             'debug'=> false,
-            'handler' => $stack
+            //'handler' => $stack
         ]);
     }
 
     public function getConfig() {
         $config = Shopware()->Config();
-
         return ApiV3\Configuration::getDefaultConfiguration()
             ->setHost('https://ratenkauf.easycredit.de')
             ->setUsername($config->get('easycreditApiKey'))

@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__  .  '/../vendor/autoload.php');
+require_once(__DIR__  .  '/../../vendor/autoload.php');
 
 function getInitRequest() {
     return new \Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInitRequest([
@@ -87,12 +87,20 @@ function getInitRequest() {
 echo getenv('EASYCREDIT_USER').' : '.getenv('EASYCREDIT_PASSWORD');
 
 $config = \Teambank\RatenkaufByEasyCreditApiV3\Configuration::getDefaultConfiguration()
-    //->setHost('https://ratenkauf.easycredit.de')
+    ->setHost('https://ratenkauf.easycredit.de')
     ->setUsername(getenv('EASYCREDIT_USER'))
     ->setPassword(getenv('EASYCREDIT_PASSWORD'));
 
 
-$apiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\TransactionApi(
-    new GuzzleHttp\Client(['debug'=>true]),
+$transactionApiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\TransactionApi(
+    new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>true]),
+    $config
+);
+$webshopApiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\WebshopApi(
+    new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>true]),
+    $config
+);
+$installmentplanApiInstance = new \Teambank\RatenkaufByEasyCreditApiV3\Service\InstallmentplanApi(
+    new \Teambank\RatenkaufByEasyCreditApiV3\Client(['debug'=>true]),
     $config
 );

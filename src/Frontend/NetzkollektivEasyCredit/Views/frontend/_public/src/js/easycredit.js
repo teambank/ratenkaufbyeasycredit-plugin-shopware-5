@@ -99,8 +99,8 @@
         }
 
         $(target).parent().find("[id^=easycredit-pp-plugin-placeholder]").remove();
-        $(target).after('<div id="' + elementId + '"></div>');
-
+        $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
+        /*
         $('#'+elementId).rkPaymentPage({
             webshopId : webshopId,
             amount: amount,
@@ -115,6 +115,7 @@
                     .css('max-width','600px');
             }
         });
+        */
     };
 
 
