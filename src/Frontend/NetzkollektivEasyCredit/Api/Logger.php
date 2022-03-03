@@ -64,6 +64,10 @@ class Logger implements \Netzkollektiv\EasyCreditApi\LoggerInterface {
     }
 
     public function logError($msg) {
+        if (strpos($msg,'Der Finanzierungsbetrag liegt') === 0) {
+            return $this->logInfo($msg);
+        }
+
         $this->_logger->error(
             $this->_format($msg)
         );
