@@ -75,7 +75,7 @@ Ext.define('Shopware.apps.EasycreditMerchant.controller.Main', {
             sidebar = me.getSidebar();
 
         sidebar.setTitle('{s name="main/transaction_status"}Transaction Status{/s}: ' + transactionId);
-        sidebar.update('<easycredit-tx-manager id="' + transactionId + '" date="' + orderDate + '" />');
+        sidebar.update('<easycredit-merchant-manager id="' + transactionId + '" date="' + orderDate + '" />');
         sidebar.unmask();
     },
 

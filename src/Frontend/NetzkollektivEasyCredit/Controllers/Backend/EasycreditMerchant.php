@@ -110,11 +110,11 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
 
     public function transactionsAction()
     {
+        $this->Front()->Plugins()->Json()->setRenderer(false);
+
         if ($this->Request()->getMethod() == 'POST') {
             return $this->_postTransactions();
         }
-
-        $this->Front()->Plugins()->Json()->setRenderer(false);
 
         $transactions = [];
         foreach ($this->get('easyCreditMerchant')->searchTransactions() as $transaction) {
@@ -143,7 +143,7 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
                     $client->cancelOrder(
                         $params->id,
                         $params->status,
-                        \DateTime::createFromFormat('Y-d-m', $params->date),
+                        new DateTime(),
                         $params->amount
                     );
                     break;
@@ -151,6 +151,8 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
                     throw new \Exception('Status "'.$params->status.'" does not have any action');
             } 
         } catch (\Exception $e) {
+            $this->Response()->setStatusCode(500);
+            echo 'Es ist ein Fehler aufgetreten. Bitte führen Sie die Statusmeldung über unser Partnerportal durch und überprüfen Sie die Logdateien.';
             return false;
         }
         return true;
