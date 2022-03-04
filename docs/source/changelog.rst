@@ -1,6 +1,25 @@
 Changelog
 =========
 
+v1.8.6
+------
+
+* "Der Finanzierungsbetrag liegt ausserhalb der zulässigen Beträge" wird nun als INFO statt als ERROR geloggt
+* es wurden textliche Anpassungen und Vereinheitlichungen durchgeführt  
+* der Menüpunkt unter "Zahlungen" im Backend wird nun auch bei einem Plugin-Update angelegt
+
+v1.8.5
+------
+
+* Änderung zur Kompatibilität mit Shopware 5.7.7
+
+v1.8.4
+------
+
+* tritt beim Abschliessen der Bestellung ein Fehler in der Kommunikation auf, erhält die Bestellung den neuen Status "Bestellstatus bei Fehlern"
+* Änderungen zur Kompatibilität mit Shopware >= 5.7
+* der Ratenrechner wird nun so dargestellt, dass der Inhalt vollständig ohne Scrollen gezeigt wird
+
 v1.8.3
 -------
 
