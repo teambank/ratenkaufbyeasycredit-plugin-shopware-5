@@ -36,7 +36,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'author' => 'Teambank AG',
             'description' => 'Dieses Plugin ermöglicht die Zahlung mittels '.$this->getLabel(),
             'support' => 'service@easycredit.de',
-            'link' => 'https://www.easycredit-ratenkauf.de/haendler.htm',
+            'link' => 'https://www.easycredit-ratenkauf.de/',
         );
     }
 
@@ -293,7 +293,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Ihre Webshop-ID finden Sie nach erfolgreicher Anmeldung im easyCredit Händlerinterface im Unterpunkt Shopadministration (z.B. 1.de.xxxx.1).',
+                'description' => 'Ihre Webshop-ID finden Sie nach erfolgreicher Anmeldung in der Shopadministration (z.B. 1.de.xxxx.1) innerhalb des Partnerportals.',
                 'position' => $position++
             )
         );
@@ -306,7 +306,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Ihr API-Kennwort legen Sie im easyCredit Händlerinterface im Unterpunkt Shopadministration selbst fest.',
+                'description' => 'Ihr API-Kennwort legen Sie in der Shopadministration innerhalbs des Partnerportals selbst fest.',
                 'position' => $position++
             )
         );
