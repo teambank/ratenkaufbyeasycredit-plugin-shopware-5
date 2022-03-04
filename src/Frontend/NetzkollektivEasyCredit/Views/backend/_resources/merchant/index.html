@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>ratenkauf by easyCredit Transaction Manager</title>
+  <script src="./easycredit-merchant.js"></script>
+</head>
+  <body>
+    <noscript>
+      <strong>Please enable JavaScript to continue.</strong>
+    </noscript>
+
+    <script>
+    var ratenkaufbyeasycreditOrderManagementConfig = {
+      endpoints: {
+        get: '/api/transaction',
+        list: '/api/transactions',
+        post: '/api/transaction'
+      },
+      request_config: {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    }
+    </script>
+
+    <div class="container">
+
+      <div class="placeholder"></div>
+
+      <easycredit-merchant-manager id="V314WJ" date="2021-05-14">
+      </easycredit-merchant-manager>
+
+      <easycredit-merchant-status-widget id="V314WJ" date="2021-05-14">
+      </easycredit-merchant-status-widget>
+
+      <!--
+      <div class="easycredit-tx-alert">This is an alert message.</div>
+      <div class="easycredit-tx-alert error">This is an error message.</div>
+      <div class="easycredit-tx-alert success">This is a success message.</div>
+      -->
+    </div>
+
+	<footer>
+    Bitte Beispiel wählen: 
+		<button data-example='{"id": "V314WJ", "date": "2021-05-14"}'>Gültig</button>
+		<button data-example='{"id": "abcdef", "date": "today"}'>Wartestatus</button>
+		<button data-example='{"id": "abcdef", "date": "2020-05-14"}'>Fehlend</button>
+  </footer>
+
+	<style>
+    body {
+        background-color:#E7E9EB;
+        padding:10px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    .container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .container > easycredit-tx-status {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: white;
+      color: black;
+      text-align: center;
+      padding:10px 0;
+    }
+    footer button {
+      background:#0066b3;
+      color:white;
+      border: 0;
+      border-radius: 5px;
+      padding:8px;
+    }
+    footer button.selected {
+      font-weight:bold;
+    }
+    </style>
+
+    <script>
+      document.querySelectorAll('footer button').forEach(button => {
+        button.addEventListener('click',(event) => {
+
+          document.querySelectorAll('footer button').forEach(button => {
+            button.classList.remove('selected');
+          });
+
+          var example = JSON.parse(event.target.dataset.example);
+          document.querySelectorAll('.container > *').forEach((element) => {
+            Object.entries(example).forEach((prop) => {
+              if (prop[1] == 'today') {
+                d = new Date();
+                prop[1] = d.toISOString().slice(0, 10);
+              }
+              element.setAttribute(prop[0],prop[1]);
+              button.classList.add('selected');
+            });
+          });
+        });
+      })
+    </script>
+
+  </body>
+</html>
