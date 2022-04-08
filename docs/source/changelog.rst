@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.8.7
+------
+
+* Prüfung auf ausgewählte Zahlart in Subscriber (behebt ein Problem mit einer Onepage Checkout Extension)
+
 v1.8.6
 ------
 
