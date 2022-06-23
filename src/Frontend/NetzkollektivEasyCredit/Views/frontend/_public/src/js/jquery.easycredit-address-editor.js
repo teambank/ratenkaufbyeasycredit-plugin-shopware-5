@@ -42,7 +42,9 @@
                 if (me.opts.showSelectionOnClose) {
                     $.addressSelection.openPrevious();
                 } else {
-                    $('#shippingPaymentForm').submit();
+                    $('#shippingPaymentForm')
+                        .append('<input type="hidden" name="easycredit[submit]" value="1" />')
+                        .submit();
                 }
             } else {
                 me._highlightErrors($modal, response.errors);

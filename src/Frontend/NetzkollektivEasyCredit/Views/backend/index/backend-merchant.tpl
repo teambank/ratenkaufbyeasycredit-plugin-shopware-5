@@ -1,9 +1,9 @@
 {block name="backend/base/header/css"}
     {$smarty.block.parent}
-	<link rel="stylesheet" type="text/css" href="{link file='backend/_resources/merchant/css/app.css'}" />
+
     <style type="text/css">
     .easycredit--icon {
-        background-image: url({link file='backend/_resources/merchant/img/ratenkauf-icon.svg'});
+        background-image: url({link file='backend/_resources/img/ratenkaufbyeasycredit-icon.svg'});
         background-repeat: no-repeat;
         background-size: contain;
     }
@@ -17,6 +17,6 @@
     window.ratenkaufbyeasycreditOrderManagementConfig = {$easyCreditConfig};
     {literal}</script>{/literal}
     
-
-	<script type="text/javascript" src="{link file='backend/_resources/merchant/js/app.js'}"></script>
+    <script type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"></script>
+    <script nomodule src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.js"></script>
 {/block}

@@ -40,27 +40,34 @@ class BackendMerchant implements SubscriberInterface
         $this->bootstrap->registerTemplateDir();
         $view->assign('easyCreditConfig', json_encode(array(
             'endpoints' => [
-                'get' => $router->assemble(
-                    array(
-                        'module' => 'backend',
-                        'controller' => 'EasycreditMerchant',
-                        'action' => 'transaction'
-                    )
-                ),
                 'list' => $router->assemble(
                     array(
                         'module' => 'backend',
                         'controller' => 'EasycreditMerchant',
                         'action' => 'transactions'
                     )
-                ),
-                'post' => $router->assemble(
+                ).'?ids={transactionId}',
+                'get' => $router->assemble(
                     array(
                         'module' => 'backend',
                         'controller' => 'EasycreditMerchant',
-                        'action' => 'transactions'
+                        'action' => 'transaction'
                     )
-                )
+                ).'?id={transactionId}',
+                'capture' => $router->assemble(
+                    array(
+                        'module' => 'backend',
+                        'controller' => 'EasycreditMerchant',
+                        'action' => 'capture'
+                    )
+                ).'?id={transactionId}',
+                'refund' => $router->assemble(
+                    array(
+                        'module' => 'backend',
+                        'controller' => 'EasycreditMerchant',
+                        'action' => 'refund'
+                    )
+                ).'?id={transactionId}'
             ]
         )));
         $view->extendsTemplate('backend/index/backend-merchant.tpl');

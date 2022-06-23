@@ -2,10 +2,9 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
 use Teambank\RatenkaufByEasyCreditApiV3\Integration;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInitRequest;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\TransactionInitRequestWrapper;
 
 class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
 
@@ -74,7 +73,7 @@ class QuoteBuilder {
     }
 
     public function getDuration() {
-        return null;
+        return $this->storage->get('duration');
     }
 
     public function getInvoiceAddress() {
@@ -106,12 +105,12 @@ class QuoteBuilder {
         );
     }
 
-    protected function _getItems(array $items): array
+    protected function _getItems($items)
     {
         $_items = [];
         foreach ($items as $item) {
-            $quoteItem = new Quote\ItemBuilder($item);
-            $quoteItem->build($item);
+            $itemBuilder = new Quote\ItemBuilder($item);
+            $quoteItem = $itemBuilder->build($item);
             if ($quoteItem->getPrice() <= 0) {
                 continue;
             }
@@ -133,11 +132,19 @@ class QuoteBuilder {
         ));
     }
 
+    public function createPaymentUniqueId()
+    {
+        if (class_exists('\Shopware\Components\Random')) {
+            return \Shopware\Components\Random::getAlphanumericString(32);
+        }
+        return md5(uniqid(mt_rand(), true));
+    }
+
     protected function getRedirectLinks() {
         if (!$this->storage->get('sec_token')) {
-            $this->storage->set('sec_token', uniqid());
+            $this->storage->set('sec_token', $this->createPaymentUniqueId());
         }
-        
+
         return new \Teambank\RatenkaufByEasyCreditApiV3\Model\RedirectLinks([
             'urlSuccess' => $this->_getUrl('return'),
             'urlCancellation' => $this->_getUrl('cancel'),
@@ -146,14 +153,14 @@ class QuoteBuilder {
         ]);
     }
 
-    public function build($cart): TransactionInitRequestWrapper {
+    public function build($cart): Transaction {
         $this->cart = $cart;
 
         if ($cart instanceof Cart && $cart->getDeliveries()->getAddresses()->first() === null) {
             throw new QuoteInvalidException();
         }
 
-        $transactionInitRequest = new TransactionInitRequest([
+        return new Transaction([
             'financingTerm' => $this->getDuration(),
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
@@ -166,17 +173,12 @@ class QuoteBuilder {
             'shopsystem' => $this->getSystem(),
             'customer' => $this->getCustomer()->build(),
             'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
-                'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTimeImmutable) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
+                'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTime) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
                 'orderDoneWithLogin' => !$this->getCustomer()->isLoggedIn(),
                 'numberOfOrders' => $this->getCustomer()->getOrderCount(),
                 'logisticsServiceProvider' => $this->getShippingMethod()      
             ]),
             'redirectLinks' => $this->getRedirectLinks()
-        ]);
-
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Integration\TransactionInitRequestWrapper([
-            'transactionInitRequest' => $transactionInitRequest,
-            'company' => $this->getCustomer()->getCompany() ? $this->getCustomer()->getCompany() : null
         ]);
     }
 }

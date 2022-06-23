@@ -2,6 +2,9 @@
 use Shopware\Models\Order\Order;
 use Doctrine\ORM\Query\Expr\Join;
 use Shopware\Components\Model\QueryBuilder;
+use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\CaptureRequest;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
 
 abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends Shopware_Controllers_Backend_Application {
 
@@ -94,66 +97,75 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
         return $orderList;
     }
 
+    protected function respondWithJson ($content, $code = 200) {
+        $this->Response()->headers->set('content-type', 'application/json');
+        // $this->Response()->setStatusCode(500);
+        http_response_code($code);
+        echo json_encode($content);
+        exit;
+    }
+
+    public function transactionsAction()
+    {
+        $this->Front()->Plugins()->Json()->setRenderer(false);
+        
+        $transactionIds = $this->Request()->getParam('ids');
+
+        $response = $this->get('easyCreditMerchant')
+            ->apiMerchantV3TransactionGet(null, null,  null, 100, null, null, null, null, array('tId' => $transactionIds));
+
+        return $this->respondWithJson($response);
+    }
+
     public function transactionAction()
     {
         $this->Front()->Plugins()->Json()->setRenderer(false);
         
         $transactionId = $this->Request()->getParam('id');
 
-        foreach ($this->get('easyCreditMerchant')->searchTransactions() as $transaction) {
-            if ($transactionId == $transaction->vorgangskennungFachlich) {
-                echo json_encode($transaction);
-            }
-        }
-        exit;
+        $response = $this->get('easyCreditMerchant')
+            ->apiMerchantV3TransactionTransactionIdGet($transactionId);
+
+        return $this->respondWithJson($response);
     }
 
-    public function transactionsAction()
+    public function captureAction()
     {
-        if ($this->Request()->getMethod() == 'POST') {
-            return $this->_postTransactions();
+        try {
+            $transactionId = $this->Request()->getParam('id');
+            $requestData = json_decode($this->Request()->getContent());
+
+            $response = $this->get('easyCreditMerchant')
+                ->apiMerchantV3TransactionTransactionIdCapturePost(
+                    $transactionId,
+                    new CaptureRequest(['trackingNumber' => $requestData->trackingNumber])
+                );
+            return $this->respondWithJson($response);
+        } catch (ApiException $e) {
+            $this->respondWithJson($e->getResponseBody(), $e->getCode());
+        } catch (\Throwable $e) {
+            return $this->respondWithJson(['error' => $e->getMessage()], 500);
         }
-
-        $this->Front()->Plugins()->Json()->setRenderer(false);
-
-        $transactions = [];
-        foreach ($this->get('easyCreditMerchant')->searchTransactions() as $transaction) {
-            $transactions[] = (array)$transaction;
-        }
-
-        echo json_encode($transactions);
-        exit;
     }
 
-    protected function _postTransactions() {
-        $client = $this->get('easyCreditMerchant');
-
-        $params = json_decode($this->Request()->getRawBody());
-
+    public function refundAction()
+    {
         try {
-            switch ($params->status) {
-                case "LIEFERUNG":
-                    $client->confirmShipment($params->id);
-                    $success = true;
-                    break;
-                case "WIDERRUF_VOLLSTAENDIG":
-                case "WIDERRUF_TEILWEISE":
-                case "RUECKGABE_GARANTIE_GEWAEHRLEISTUNG":
-                case "MINDERUNG_GARANTIE_GEWAEHRLEISTUNG":
-                    $client->cancelOrder(
-                        $params->id,
-                        $params->status,
-                        \DateTime::createFromFormat('Y-d-m', $params->date),
-                        $params->amount
-                    );
-                    break;
-                default:
-                    throw new \Exception('Status "'.$params->status.'" does not have any action');
-            } 
-        } catch (\Exception $e) {
-            return false;
+            $transactionId = $this->Request()->getParam('id');
+            $requestData = json_decode($this->Request()->getContent());
+
+            $response = $this->get('easyCreditMerchant')
+                ->apiMerchantV3TransactionTransactionIdRefundPost(
+                    $transactionId,
+                    new RefundRequest(['value' => $requestData->value])
+                );
+
+            return $this->respondWithJson($response);
+        } catch (ApiException $e) {
+            return $this->respondWithJson($e->getResponseBody(), $e->getCode());
+        } catch (\Throwable $e) {
+            return $this->respondWithJson(['error' => $e->getMessage()], 500);
         }
-        return true;
     }
 }
 
@@ -169,7 +181,9 @@ if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
         {
             return array(
                 'transaction',
-                'transactions'
+                'transactions',
+                'capture',
+                'refund'
             );
         }
     }

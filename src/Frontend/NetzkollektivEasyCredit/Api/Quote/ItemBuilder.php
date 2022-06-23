@@ -101,8 +101,8 @@ class ItemBuilder
                 continue;
             }
             $skus[] = new \Teambank\RatenkaufByEasyCreditApiV3\Model\ArticleNumberItem([
-                'numberType' => $type,
-                'number' => $sku
+                'numberType' => $key,
+                'number' => $this->rawItem[$key]
             ]);
         }
         return $skus;

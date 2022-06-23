@@ -8,21 +8,29 @@ abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends S
         $checkout = $this->get('easyCreditCheckout');
 
         $apiKey = $this->Request()->getParam('easycreditApiKey', null);
-        $apiToken = $this->Request()->getParam('easycreditApiToken', null);
+        $apiPassword = $this->Request()->getParam('easycreditApiPassword', null);
+        $apiSignature = $this->Request()->getParam('easycreditApiSignature', null);
 
         if (
             $apiKey === null ||
             strlen($apiKey) === 0 ||
-            strlen($apiToken) === 0 ||
-            $apiToken === null
+            strlen($apiPassword) === 0 ||
+            $apiPassword === null
         ) {
             $this->View()->assign(array('status' => false, 'errorMessage' => "Please provide apiKey and apiToken!"));
             return;
         }
 
-        $valid = $checkout->verifyCredentials($apiKey, $apiToken);
+        try {
+           $checkout->verifyCredentials($apiKey, $apiPassword, $apiSignature);
 
-        $this->View()->assign(array('status' => true, 'valid' => $valid, 'errorMessage' => ''));
+           $valid = true;
+           $message = '';
+        } catch (\Exception $e) {
+            $valid = false;
+            $message = $e->getMessage();
+        }
+        $this->View()->assign(array('status' => true, 'valid' => $valid, 'errorMessage' => $message));
     }
 }
 

@@ -221,7 +221,7 @@ Ext.define('Shopware.apps.EasycreditMerchant.view.main.Grid', {
         const offset = record.data.orderTime.getTimezoneOffset();
         var date = new Date(record.data.orderTime.getTime() + (offset*60*1000));
 
-        return '<easycredit-tx-status id="'+ value +'" date="'+ date.toISOString().split('T')[0] +'" />';
+        return '<easycredit-merchant-status-widget tx-id="'+ value +'" date="'+ date.toISOString().split('T')[0] +'" />';
     }
 });
 // {/block}

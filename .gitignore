@@ -1,7 +1,8 @@
 /.docker-compose-default
-/tools/tmp
+/tools
 shopware/*
 .idea/*
 /build
 /dist
 /.db
+src/Frontend/NetzkollektivEasyCredit/vendor

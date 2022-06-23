@@ -6,6 +6,8 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
+use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
 
 class OrderRefunded extends OrderStatusChanged
 {
@@ -15,25 +17,33 @@ class OrderRefunded extends OrderStatusChanged
 
     public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
 
-        try {
-            $order = $eventArgs->getEntity();
-            $transactionId = $order->getTransactionId();
-            if (empty($transactionId)) {
-                throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
-            }
+        try{
+            try {
+                $order = $eventArgs->getEntity();
+                $transactionId = $order->getTransactionId();
+                if (empty($transactionId)) {
+                    throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
+                }
 
-           $merchantClient = Shopware()->Container()->get('easyCreditMerchant');
-           $transactions = $merchantClient->search($order->getTransactionId());
-           if (count($transactions) != 1) {
-                throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion existiert nicht.');
-            }
-            $merchantClient->cancelOrder($order->getTransactionId(),'WIDERRUF_VOLLSTAENDIG', new \DateTime());
+                $merchantClient = Shopware()->Container()->get('easyCreditMerchant');
+                $this->get('easyCreditMerchant')
+                    ->apiMerchantV3TransactionTransactionIdRefundPost(
+                        $transactionId,
+                        new RefundRequest(['value'=> $order->getInvoiceAmount()])
+                    );
+            } catch (ApiException $e) {
+                if ($e->getResponseObject() instanceof ConstraintViolation) {
+                    $error = 'ratenkauf by easyCredit: ';
+                    foreach ($e->getResponseObject()->getViolations() as $violation) {
+                        $error .= $violation['message'];
+                    }
+                    return $this->handleError($error);
+                }
 
+                throw $e;
+            }
         } catch (\Exception $e) {
-            $error = $e->getMessage().' '; 
-            $error.= "Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Händler-Interface (https://app.easycredit.de/).";
-
-            $GLOBALS['easycreditMerchantStatusChangedError'] = $error;
+            return $this->handleError($e->getMessage());
         }
     }
 }

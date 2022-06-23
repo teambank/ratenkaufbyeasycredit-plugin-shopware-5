@@ -1,19 +1,34 @@
 (function () {
     var webshopId = $('meta[name=easycredit-api-key]').attr('content');
-    if (!webshopId) {
-        return;
+
+    var onHydrated = function (selector, cb) {
+        if (!document.querySelector(selector)) {
+            return
+        }
+        
+        window.setTimeout(function() {
+            if (!document.querySelector(selector).classList.contains('hydrated')) {
+                return onHydrated(selector, cb);
+            }
+            cb();
+        }, 50)
     }
 
-    var guid = function () {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                    .toString(16)
-                    .substring(1);
-        }
-
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-                s4() + '-' + s4() + s4() + s4();
-    };
+    var watchForSelector = function (selector, cb) {
+        var observer = new MutationObserver(function(mutations) { 
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {  
+                    if (node.nodeType !== 1) { 
+                        return; 
+                    }
+                    if (el = node.querySelector(selector)) {
+                        cb();
+                    }
+                });
+            });
+        });
+        observer.observe(document, { subtree: true, childList: true });        
+    }
 
     var getPriceAsFloat = function (price) {
         var separatorComa,
@@ -52,7 +67,6 @@
             }
         }
 
-
         var productPrice = $(".product--buybox div.price--default"),
                 target = null;
 
@@ -78,21 +92,20 @@
             target = productPrice;
         }
 
-        var elementId = 'easycredit-pp-plugin-placeholder-' + guid(),
-                amount = function () {
-                    // if price is identifed by meta tag
-                    if (price !== undefined && price !== null && !isNaN(price)) {
-                        return price;
-                    }
+        var amount = function () {
+            // if price is identified by meta tag
+            if (price !== undefined && price !== null && !isNaN(price)) {
+                return price;
+            }
 
-                    price = $(productPrice).text();
+            price = $(productPrice).text();
 
-                    if (price === undefined) {
-                        return NaN;
-                    }
+            if (price === undefined) {
+                return NaN;
+            }
 
-                    return getPriceAsFloat(price);
-                }();
+            return getPriceAsFloat(price);
+        }();
 
         if (isNaN(amount)) {
             return;
@@ -100,28 +113,54 @@
 
         $(target).parent().find("[id^=easycredit-pp-plugin-placeholder]").remove();
         $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
-        /*
-        $('#'+elementId).rkPaymentPage({
-            webshopId : webshopId,
-            amount: amount,
-            modal: function(element, content, opts) {
-                content = '<div class="easycredit-embed-responsive">'+content+'</div>';
-                $.modal.open(content,{
-                  height: '700px'
-                });
-                $.modal._$content.find('.easycredit-embed-responsive')
-                    .css('height','100%')
-                    .closest('.modal-inner-wrap')
-                    .css('max-width','600px');
-            }
-        });
-        */
     };
+
+    var handleShippingPaymentConfirm = function () {
+        onHydrated('easycredit-checkout', function() {
+            $('easycredit-checkout', 'form[name=shippingPaymentForm]').submit(function(e){
+                $('#shippingPaymentForm')
+                    .append('<input type="hidden" name="easycredit[submit]" value="1" />')
+                    .append('<input type="hidden" name="easycredit[number-of-installments]" value="'+ e.detail.numberOfInstallments +'" />')
+                    .submit();
+                
+
+                return false;
+            });
+            $('form[name=shippingPaymentForm]').submit(function() {
+                if (!$('easycredit-checkout').prop('isActive')
+                    || $('easycredit-checkout').prop('paymentPlan') !== ''
+                    || $('easycredit-checkout').prop('alert') !== ''
+                ) {
+                    return true;
+                }
+                if ($(this).find('input[name="easycredit[submit]"]').length > 0) {
+                    return true;
+                }
+                
+                $('easycredit-checkout')
+                    .get(0)
+                    .dispatchEvent(new Event('openModal'));
+                return false;
+            }); 
+        });
+    }
 
 
     var addSubscriber =  function(){
-        $.subscribe('plugin/swAjaxProductNavigation/onInit', addPpToDetailPage);
-        $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+        if (webshopId) {
+            $.subscribe('plugin/swAjaxProductNavigation/onInit', addPpToDetailPage);
+            $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
+        }
+
+        $.subscribe('plugin/swShippingPayment/onInit', function() {
+            watchForSelector('easycredit-checkout', handleShippingPaymentConfirm);        
+            onHydrated('easycredit-checkout', handleShippingPaymentConfirm);  
+        });
+        $.subscribe('plugin/swPanelAutoResizer/onAfterInit', function(ev, plugin){
+            onHydrated('easycredit-checkout', function(){
+                plugin.update();
+            });
+        });
     }
     if (typeof document.asyncReady !== 'undefined' && typeof $('#main-script').attr('async') != 'undefined') {
         document.asyncReady(addSubscriber);

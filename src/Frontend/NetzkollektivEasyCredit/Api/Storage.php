@@ -18,7 +18,7 @@ class Storage implements \Teambank\RatenkaufByEasyCreditApiV3\Integration\Storag
         return Shopware()->Session()->EasyCredit[$key];
     }
 
-    public function all(): array
+    public function all()
     {
         return Shopware()->Session()->offsetGet('EasyCredit');
     }

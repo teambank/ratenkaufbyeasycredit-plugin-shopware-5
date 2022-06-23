@@ -1,3 +1,8 @@
+easycredit-widget {
+    margin: 10px 0;
+}
+
+/*
 .easycredit-method .easycredit-tooltip {
     position:absolute;
     font-weight:normal;
@@ -64,3 +69,4 @@ body.is--ctl-checkout.is--act-shippingpayment .address-manager--modal.address-ma
         display: none;
     }
 }
+*/

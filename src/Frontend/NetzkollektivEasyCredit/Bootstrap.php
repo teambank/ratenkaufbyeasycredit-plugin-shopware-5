@@ -59,7 +59,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createPaymentConfigForm();
         $this->_createPayment();
         $this->_createMenuItem();
-
+        $this->_createAttributes();
 
         return array(
             'success' => true,
@@ -75,6 +75,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     {
         $this->_createPaymentConfigForm();
         $this->_createMenuItem();
+        $this->_createAttributes();
 
         return array(
             'success' => true,
@@ -165,14 +166,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
         return new ArrayCollection(array(
             $jsDir . 'jquery.easycredit-address-editor.js',
-//            $jsDir . 'easycredit-widget.js',
             $jsDir . 'easycredit.js'
         ));
     }
 
     public function addCssFiles() {
         return new ArrayCollection(array(
-            $this->Path() . '/Views/frontend/_public/src/css/easycredit-widget.css',
             $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
         ));
     }
@@ -189,7 +188,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     protected function getLogger() {
         $logger = Shopware()->Container()->get('pluginlogger');
-
+    
         /*
         if (Shopware()->Config()->get('easycreditDebugLogging')) {
             $this->debug = true;
@@ -209,17 +208,23 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     protected function getClient () {
-        /*
-        $stack = HandlerStack::create();
-        $stack->push(
-            Middleware::log(
-                $this->getLogger(),
-                new MessageFormatter(MessageFormatter::DEBUG)
-            )
-        );
-        */
+        $stack = null;
+        if (class_exists('\GuzzleHttp\Client') && method_exists('\GuzzleHttp\Client','sendRequest')) {
+            $stack = HandlerStack::create();
+            $stack->push(
+                Middleware::log(
+                    $this->getLogger(),
+                    new MessageFormatter(MessageFormatter::DEBUG)
+                )
+            );
+
+            return new \GuzzleHttp\Client([
+                'debug'=> false,
+                'handler' => $stack
+            ]);
+        }
         return new ApiV3\Client([
-            'debug'=> false,
+            'debug'=> true,
             //'handler' => $stack
         ]);
     }
@@ -262,20 +267,19 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
+    public function getStorage() {
+        return new Api\Storage();
+    }
+
     public function onInitResourceMerchant()
     {
         $client = $this->getClient();
         $config = $this->getConfig()
             ->setHost('https://partner.easycredit-ratenkauf.de');
 
-        $transactionApi = new Api\Service\TransactionApi(
+        return new ApiV3\Service\TransactionApi(
             $client,
             $config
-        );
-
-        return new Api\Integration\Merchant(
-            $transactionApi,
-            $this->getLogger()
         );
     }
 
@@ -358,13 +362,26 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         $form->setElement(
             'text',
-            'easycreditApiToken',
+            'easycreditApiPassword',
             array(
                 'label' => 'API-Kennwort',
                 'required' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
                 'description' => 'Ihr API-Kennwort legen Sie im easyCredit Händlerinterface im Unterpunkt Shopadministration selbst fest.',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'text',
+            'easycreditApiSignature',
+            array(
+                'label' => 'API-Signatur',
+                'required' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'stripCharsRe' => ' ',
+                'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im ratenkauf by easyCredit Partnerportal aktivieren.',
                 'position' => $position++
             )
         );
@@ -565,6 +582,36 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
+    protected function _createAttributes()
+    {
+        /** @var ModelManager $em */
+        $em = Shopware()->Container()->get('models');
+    
+        if ($this->assertMinimumVersion('5.2.0')) {
+            /** @var CrudService $service */
+            $service = Shopware()->Container()->get('shopware_attribute.crud_service')
+                ->update('s_order_attributes', 'easycredit_sectoken', 'varchar', [
+                    'label' => 'ratenkauf by easyCredit Sec Token',
+                    'displayInBackend' => false,
+                    'position' => 900,
+                    'custom' => false,
+                    'translatable' => false,
+                ]);
+    
+        } else {
+            $em->addAttribute(
+                's_order_attributes',
+                'easycredit',
+                'sectoken',
+                'varchar(255)',
+                true,
+                null
+            );
+        }
+        $em->getConfiguration()->getMetadataCacheImpl()->deleteAll();
+        $em->generateAttributeModels(['s_order_attributes']);
+    }
+
     public function getCheckout() {
         return $this->get('easyCreditCheckout');
     }
@@ -588,16 +635,23 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
 
     public function isValid() {
-        $quote = new Api\Quote();
+        $quote = $this->getQuote();
 
         return $this->isInterestInBasket()
             && $this->getCheckout()->isAmountValid($quote)
-            && $this->getCheckout()->verifyAddressNotChanged($quote);
+            && $this->getCheckout()->verifyAddress($quote);
     }
 
     public function clear() {
         $this->getCheckout()->clear();
         $this->removeInterest();
+    }
+
+    public function getQuote() {
+        $quote = new Api\QuoteBuilder();
+        return $quote->build(
+            Shopware()->Modules()->Basket()->sGetBasket()
+        );
     }
 
     protected function _getUser()
@@ -642,7 +696,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'tax_rate' => 0,
                 'datum' => new Zend_Date(),
                 'modus' => 4,
-                'shippingfree' => 1,
+                'shippingfree' => 0,
                 'currencyFactor' => 1
             )
         );

@@ -11,22 +11,20 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
      */
     private $session;
 
+    private $order;
+
+    private $em;
+
     /**
      * {@inheritdoc}
      */
     public function init()
     {
-        $this->plugin = $this->get('plugins')->Frontend()->NetzkollektivEasyCredit();
-        $this->session = $this->get('session');
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function get($name)
-    {
-        return Shopware()->Container()->get($name);
+        $this->container = Shopware()->Container();
+        $this->plugin = $this->container->get('plugins')->Frontend()->NetzkollektivEasyCredit();
+        $this->session = $this->container->get('session');
+        $this->order = Shopware()->Modules()->Order();
+        $this->em = Shopware()->Container()->get('models');
     }
 
     public function getPaymentShortName()
@@ -39,7 +37,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
     }
 
-
     public function createPaymentUniqueId()
     {
         if (class_exists('\Shopware\Components\Random')) {
@@ -48,20 +45,43 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return parent::createPaymentUniqueId();
     }
 
+    public function getOrderId($transactionId, $paymentUniqueId) {
+        $sql = '
+            SELECT id FROM s_order
+            WHERE transactionID=? AND temporaryID=?
+            AND status!=-1
+        ';
+        return (int) Shopware()->Db()->fetchOne($sql, [
+            $transactionId,
+            $paymentUniqueId,
+        ]);
+    }
+
+    public function getUniqueIdBySecuredTransaction($transactionId, $secToken) {
+        $sql = '
+            SELECT temporaryID FROM s_order o INNER JOIN s_order_attributes oa ON o.id = oa.orderID
+            WHERE o.transactionID=? AND oa.easycredit_sectoken = ?
+            AND o.status!=-1
+        ';
+        return Shopware()->Db()->fetchOne($sql, [
+            $transactionId,
+            $secToken,
+        ]);
+    }
+
     public function indexAction()
     {
+        $transactionId = $this->session->EasyCredit["transaction_id"];
+        $paymentUniqueId = $this->createPaymentUniqueId();
+
+        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
+        $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
+
+        $this->saveSecToken($orderId);
+
         try {
-            $transactionId = Shopware()->Session()->EasyCredit["transaction_id"];
-            $paymentUniqueId = $this->createPaymentUniqueId();
-            $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
-
-            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
-
-            $checkout = $this->get('easyCreditCheckout');
-            $captureResult = $checkout->capture(null, $orderNumber);
-
-            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId, false);
-            $this->setPaymentClearedDate($transactionId);
+            $checkout = $this->container->get('easyCreditCheckout');
+            $captureResult = $checkout->authorize($orderNumber);
 
             $this->redirect(array(
                 'controller' => 'checkout',
@@ -71,11 +91,12 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
         } catch (\Exception $e) {
             $orderStatusId = $this->plugin->Config()->get('easycreditOrderErrorStatus');
-            $this->saveOrderStatus($transactionId, $paymentUniqueId, $orderStatusId, true, $e->getMessage());
+            $this->saveOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
+            $this->order->setOrderStatus($orderId, $orderStatusId, $sendStatusMail, $comment);
 
-            Shopware()->Container()->get('pluginlogger')->error($e->getMessage());
-            $this->getPlugin()->getStorage()->set('apiError', 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
-            $this->getPlugin()->getStorage()->set('apiErrorSkipSuffix', true);
+            $this->container->get('pluginlogger')->error($e->getMessage());
+            $this->plugin->getStorage()->set('apiError', 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
+            $this->plugin->getStorage()->set('apiErrorSkipSuffix', true);
             $this->redirect(array(
                 'controller' => 'checkout',
                 'action' => 'cart'
@@ -84,19 +105,54 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
     }
 
-    public function saveOrderStatus($transactionId, $paymentUniqueId, $orderStatusId, $sendStatusMail = false, $comment)
+    public function returnAction()
     {
-        $sql = '
-            SELECT id FROM s_order
-            WHERE transactionID=? AND temporaryID=?
-            AND status!=-1
-        ';
-        $orderId = (int) Shopware()->Db()->fetchOne($sql, [
-                $transactionId,
-                $paymentUniqueId,
-            ]);
-        $order = Shopware()->Modules()->Order();
-        $order->setOrderStatus($orderId, $orderStatusId, $sendStatusMail, $comment);
+        $checkout = $this->container->get('easyCreditCheckout');
+
+        try {
+            $checkout->loadTransaction();
+            $approved = $checkout->isApproved();
+        } catch (Exception $e) {
+            $this->plugin->getStorage()->set('apiError', $e->getMessage());
+            $this->_redirToPaymentSelection();
+            return;
+        }
+
+        if (!$approved) {
+            $this->plugin->getStorage()->set('apiError', 'ratenkauf by easyCredit wurde nicht genehmigt.');
+            $this->_redirToPaymentSelection();
+            return;
+        }
+
+        $this->plugin->addInterest();
+        $this->redirectCheckoutConfirm();
+    }
+
+    public function cancelAction() {
+        $this->_redirToPaymentSelection();
+    }
+
+    public function rejectAction() {
+        $this->_redirToPaymentSelection();
+    }
+
+    public function authorizeAction()
+    {
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $secToken = $this->Request()->getParam('secToken', null);
+        $transactionId = $this->Request()->getParam('transactionId', null);
+
+        if ($paymentUniqueId = $this->getUniqueIdBySecuredTransaction($transactionId, $secToken)) {
+
+            $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
+
+            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId, false);
+            $this->setPaymentClearedDate($transactionId);
+
+            return $this->Response()->setStatusCode(200);
+        }
+        $this->Response()->setStatusCode(404);
     }
 
     protected function setPaymentClearedDate($transactionId) {
@@ -113,21 +169,21 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             AND s.name = 'completely_paid'
             AND o.transactionID = ?;
         ";
-        $this->get('db')->query($sql, array($transactionId));
+        $this->container->get('db')->query($sql, array($transactionId));
     }
 
     public function addInterestSurcharge() {
-        if (!isset(Shopware()->Session()->EasyCredit["interest_amount"])
-            || empty(Shopware()->Session()->EasyCredit["interest_amount"])
+        if (!isset($this->session->EasyCredit["interest_amount"])
+            || empty($this->session->EasyCredit["interest_amount"])
            ) {
             return;
         }
 
         $interest_order_name = 'sw-payment-ec-interest';
 
-        $interest_amount = round(Shopware()->Session()->EasyCredit["interest_amount"], 2);
+        $interest_amount = round($this->session->EasyCredit["interest_amount"], 2);
 
-        $this->get('db')->delete(
+        $this->container->get('db')->delete(
             's_order_basket',
             array(
                 'sessionID = ?' => $this->session->get('sessionId'),
@@ -135,10 +191,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             )
         );
 
-        $this->get('db')->insert(
+        $this->container->get('db')->insert(
             's_order_basket',
             array(
-                'sessionID' => Shopware()->Session()->offsetGet('sessionId'),
+                'sessionID' => $this->session->offsetGet('sessionId'),
                 'articlename' => 'Zinsen für Ratenzahlung',
                 'articleID' => 0,
                 'ordernumber' => $interest_order_name,
@@ -152,6 +208,23 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             )
         );
     }
+
+    public function saveSecToken($orderId) {
+        $orderAttributeModel = $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
+            array('orderId' => $orderId)
+        );
+        if ($orderAttributeModel instanceof \Shopware\Models\Attribute\Order) {
+            $orderAttributeModel->setEasycreditSectoken($this->session->EasyCredit["sec_token"]);
+            $this->em->persist($orderAttributeModel);
+            $this->em->flush();
+        }
+    }
+
+    public function getSecToken() {
+        $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
+            array('orderId' => $orderId)
+        )->getEasycreditSectoken();
+    }
  
     public function redirectCheckoutConfirm() {
         $this->redirect(
@@ -160,48 +233,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 'action' => 'confirm',
             )
         );
-    }
-
-    public function returnAction()
-    {
-        $checkout = $this->get('easyCreditCheckout');
-
-        try {
-            $approved = $checkout->isApproved();
-        } catch (Exception $e) {
-            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
-            $this->_redirToPaymentSelection();
-            return;
-        }
-
-        if (!$approved) {
-            $this->getPlugin()->getStorage()->set('apiError', 'ratenkauf by easyCredit wurde nicht genehmigt.');
-            $this->_redirToPaymentSelection();
-            return;
-        }
-
-        try{
-            $checkout->loadFinancingInformation();
-        } catch (Exception $e) {
-            $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
-            $this->_redirToPaymentSelection();
-            return;
-        }
-
-        $this->getPlugin()->addInterest();
-        $this->redirectCheckoutConfirm();
-    }
-
-    public function cancelAction() {
-        $this->_redirToPaymentSelection();
-    }
-
-    public function rejectAction() {
-        $this->_redirToPaymentSelection();
-    }
-
-    public function getPlugin() {
-        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
     }
 
     protected function _redirToPaymentSelection() {

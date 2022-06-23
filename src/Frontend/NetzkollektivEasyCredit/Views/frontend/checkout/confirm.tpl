@@ -5,9 +5,7 @@
 
     {if $EasyCreditPaymentPlan}
     <p class="easycredit-info-description">
-        <span class="easycredit-info-logo">ratenkauf by easyCredit</span><br />
-        <strong>Einfach. Fair. In Raten zahlen.</strong><br />
-        {$EasyCreditPaymentPlan}
+        <easycredit-checkout payment-plan="{$EasyCreditPaymentPlan}" />
    </p>
    {/if}
 {/block}

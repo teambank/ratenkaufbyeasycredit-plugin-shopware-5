@@ -2,9 +2,11 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
-use Netzkollektiv\EasyCreditApi\AddressException;
-use Netzkollektiv\EasyCreditApi\Exception;
+use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\ConstraintViolation;
+use Teambank\RatenkaufByEasyCreditApiV3\Integration\AddressValidationException;
 
+use GuzzleHttp\Exception\ConnectException;
 use Enlight\Event\SubscriberInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
@@ -134,7 +136,7 @@ class Frontend implements SubscriberInterface
 
     public function onGetControllerPathFrontend() {
         $this->_registerTemplateDir();
-        return $this->Path() . 'Controllers/Frontend/PaymentEasycredit.php';
+        return $this->getPlugin()->Path() . 'Controllers/Frontend/PaymentEasycredit.php';
     }
 
     public function addEasyCreditModelWidget(\Enlight_Event_EventArgs $arguments) {
@@ -157,7 +159,7 @@ class Frontend implements SubscriberInterface
             return;
         }
 
-        $this->extendIndexTemplate($view, $config);
+        $this->extendIndexTemplate($view, $this->config);
     }
 
     public function extendIndexTemplate($view, $config) {
@@ -209,11 +211,22 @@ class Frontend implements SubscriberInterface
             return;
         }
 
+        if (!$params = $request->getParam('easycredit')) {
+            return;
+        }
+
         if (!$request->isPost()
             || $request->getParam('isXHR')
         ) {
             return;
         }
+
+        if (isset($params['number-of-installments']) && $params['number-of-installments'] > 0) {
+            $this->getPlugin()
+                ->getStorage()
+                ->set('duration', $params['number-of-installments']);
+        }
+
         return $this->_handleRedirect($paymentId, $action);
     }
 
@@ -260,18 +273,48 @@ class Frontend implements SubscriberInterface
 
     protected function _redirectToEasycredit($action) {
         try {
-            $checkout = $this->container->get('easyCreditCheckout')->start(
-                new Api\Quote(),
-                $this->_getUrl('cancel'),
-                $this->_getUrl('return'),
-                $this->_getUrl('reject')
-            );
- 
-            if ($url = $checkout->getRedirectUrl()) {
-                header('Location: '.$url);
-                exit;
+            try {
+                $checkout = $this->container->get('easyCreditCheckout')->start(
+                    $this->getPlugin()->getQuote(),
+                    $this->_getUrl('cancel'),
+                    $this->_getUrl('return'),
+                    $this->_getUrl('reject')
+                );
+    
+                if ($url = $checkout->getRedirectUrl()) {
+                    header('Location: '.$url);
+                    exit;
+                }
+            } catch (ConnectException $e) {
+                $this->container->get('pluginlogger')->error($e->getMessage());
+                $this->getPlugin()->getStorage()
+                    ->set('apiError', 'ratenkauf by easyCredit ist im Moment nicht verfügbar. Bitte probieren Sie es erneut oder wählen Sie eine andere Zahlungsart.')
+                    ->set('apiErrorSkipSuffix', true);
+
+                $action->redirect(array(
+                    'controller' => 'checkout',
+                    'action' => 'confirm'
+                ));
+            } catch (ApiException $e) {
+                if ($e->getResponseObject() instanceof ConstraintViolation) {
+                    $errors = [];
+                    foreach ($e->getResponseObject()->getViolations() as $violation) {
+                        $error[$violation['field']] = $violation['message'];
+                    }
+                    if (in_array($violation['field'],['orderDetails.invoiceAddress','orderDetails.shippingAddress'])) {
+                        throw new AddressValidationException(implode(' ', $error));
+                    }
+
+                    $this->getPlugin()->getStorage()->set('apiError', implode(' ', $error));
+                    $action->redirect(array(
+                        'controller' => 'checkout',
+                        'action' => 'confirm'
+                    ));
+                    return;
+                }
+                throw $e;
             }
-        } catch (AddressException $e) {
+        }  catch (AddressValidationException $e) {
             $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
             $action->redirect(array(
                 'controller' => 'checkout',
@@ -308,28 +351,27 @@ class Frontend implements SubscriberInterface
 
     protected function _extendPaymentTemplate($action, $view) {
         $checkout = $this->container->get('easyCreditCheckout');
-        $quote = new Api\QuoteBuilder();
-
         $error = false;
 
         try {
-            $checkout->isAvailable($quote->build());
-        } catch (AddressException $e) {
+            $checkout->isAvailable(
+                $this->getPlugin()->getQuote()
+            );
+        } catch (AddressValidationException $e) {
             $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $error = $e->getMessage();
-        }
-
-        if ($error && $error === 'Der Webshop existiert nicht.') {
-            $error = 'ratenkauf by easyCredit zur Zeit nicht verfügbar.';
         }
 
         $view->assign('EasyCreditApiKey', $this->config->get('easycreditApiKey'));
         $view->assign('EasyCreditError', $error);
+        $view->assign('EasyCreditAmount', $this->getPlugin()->getQuote()->getOrderDetails()->getOrderValue());
 
-        $selectedPaymentId = $view->sUserData['additional']['user']['paymentID'];
-        if (!$error && $this->getPlugin()->isSelected($selectedPaymentId)) {
+        $isSelected = $this->getPlugin()->isSelected($view->sUserData['additional']['user']['paymentID']);
+        $view->assign('EasyCreditIsSelected', ($isSelected) ? 'true' : 'false');
+        $view->assign('EasyCreditPaymentPlan', $this->getPaymentPlan());
 
+        if (!$error && $isSelected) {
             if (isset(Shopware()->Session()->EasyCredit["addressError"])
                 && Shopware()->Session()->EasyCredit["addressError"]
             ) {
@@ -356,13 +398,24 @@ class Frontend implements SubscriberInterface
             $errors[] = Shopware()->Session()->EasyCredit["addressError"]; 
             $view->error_messages = $errors;
         }
+
         if ($actionPath == 'frontend/address/ajaxSave'
             && isset(Shopware()->Session()->EasyCredit["addressError"])
         ) {
             $response = json_decode($action->Response()->getBody());
+
             if (isset($response->success) && $response->success) {
-                unset(Shopware()->Session()->sOrderVariables['sUserData']);
-                unset(Shopware()->Session()->EasyCredit["addressError"]);
+                $data = Shopware()->Session()->offsetGet('EasyCredit');
+                if (isset($data['addressError'])) {
+                    unset($data['addressError']);
+                }
+                Shopware()->Session()->offsetSet('EasyCredit', $data);
+
+                $data = Shopware()->Session()->sOrderVariables['sUserData'];
+                if (isset($data['sUserData'])) {
+                    unset($data['sUserData']);
+                }
+                Shopware()->Session()->offsetSet('sOrderVariables', $data);
             } 
         }
     }
@@ -385,13 +438,13 @@ class Frontend implements SubscriberInterface
             return $this->_redirToPaymentSelection($action);
         }
 
-        try {
+        try { 
             $approved = $checkout->isApproved();
             if (!$approved) {
                 throw new \Exception($this->getPlugin()->getLabel().' wurde nicht genehmigt.');
             }
 
-            $checkout->loadFinancingInformation();
+            $checkout->loadTransaction();
         } catch (\Exception $e) {
             $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             return $this->_redirToPaymentSelection($action);
@@ -405,17 +458,18 @@ class Frontend implements SubscriberInterface
         ));
     }
 
-    protected function _extendConfirmTemplate($view) {
-        $paymentPlan = json_decode(Shopware()->Session()->EasyCredit["payment_plan"]);
+    protected function getPaymentPlan() {
+        $summary = json_decode($this->getPlugin()->getStorage()->get('summary'));
+        if ($summary === false || $summary === null) {
+            return null;
+        }
+        return htmlspecialchars(json_encode($summary));
+    }
 
-        $view->assign('EasyCreditPaymentPlan', sprintf('%d Raten à %0.2f€ (%d x %0.2f€, %d x %0.2f€)',
-            (int)   $paymentPlan->anzahlRaten,
-            (float) $paymentPlan->betragRate,
-            (int)   $paymentPlan->anzahlRaten - 1,
-            (float) $paymentPlan->betragRate,
-            1,
-            (float) $paymentPlan->betragLetzteRate
-        ))->assign('EasyCreditDisableAddressChange', true);
+    protected function _extendConfirmTemplate($view) {
+        $view
+            ->assign('EasyCreditPaymentPlan', $this->getPaymentPlan())
+            ->assign('EasyCreditDisableAddressChange', true);
     }
     
     public function getPlugin() {
@@ -436,8 +490,8 @@ class Frontend implements SubscriberInterface
 
         try {
             $checkout = $this->container->get('easyCreditCheckout');
-            $checkout->isAvailable(new Api\Quote());
-        } catch (AddressException $e) {
+            $checkout->isAvailable($this->getPlugin()->getQuote());
+        } catch (AddressValidationException $e) {
             $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
             return;
         } catch (Exception $e) {
@@ -450,7 +504,7 @@ class Frontend implements SubscriberInterface
 
     protected function _registerTemplateDir($viewDir = 'Views') {
         $template = $this->container->get('template');
-        $template->addTemplateDir($this->Path() . $viewDir.'/');
+        $template->addTemplateDir($this->getPlugin()->Path() . $viewDir.'/');
     }
 
     protected function _displayError($action) {
@@ -472,19 +526,10 @@ class Frontend implements SubscriberInterface
         return $error;
     }
 
-    protected function _getAmount(){
-        $quote = new Api\Quote();
-        return $quote->getGrandTotal();
-    }
-
     protected function _getUrl($action) {
         return Shopware()->Front()->Router()->assemble(array(
             'controller' => 'payment_easycredit',
             'action'    => $action,
         ));
-    }
-    
-    public function Path() {
-        return $this->getPlugin()->Path();
     }
 }

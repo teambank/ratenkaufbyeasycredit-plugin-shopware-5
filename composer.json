@@ -1,24 +1,12 @@
 {
     "require": {
-        "netzkollektiv/ratenkaufbyeasycredit-payment-api-v3-php": "dev-legacy-test"
-    },
-    "replace": {
-        "guzzlehttp/psr7": "*"
+        "netzkollektiv/ratenkaufbyeasycredit-api-v3-php": "1.1.0",
+        "guzzlehttp/psr7": "1.8.2"
     },
     "platform": {
         "php": "5.6"
     },
     "config": {
-      "vendor-dir": "src/Frontend/NetzkollektivEasyCredit/vendor",
-      "preferred-install": {
-        "netzkollektiv/ratenkaufbyeasycredit-api-v3-php": "auto",
-        "*": "dist"
-      }
-    },
-    "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/netzkollektiv/ratenkaufbyeasycredit-api-v3-php.git"
-      }
-    ]
+      "vendor-dir": "src/Frontend/NetzkollektivEasyCredit/vendor"
+    }
 }

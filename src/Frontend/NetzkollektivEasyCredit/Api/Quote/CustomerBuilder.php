@@ -18,7 +18,7 @@ class CustomerBuilder
     }
 
     public function getPrefix() {
-        return $this->_userData['billingaddress']['salutation'];
+        return strtoupper((string)$this->_userData['billingaddress']['salutation']);
     }
     public function getFirstname() {
         return $this->_userData['billingaddress']['firstname'];
@@ -57,7 +57,7 @@ class CustomerBuilder
 
     public function getCreatedAt() {
         if ($this->_user) {
-            return $this->_user->getFirstLogin()->format('Y-m-d');
+            return $this->_user->getFirstLogin();
         }
 
         return null;
@@ -82,8 +82,14 @@ class CustomerBuilder
             'lastName' => $this->getLastName(),
             'birthDate' => $this->getDob(),
             'contact' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
-                'email' => $this->getEmail()
+                'email' => $this->getEmail(),
+                //'mobilePhoneNumber' => '0123456789',
+                //'phoneNumbersConfirmed' => true
             ]),
+            //'bank' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Bank([
+            //    'iban' => 'DE88100900001234567892'
+            //]),
+            'companyName' => $this->getCompany() ? $this->getCompany() : null
         ]);
     }
 }
