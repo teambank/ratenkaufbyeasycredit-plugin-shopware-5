@@ -1,1 +1,0 @@
-import{r as registerInstance}from"./index-ea9637fe.js";var EasycreditBase=function(){function e(e){registerInstance(this,e)}Object.defineProperty(e,"assetsDirs",{get:function(){return["assets"]},enumerable:false,configurable:true});return e}();export{EasycreditBase as easycredit_base};

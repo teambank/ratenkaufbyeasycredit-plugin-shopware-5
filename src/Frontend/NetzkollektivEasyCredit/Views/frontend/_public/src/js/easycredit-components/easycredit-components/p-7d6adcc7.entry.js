@@ -1,1 +1,0 @@
-import{r as s}from"./p-d5c3c4b9.js";let t=class{constructor(t){s(this,t)}static get assetsDirs(){return["assets"]}};export{t as easycredit_base}
