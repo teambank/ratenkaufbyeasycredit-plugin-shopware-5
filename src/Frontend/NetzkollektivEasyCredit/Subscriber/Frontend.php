@@ -26,6 +26,8 @@ class Frontend implements SubscriberInterface
 
     protected $db;
 
+    protected $container;
+
     /**
      * Frontend constructor.
      *
@@ -127,9 +129,9 @@ class Frontend implements SubscriberInterface
             ", [$orderNumber, self::INTEREST_ORDERNUM]);
 
             $this->db->commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->db->rollBack();
-            throw new Enlight_Exception("Removal of interest failed:" . $e->getMessage(), 0, $e);
+            throw new \Enlight_Exception("Removal of interest failed:" . $e->getMessage(), 0, $e);
         }
 
     }
@@ -299,13 +301,15 @@ class Frontend implements SubscriberInterface
                 if ($e->getResponseObject() instanceof ConstraintViolation) {
                     $errors = [];
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
-                        $error[$violation['field']] = $violation['message'];
+                        $errors[$violation['field']] = $violation['message'];
                     }
-                    if (in_array($violation['field'],['orderDetails.invoiceAddress','orderDetails.shippingAddress'])) {
-                        throw new AddressValidationException(implode(' ', $error));
+                    if (in_array('orderDetails.invoiceAddress', array_keys($errors)) ||
+                        in_array('orderDetails.shippingAddress', array_keys($errors))
+                    ) {
+                        throw new AddressValidationException(implode(' ', $errors));
                     }
 
-                    $this->getPlugin()->getStorage()->set('apiError', implode(' ', $error));
+                    $this->getPlugin()->getStorage()->set('apiError', implode(' ', $errors));
                     $action->redirect(array(
                         'controller' => 'checkout',
                         'action' => 'confirm'
@@ -498,7 +502,7 @@ class Frontend implements SubscriberInterface
         } catch (AddressValidationException $e) {
             $this->getPlugin()->getStorage()->set('addressError', $e->getMessage());
             return;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             return;
         }

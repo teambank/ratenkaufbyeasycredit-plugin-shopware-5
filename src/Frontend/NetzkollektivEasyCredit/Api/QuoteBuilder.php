@@ -23,12 +23,15 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
 
 class QuoteBuilder {
 
-    protected $basket = null;
+    protected $basket;
+    protected $user;
+    protected $config;
+    protected $storage;
 
     public function __construct() {
-        $this->_basket = Shopware()->Modules()->Basket()->sGetBasket(); 
-        $this->_user = $this->_getUser();
-        $this->_config = Shopware()->Config();
+        $this->basket = Shopware()->Modules()->Basket()->sGetBasket(); 
+        $this->user = $this->_getUser();
+        $this->config = Shopware()->Config();
         $this->storage = new Storage();
     }
 
@@ -62,7 +65,7 @@ class QuoteBuilder {
         $dispatch = $controller->getSelectedDispatch();
         return (
             isset($dispatch['id'])
-            && $dispatch['id'] == $this->_config->get('easycreditClickAndCollectShippingMethod')
+            && $dispatch['id'] == $this->config->get('easycreditClickAndCollectShippingMethod')
         );
     }
 
@@ -79,19 +82,19 @@ class QuoteBuilder {
     public function getInvoiceAddress() {
         $addressBuilder = new Quote\AddressBuilder();
         return $addressBuilder
-            ->setAddress(new InvoiceAddress())
+            ->setAddressModel(new InvoiceAddress())
             ->build(
-                $this->_user,
-                $this->_user['billingaddress']
+                $this->user,
+                $this->user['billingaddress']
             );
     }
     public function getShippingAddress() {
         $addressBuilder = new Quote\AddressBuilder();
         return $addressBuilder
-            ->setAddress(new ShippingAddress())
+            ->setAddressModel(new ShippingAddress())
             ->build(
-                $this->_user,
-                $this->_user['shippingaddress']
+                $this->user,
+                $this->user['shippingaddress']
             );
     }
 
@@ -101,7 +104,7 @@ class QuoteBuilder {
 
     public function getItems() {
         return $this->_getItems(
-            $this->_basket['content']
+            $this->basket['content']
         );
     }
 
@@ -153,13 +156,7 @@ class QuoteBuilder {
         ]);
     }
 
-    public function build($cart): Transaction {
-        $this->cart = $cart;
-
-        if ($cart instanceof Cart && $cart->getDeliveries()->getAddresses()->first() === null) {
-            throw new QuoteInvalidException();
-        }
-
+    public function build(): Transaction {
         return new Transaction([
             'financingTerm' => $this->getDuration(),
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([

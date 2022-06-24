@@ -118,11 +118,12 @@
     var handleShippingPaymentConfirm = function () {
         onHydrated('easycredit-checkout', function() {
             $('easycredit-checkout', 'form[name=shippingPaymentForm]').submit(function(e){
-                $('#shippingPaymentForm')
-                    .append('<input type="hidden" name="easycredit[submit]" value="1" />')
-                    .append('<input type="hidden" name="easycredit[number-of-installments]" value="'+ e.detail.numberOfInstallments +'" />')
-                    .submit();
-                
+                var form = $('#shippingPaymentForm')
+                form.append('<input type="hidden" name="easycredit[submit]" value="1" />')
+                if (e.detail && e.detail.numberOfInstallments) {
+                    form.append('<input type="hidden" name="easycredit[number-of-installments]" value="'+ e.detail.numberOfInstallments +'" />')
+                }
+                form.submit();
 
                 return false;
             });

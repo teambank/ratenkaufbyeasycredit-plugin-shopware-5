@@ -9,7 +9,7 @@ class SystemBuilder {
 
     public function getSystemVersion() {
         if (defined('\Shopware::VERSION')) {
-            return \Shopware::VERSION;
+            return \Shopware::VERSION; /** @phpstan-ignore-line */
         }
         return Shopware()->Container()->getParameter('shopware.release.version');
     }

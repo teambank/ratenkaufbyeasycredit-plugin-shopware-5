@@ -91,8 +91,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
         } catch (\Exception $e) {
             $orderStatusId = $this->plugin->Config()->get('easycreditOrderErrorStatus');
-            $this->saveOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
-            $this->order->setOrderStatus($orderId, $orderStatusId, $sendStatusMail, $comment);
+            $this->order->setOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
 
             $this->container->get('pluginlogger')->error($e->getMessage());
             $this->plugin->getStorage()->set('apiError', 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
@@ -156,6 +155,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     protected function setPaymentClearedDate($transactionId) {
+        /** @phpstan-ignore-next-line */
         if (defined('\Shopware::VERSION') && version_compare(\Shopware::VERSION,'5.1.0') == -1) {
             return;
         }
@@ -213,17 +213,12 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $orderAttributeModel = $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
             array('orderId' => $orderId)
         );
+        /** @phpstan-ignore-next-line */
         if ($orderAttributeModel instanceof \Shopware\Models\Attribute\Order) {
             $orderAttributeModel->setEasycreditSectoken($this->session->EasyCredit["sec_token"]);
             $this->em->persist($orderAttributeModel);
             $this->em->flush();
         }
-    }
-
-    public function getSecToken() {
-        $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
-            array('orderId' => $orderId)
-        )->getEasycreditSectoken();
     }
  
     public function redirectCheckoutConfirm() {

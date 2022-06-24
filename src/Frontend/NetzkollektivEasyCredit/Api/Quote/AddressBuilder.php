@@ -2,11 +2,13 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
 class AddressBuilder {
+
+    protected $addressModel;
     protected $_address = array();
     protected $_user = array();
 
-    public function setAddress($address) {
-        $this->address = $address;
+    public function setAddressModel($address) {
+        $this->addressModel = $address;
         return $this;
     }
 
@@ -44,14 +46,14 @@ class AddressBuilder {
         $this->_user = $user;
         $this->_address = $address;
 
-        $this->address['firstName'] = $this->getFirstName();
-        $this->address['lastName'] = $this->getLastName();
-        $this->address['address'] = $this->getStreet();
-        $this->address['additionalAddressInformation'] = $this->getStreetAdditional();
-        $this->address['zip'] = $this->getPostcode();
-        $this->address['city'] = $this->getCity();
-        $this->address['country'] = $this->getCountryId();
+        $this->addressModel['firstName'] = $this->getFirstName();
+        $this->addressModel['lastName'] = $this->getLastName();
+        $this->addressModel['address'] = $this->getStreet();
+        $this->addressModel['additionalAddressInformation'] = $this->getStreetAdditional();
+        $this->addressModel['zip'] = $this->getPostcode();
+        $this->addressModel['city'] = $this->getCity();
+        $this->addressModel['country'] = $this->getCountryId();
 
-        return $this->address;
+        return $this->addressModel;
     }
 }

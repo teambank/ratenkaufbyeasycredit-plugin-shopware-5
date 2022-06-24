@@ -1,0 +1,10 @@
+parameters:
+    level: 1
+    paths:
+      - src
+    excludePaths:
+      - src/Frontend/NetzkollektivEasyCredit/vendor
+    bootstrapFiles:
+      - src/Frontend/NetzkollektivEasyCredit/vendor/autoload.php
+    scanDirectories:
+      - shopware

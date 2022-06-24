@@ -17,7 +17,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     const PAYMENT_NAME = 'easycredit';
     const INTEREST_ORDERNUM = 'sw-payment-ec-interest';
-    const DEBUG = true;
 
     public function getLabel()
     {
@@ -186,47 +185,24 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->get('events')->addSubscriber(new Subscriber\BackendMerchant($this));
     }
 
-    protected function getLogger() {
-        $logger = Shopware()->Container()->get('pluginlogger');
-    
-        /*
-        if (Shopware()->Config()->get('easycreditDebugLogging')) {
-            $this->debug = true;
-            $this->allowLineBreaks(true); // allow line breaks in log globally, when easycredit Debug Logging is active
-            $handler = $this->_logger->getHandlers();
-            if (
-                is_array($handlers) 
-                && isset($handlers[0]) 
-                && $handlers[0] instanceof Monolog\Logger\StreamHandler
-                && $handlers[0]->getFormatter() instanceof Monolog\Logger\LineFormatter
-            ) {
-                $handlers[0]->getFormatter()->allowInlineLineBreaks($bool); 
-            }
-        }
-        */
-        return $logger;
-    }
-
     protected function getClient () {
-        $stack = null;
         if (class_exists('\GuzzleHttp\Client') && method_exists('\GuzzleHttp\Client','sendRequest')) {
             $stack = HandlerStack::create();
-            $stack->push(
-                Middleware::log(
-                    $this->getLogger(),
-                    new MessageFormatter(MessageFormatter::DEBUG)
-                )
-            );
+
+            if (Shopware()->Config()->get('easycreditDebugLogging')) {
+                $stack->push(
+                    Middleware::log(
+                        Shopware()->Container()->get('pluginlogger'),
+                        new MessageFormatter(MessageFormatter::DEBUG)
+                    )
+                );
+            }
 
             return new \GuzzleHttp\Client([
-                'debug'=> false,
                 'handler' => $stack
             ]);
         }
-        return new ApiV3\Client([
-            'debug'=> true,
-            //'handler' => $stack
-        ]);
+        return new ApiV3\Client();
     }
 
     public function getConfig() {
@@ -263,7 +239,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             new Api\Storage(),
 			new ApiV3\Integration\Util\AddressValidator(),
             new ApiV3\Integration\Util\PrefixConverter(),
-            $this->getLogger()
+            Shopware()->Container()->get('pluginlogger')
         );
     }
 
@@ -649,9 +625,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getQuote() {
         $quote = new Api\QuoteBuilder();
-        return $quote->build(
-            Shopware()->Modules()->Basket()->sGetBasket()
-        );
+        return $quote->build();
     }
 
     protected function _getUser()

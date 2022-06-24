@@ -5,6 +5,8 @@ class CustomerBuilder
 {
     protected $_user = null;
 
+    protected $_userData;
+
     public function __construct() {
         if (isset(Shopware()->Session()->sUserId) && !empty(Shopware()->Session()->sUserId)) {
             $this->_user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);

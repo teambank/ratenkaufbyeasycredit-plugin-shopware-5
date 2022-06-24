@@ -8,6 +8,7 @@ class ItemBuilder
 
     private $categoryId;
     private $articleId;
+    private $manufacturer;
 
     private $name;
     private $qty;

@@ -98,8 +98,12 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
     }
 
     protected function respondWithJson ($content, $code = 200) {
-        $this->Response()->headers->set('content-type', 'application/json');
-        // $this->Response()->setStatusCode(500);
+        if (method_exists($this->Response(),'setHeader')) {
+            $this->Response()->setHeader('content-type','application/json');
+        } else {
+            $this->Response()->headers->set('content-type', 'application/json');
+        }
+
         http_response_code($code);
         echo json_encode($content);
         exit;
@@ -133,7 +137,12 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
     {
         try {
             $transactionId = $this->Request()->getParam('id');
-            $requestData = json_decode($this->Request()->getContent());
+
+            if (method_exists($this->Request(),'getContent')) {
+                $requestData = json_decode($this->Request()->getContent());
+            } else {
+                $requestData = json_decode($this->Request()->getRawBody());
+            }
 
             $response = $this->get('easyCreditMerchant')
                 ->apiMerchantV3TransactionTransactionIdCapturePost(
@@ -152,8 +161,13 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
     {
         try {
             $transactionId = $this->Request()->getParam('id');
-            $requestData = json_decode($this->Request()->getContent());
 
+            if (method_exists($this->Request(),'getContent')) {
+                $requestData = json_decode($this->Request()->getContent());
+            } else {
+                $requestData = json_decode($this->Request()->getRawBody());
+            }
+            
             $response = $this->get('easyCreditMerchant')
                 ->apiMerchantV3TransactionTransactionIdRefundPost(
                     $transactionId,

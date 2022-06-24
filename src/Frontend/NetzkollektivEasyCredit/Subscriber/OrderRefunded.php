@@ -8,6 +8,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
 use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\ConstraintViolation;
 
 class OrderRefunded extends OrderStatusChanged
 {
@@ -17,7 +18,7 @@ class OrderRefunded extends OrderStatusChanged
 
     public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
 
-        try{
+        try {
             try {
                 $order = $eventArgs->getEntity();
                 $transactionId = $order->getTransactionId();

@@ -42,6 +42,8 @@ abstract class OrderStatusChanged implements EventSubscriber
         }
     }
 
+    abstract protected function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs);
+
     protected function config($key) {
         return $this->get('config')->getByNamespace('NetzkollektivEasyCredit', $key);
     }
