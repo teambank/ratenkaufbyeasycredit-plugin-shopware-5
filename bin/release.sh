@@ -9,7 +9,6 @@ fi
 mkdir -p ./build/Frontend/NetzkollektivEasyCredit
 
 cp -r ./src/Frontend/NetzkollektivEasyCredit/* ./build/Frontend/NetzkollektivEasyCredit/
-cp -r ./merchant-interface/dist/* ./build/Frontend/NetzkollektivEasyCredit/Views/backend/_resources/merchant/
 
 version=`php -r "class Shopware_Components_Plugin_Bootstrap {}; require_once 'src/Frontend/NetzkollektivEasyCredit/Bootstrap.php'; echo \Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap::getVersion();"`
 

@@ -19,7 +19,7 @@ abstract class OrderStatusChanged implements EventSubscriber
     abstract public function getConfigKey();
 
     protected function handleError ($error) {
-        $error.= " Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Parter-Portal (https://partner.easycredit-ratenkauf.de/portal).";
+        $error.= " Bitte ändern Sie den Bestellstatus zur Ratenzahlung manuell im Partner-Portal (https://partner.easycredit-ratenkauf.de/portal).";
         $GLOBALS['easycreditMerchantStatusChangedError'] = $error;
     }
 
