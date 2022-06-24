@@ -1,10 +1,9 @@
 version: "2"
 services: 
-  shopware-base:
-    image: dnhsoft/shopware:5.4.6
+  shopware-base-php:
+    image: netzkollektivgmbh/docker-shopware:php-7.3
     volumes:
-      - ./src/Frontend/NetzkollektivEasyCredit:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
-      - ./merchant-interface/dist:/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit/Views/backend/_resources/merchant
+      - ./src/Frontend/NetzkollektivEasyCredit:/var/www/html/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
       - ./tools:/tools
       - ./thirdparty:/shopware/engine/Shopware/Plugins/Community/Frontend
       - /opt/gocode/bin/mhsendmail:/usr/local/bin/mhsendmail
@@ -15,6 +14,7 @@ services:
       SMTP_HOST: smtp
       SWDB_DATABASE: shopware
       SWDB_USER: root
+      SWDB_PASSWORD: 123456
     labels:
       - "traefik.enable=true"
       - "traefik.web.backend=web"

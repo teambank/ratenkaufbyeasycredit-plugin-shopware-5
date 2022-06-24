@@ -1,35 +1,45 @@
-# easyCredit Shopware Extension
+# ratenkauf by easyCredit Plugin for Shopware 5 - Installment Payment Plugin
 
-Das easyCredit Zahlungsmodul für Shopware 4./5. ermöglicht es Ihnen durch einfache Installation Ratenkauf by easyCredit in Ihrem Shopware-Store anbieten zu können.
-Weitere Informationen zu easyCredit finden Sie unter  [Ratenkauf by easyCredit](https://www.easycredit-ratenkauf.de/haendler.htm)
+ratenkauf by easyCredit is the easiest and fastest installment payment solution of Germany. Join today to get the simplest way of partial payment for your POS and E-Commerce. ratenkauf by easyCredit gives you the opportunity to offer installments as an additional payment method in your German WooCommerce store.
 
-## Installation
+Traditional financing solutions are often connected with complicated application processes for customers. With ratenkauf by easyCredit you can offer a simple, fully online and fast financing solution. Customers can use ‚ratenkauf by easyCredit‘ in just a few steps: choose their purchases, calculate their preferred installments, enter their personal data, and pay. No paperwork, immediate approval, and complete flexibility throughout. Simple. Fair. Paying in installments with ‚ratenkauf by easyCredit‘.
 
-## Konfiguration
+# Getting started
+Are you interested in using ratenkauf by easyCredit? Contact us now:
+* [sales.ratenkauf@easycredit.de](https://store.shopware.com/en/easyc36021249341f/ratenkauf-by-easycredit.html#)
+* +49 (0)911 5390 2726
 
-### Zahlarten-Einstellung
+or register at [easycredit-ratenkauf.de](https://www.easycredit-ratenkauf.de/registrierung.htm) and we will contact you.
 
-Die Zahlungsarten-Konfiguration befindet sich in unter *System -> Konfiguration -> Zahlungsarten -> easyCredit Ratenzahlung*
+**Please note that a valid contract is required to use the plug-in.**
 
-![Zahlarten-Konfiguration](./screenshots/payment_method_settings.png "Zahlarten-Konfiguration")
+# Installation
 
-| Option                                        | Erklärung                                                                                                                                                                                                                                                                       |
-|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Title                                         | Unter dem Titel wird die Zahlungsmethode im Checkout angezeigt.                                                                                                                                                                                                                 |
-| Status neuer Bestellungen                     | Ermöglicht es Ihnen den Status festzulegen den Bestellungen die mit Ratenkauf by easyCredit bezahlt wurden, nach dem Eingang im System aufweisen.                                                                                                                               |
-| Zeige Modellrechner-Widget neben Produktpreis | Aktivieren Sie diese Option wenn Sie auf Produkt-Detail-Seiten ein monatliches Raten Angebot anzeigen möchten. Bitte beachten Sie das ein monaterlicher Ratenpreis nur angezeigt wird wenn der Preis des Produkts sich in der festgelegten Preisspanne für Ratenkäufe befindet. |
-| Zahlung aus zutreffenden Ländern              | Stellen Sie diese Option bitte auf Bestimmte Länder (Specific Countries)                                                                                                                                                                                                        |
-| Zahlung aus bestimmmten Ländern               | Wählen Sie hier als einziges Land Deutschland aus.                                                                                                                                                                                                                              |
-| Debug Logging                                 | Erlaubt Ihnen festzulegen ob der Inhalt aller easyCredit API-Zugriffe in var/log/debug.log gespeichert werden soll. Fehlermitteillungen werden immer gespeichert.                                                                                                               |
-| API Key                                       | Der API-Key wird Ihnen von der Teambank AG zur Verfügung gestellt.                                                                                                                                                                                                              |
-| API Token                                     | Der nicht öffentliche API Token wird Ihnen von der Teambank AG zur Verfügung gestellt und sollte nicht mit Dritten geteilt werden.                                                                                                                                              |
-| easyCredit Zugangsdaten überprüfen            | Ein Klick auf diesen Button überprüft die Kombination von API-Key und -Token auf Gültigkeit. Bitte vergessen Sie nicht nach einem erfolgreichen Test noch auf Speichern zu klicken.                                                                                             |
+```
+cd my-shopware-dir
 
-## Kompatibilität
+git clone https://github.com/teambank/ratenkaufbyeasycredit-plugin-shopware-5.git sw-easycredit
+cp -r sw-easycredit/src/Frontend/NetzkollektivEasyCredit engine/Shopware/Plugins/Local/Frontend/
 
-Die Extension wurde mit folgenden Shopware Versionen und PHP5 getestet:
-* 4.3.0
-* 4.3.6
-* 5.1.3
-* 5.1.5
-* 5.2.x (auch PHP7)
+./bin/console sw:plugin:refresh
+./bin/console sw:plugin:install NetzkollektivEasyCredit
+./bin/console sw:plugin:activate NetzkollektivEasyCredit
+```
+
+# Compatibility
+
+This extension aims to be as compatible as possible with current, future versions of Shopware 5. This version is regularly tested with Shopware versions:
+
+* >= v5.2.x 
+* <= v5.7.7
+
+Earlier versions of Shopware 5 may work, but are not actively tested anymore.
+
+If you still have any problems, please open a ticket or contact [ratenkauf@easycredit.de](mailto:ratenkauf@easycredit.de).
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
+# Security
+If you have discovered a security vulnerability, please email [opensource@teambank.de](mailto:opensource@teambank.de).

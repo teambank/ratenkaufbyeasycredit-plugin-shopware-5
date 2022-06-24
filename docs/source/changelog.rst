@@ -1,10 +1,17 @@
 Changelog
 =========
 
+v1.8.7
+------
+
+* Prüfung auf ausgewählte Zahlart in Subscriber (behebt ein Problem mit einer Onepage Checkout Extension)
+
 v1.8.6
 ------
 
-* die Zinsen werden nun statisch als "versandkostenfrei" markiert (behebt Probleme i.V.m. "Eigene Bedingung" & "Eigene Berechnung")
+* "Der Finanzierungsbetrag liegt ausserhalb der zulässigen Beträge" wird nun als INFO statt als ERROR geloggt
+* es wurden textliche Anpassungen und Vereinheitlichungen durchgeführt  
+* der Menüpunkt unter "Zahlungen" im Backend wird nun auch bei einem Plugin-Update angelegt
 
 v1.8.5
 ------

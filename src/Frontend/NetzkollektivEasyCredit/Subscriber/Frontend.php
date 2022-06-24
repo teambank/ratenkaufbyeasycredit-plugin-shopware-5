@@ -385,7 +385,11 @@ class Frontend implements SubscriberInterface
         $action = $args->getSubject();
         $request = $action->Request();
         $view = $action->View();
-       
+
+        if (!$this->getPlugin()->isSelected($view->sUserData['additional']['user']['paymentID'])) {
+            return;
+        }
+
         $actionPath = implode('/',array($request->getModuleName(),$request->getControllerName(),$request->getActionName())); 
 
         if ($actionPath == 'frontend/address/ajaxEditor'

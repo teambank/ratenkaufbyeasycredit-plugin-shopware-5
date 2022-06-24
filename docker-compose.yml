@@ -5,14 +5,36 @@ networks:
     external: true
 
 services:
-  shopware:
+  shopware-php:
     extends:
       file: shopware.yml
-      service: shopware-base
+      service: shopware-base-php
+
+  shopware577:
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-8.0
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware577
+      SW_HOST: sweasycredit.shopware577.dev.netzkollektiv.com
+      SW_DOWNLOAD_URL: https://www.shopware.com/de/Download/redirect/version/sw5/file/install_5.7.7_cba194ae2aab11d165a3876608a481bcbb971f57.zip
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware577.dev.netzkollektiv.com"
+
+  shopware57:
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-7.4
+    links:
+     - db
+    environment:
+      SWDB_DATABASE: shopware57
+    labels:
+      - "traefik.web.frontend.rule=Host: sweasycredit.shopware57.dev.netzkollektiv.com"
 
   shopware56:
-    extends: shopware
-    build: .
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-7.3
     links:
      - db
     environment:
@@ -21,8 +43,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware56.dev.netzkollektiv.com"
 
   shopware55:
-    extends: shopware
-    image: dnhsoft/shopware:5.5.6
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-7.2
     links:
      - db
     environment:
@@ -31,8 +53,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware55.dev.netzkollektiv.com"
 
   shopware54:
-    extends: shopware
-    image: dnhsoft/shopware:5.4.6
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-7.1
     links:
      - db
     environment:
@@ -41,8 +63,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware54.dev.netzkollektiv.com"
 
   shopware53:
-    extends: shopware
-    image: dnhsoft/shopware:5.3.7
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-7.0
     links:
      - db
     environment:
@@ -51,8 +73,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware53.dev.netzkollektiv.com"
 
   shopware52:
-    extends: shopware
-    image: dnhsoft/shopware:5.2.27
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-5.6
     links:
      - db
     environment:
@@ -61,8 +83,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware52.dev.netzkollektiv.com"
 
   shopware51:
-    extends: shopware
-    image: dnhsoft/shopware:5.1.6
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-5.6
     links:
      - db
     environment:
@@ -71,8 +93,8 @@ services:
       - "traefik.web.frontend.rule=Host: sweasycredit.shopware51.dev.netzkollektiv.com"
 
   shopware50:
-    extends: shopware
-    image: dnhsoft/shopware:5.0.4
+    extends: shopware-php
+    image: netzkollektivgmbh/docker-shopware:php-5.6
     links:
      - db
     environment:
