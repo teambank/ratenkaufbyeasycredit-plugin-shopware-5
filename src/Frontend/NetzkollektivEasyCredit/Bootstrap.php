@@ -650,7 +650,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function addInterest($refresh = true) {
         $interestAmount = Shopware()->Session()->EasyCredit['interest_amount'];
-        if (empty($interestAmount)) {
+        if ($interestAmount === null) {
             return;
         }
 
