@@ -353,8 +353,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'text',
             'easycreditApiSignature',
             array(
-                'label' => 'API-Signatur',
-                'required' => true,
+                'label' => 'API-Signatur (optional)',
+                'required' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
                 'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im ratenkauf by easyCredit Partnerportal aktivieren.',
@@ -612,7 +612,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function isValid() {
         $quote = $this->getQuote();
-
         return $this->isInterestInBasket()
             && $this->getCheckout()->isAmountValid($quote)
             && $this->getCheckout()->verifyAddress($quote);
