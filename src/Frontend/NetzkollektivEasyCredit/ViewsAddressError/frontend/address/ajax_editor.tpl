@@ -3,7 +3,7 @@
 {block name="frontend_address_editor_modal_body"}
     {$smarty.block.parent}
 
-    <div class="panel--footer">
+    <div class="panel--actions address--form-actions is--wide">
         <button class="btn is--primary address--form-submit" data-submit-form="frmAddresses" data-value="update" data-checkFormIsValid="false" data-preloader-button="true">weiter zur Ratenauswahl</button>
     </div>
 {/block}
