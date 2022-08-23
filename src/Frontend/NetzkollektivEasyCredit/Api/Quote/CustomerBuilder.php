@@ -1,6 +1,8 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
+use Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter;
+
 class CustomerBuilder
 {
     protected $_user = null;
@@ -19,9 +21,12 @@ class CustomerBuilder
         }
     }
 
-    public function getPrefix() {
-        return strtoupper((string)$this->_userData['billingaddress']['salutation']);
+    public function getPrefix()
+    {
+        $prefixConverter = new PrefixConverter();
+        return $prefixConverter->convert($this->_userData['billingaddress']['salutation']);
     }
+
     public function getFirstname() {
         return $this->_userData['billingaddress']['firstname'];
     }

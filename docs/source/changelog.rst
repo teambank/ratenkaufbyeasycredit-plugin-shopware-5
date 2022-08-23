@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.0.1
+------
+
+* behebt einen Fehler bei Übertragung der Anrede
+
 v2.0.0
 -------
 
