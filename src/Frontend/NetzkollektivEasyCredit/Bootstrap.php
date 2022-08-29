@@ -20,12 +20,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getLabel()
     {
-        return 'ratenkauf by easyCredit';
+        return 'easyCredit-Ratenkauf';
     }
 
     public function getVersion()
     {
-        return '2.0.1';
+        return '2.0.2';
     }
 
     public function getInfo()
@@ -75,6 +75,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->_createPaymentConfigForm();
         $this->_createMenuItem();
         $this->_createAttributes();
+        $this->_applyBrandRelaunch();
 
         return array(
             'success' => true,
@@ -290,11 +291,13 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     protected function _createMenuItem()
     {
         Shopware()->Db()->delete('s_core_menu',['controller = ?' => 'EasycreditMerchant']);
+        Shopware()->Db()->delete('s_core_snippets',['name = ?' => 'EasycreditMerchant']);
+
         $parent = $this->Menu()->findOneBy(array('label' => 'Zahlungen'));
 
         $this->createMenuItem(
             array(
-                'label' => 'ratenkauf by easyCredit',
+                'label' => 'easyCredit-Ratenkauf',
                 'controller' => 'EasycreditMerchant',
                 'action' => 'Index',
                 'class' => 'easycredit--icon',
@@ -357,7 +360,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'required' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im ratenkauf by easyCredit Partnerportal aktivieren.',
+                'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit-Ratenkauf Partnerportal aktivieren.',
                 'position' => $position++
             )
         );
@@ -460,7 +463,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => '„Lieferung melden“ automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.',
+                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit-Ratenkauf übermittelt.',
                 'position' => $position++
             )
         );
@@ -486,7 +489,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Rückabwicklung automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an ratenkauf by easyCredit übermittelt.',
+                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit-Ratenkauf übermittelt.',
                 'position' => $position++
             )
         );
@@ -524,7 +527,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'label' => 'Zeige Modellrechner-Widget neben Produktpreis',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem ratenkauf by easyCredit empfehlen wir, das Widget zu aktivieren.',
+                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
                 'position' => $position++
             )
         );
@@ -567,7 +570,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             /** @var CrudService $service */
             $service = Shopware()->Container()->get('shopware_attribute.crud_service')
                 ->update('s_order_attributes', 'easycredit_sectoken', 'varchar', [
-                    'label' => 'ratenkauf by easyCredit Sec Token',
+                    'label' => 'easyCredit-Ratenkauf Sec Token',
                     'displayInBackend' => false,
                     'position' => 900,
                     'custom' => false,
@@ -586,6 +589,17 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         }
         $em->getConfiguration()->getMetadataCacheImpl()->deleteAll();
         $em->generateAttributeModels(['s_order_attributes']);
+    }
+
+    public function _applyBrandRelaunch() {
+        Shopware()->Db()->query("
+            UPDATE s_core_plugins Set description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf') WHERE name = 'NetzkollektivEasyCredit';
+            UPDATE s_core_paymentmeans Set description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf') WHERE name = 'easycredit';
+            UPDATE s_core_config_forms Set
+                description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf'),
+                label = REPLACE(label, 'ratenkauf by easyCredit','easyCredit-Ratenkauf')
+            WHERE name = 'NetzkollektivEasyCredit';
+        ");
     }
 
     public function getCheckout() {

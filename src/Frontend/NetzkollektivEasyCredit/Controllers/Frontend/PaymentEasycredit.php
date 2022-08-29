@@ -94,7 +94,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $this->order->setOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
 
             $this->container->get('pluginlogger')->error($e->getMessage());
-            $this->plugin->getStorage()->set('apiError', 'Die Zahlung mit <strong>ratenkauf by easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
+            $this->plugin->getStorage()->set('apiError', 'Die Zahlung mit <strong>easyCredit-Ratenkauf</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
             $this->plugin->getStorage()->set('apiErrorSkipSuffix', true);
             $this->redirect(array(
                 'controller' => 'checkout',
@@ -118,7 +118,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         if (!$approved) {
-            $this->plugin->getStorage()->set('apiError', 'ratenkauf by easyCredit wurde nicht genehmigt.');
+            $this->plugin->getStorage()->set('apiError', 'easyCredit-Ratenkauf wurde nicht genehmigt.');
             $this->_redirToPaymentSelection();
             return;
         }

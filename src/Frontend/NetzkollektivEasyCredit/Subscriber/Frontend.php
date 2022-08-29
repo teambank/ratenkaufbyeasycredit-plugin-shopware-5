@@ -290,7 +290,7 @@ class Frontend implements SubscriberInterface
             } catch (ConnectException $e) {
                 $this->container->get('pluginlogger')->error($e->getMessage());
                 $this->getPlugin()->getStorage()
-                    ->set('apiError', 'ratenkauf by easyCredit ist im Moment nicht verfügbar. Bitte probieren Sie es erneut oder wählen Sie eine andere Zahlungsart.')
+                    ->set('apiError', 'easyCredit-Ratenkauf ist im Moment nicht verfügbar. Bitte probieren Sie es erneut oder wählen Sie eine andere Zahlungsart.')
                     ->set('apiErrorSkipSuffix', true);
 
                 $action->redirect(array(

@@ -14,7 +14,7 @@ Ext.define('Shopware.apps.EasycreditMerchant.view.main.Window', {
      */
     configure: function () {
         var me = this;
-        me.title = '{s name="window/title"}ratenkauf by easyCredit: Payments{/s}';
+        me.title = '{s name="window/title"}easyCredit-Ratenkauf: Payments{/s}';
 
         return {
             listingGrid: 'Shopware.apps.EasycreditMerchant.view.main.Grid',

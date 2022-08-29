@@ -6,12 +6,12 @@
 Konfiguration
 =============
 
-Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie ratenkauf by easyCredit als Zahlungsmethode für den deutschen Store.
+Nachdem Sie die Installation erfolgreich abgeschlossen haben, konfigurieren Sie das Plugin. Damit das Plugin als Zahlungsmethode angezeigt wird aktivieren Sie easyCredit-Ratenkauf als Zahlungsmethode für den deutschen Store.
 
 Konfigurations Menü öffnen
 --------------------------
 
-Zur Konfiguration öffnen Sie im Backend erneut den Plugin-Manager. In der Liste der installierten Plugins sollte nun **ratenkauf by easyCredit** enthalten sein.
+Zur Konfiguration öffnen Sie im Backend erneut den Plugin-Manager. In der Liste der installierten Plugins sollte nun **easyCredit-Ratenkauf** enthalten sein.
 In dieser Zeile klicken Sie das Stifte Icon, um die Plugin Konfiguration zu öffnen.
 
 .. image:: ./_static/config-open.png
@@ -29,8 +29,8 @@ Die Konfigurationsmöglichkeiten sind im Folgenden gezeigt. Als Mindestkonfigura
 Zahlungsart Einstellungen
 -------------------------
 
-Um die Zahlungsart **ratenkauf by easyCredit** im Frontend anzuzeigen, muss die Zahlungsart aktiviert sein, und dem Land *Deutschland* zugewiesen werden. Navigieren Sie hierzu zu den Zahlungsart Einstellungen: :menuselection:`System -> Konfiguration -> Zahlungsarten -> ratenkauf by easyCredit`
-Im ersten Reiter **Generell** stellen Sie sicher, dass **ratenkauf by easyCredit** aktiviert ist.
+Um die Zahlungsart **easyCredit-Ratenkauf** im Frontend anzuzeigen, muss die Zahlungsart aktiviert sein, und dem Land *Deutschland* zugewiesen werden. Navigieren Sie hierzu zu den Zahlungsart Einstellungen: :menuselection:`System -> Konfiguration -> Zahlungsarten -> easyCredit-Ratenkauf`
+Im ersten Reiter **Generell** stellen Sie sicher, dass **easyCredit-Ratenkauf** aktiviert ist.
 
 .. image:: ./_static/config-payment-active.png
 

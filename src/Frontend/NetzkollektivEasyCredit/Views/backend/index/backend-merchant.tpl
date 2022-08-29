@@ -3,7 +3,7 @@
 
     <style type="text/css">
     .easycredit--icon {
-        background-image: url({link file='backend/_resources/img/ratenkaufbyeasycredit-icon.svg'});
+        background-image: url({link file='backend/_resources/img/easycredit-icon.svg'});
         background-repeat: no-repeat;
         background-size: contain;
     }
