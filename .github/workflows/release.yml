@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tag:
+    - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run script file
+      id: build-release
+      run: |
+         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+         chmod +x ./bin/release.sh
+         ./bin/release.sh
+         echo "build $(ls dist/* | head -1)"
+         echo "::set-output name=filepath::$(ls dist/* | head -1)"
+         echo "::set-output name=filename::$(basename `ls dist/* | head -1`)"
+
+         CHANGELOG=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
+         echo "::set-output name=changelog::$CHANGELOG"
+      shell: bash
+    - name: Create Release
+      id: create-release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: v${{ github.ref }}
+        body: ${{ steps.build-release.outputs.changelog }}
+        draft: true
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-release.outputs.upload_url }}
+        asset_path: ${{ steps.build-release.outputs.filepath }}
+        asset_name: ${{ steps.build-release.outputs.filename }}
+        asset_content_type: application/zip
