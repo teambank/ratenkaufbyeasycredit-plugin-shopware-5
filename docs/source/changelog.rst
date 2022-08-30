@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.0.2
+------
+
+* Änderungen zum Markenrelaunch von easyCredit-Ratenkauf
+
 v2.0.1
 ------
 
