@@ -19,8 +19,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'ratenkauf by easyCredit für Shopware 5.x'
-copyright = u'2021, NETZKOLLEKTIV GmbH'
+project = u'easyCredit-Ratenkauf für Shopware 5.x'
+copyright = u'2022, NETZKOLLEKTIV GmbH'
 author = u'Teambank AG'
 
 # The short X.Y version
@@ -85,7 +85,7 @@ html_show_sphinx = False
 #
 html_theme_options = {
   'display_version': True,
-  'style_nav_header_background': 'white'
+  'style_nav_header_background': '#0066B3'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -163,7 +163,7 @@ latex_logo = '_static/50_ratenkauf_Logo_1240x824_easyCredit.png'
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'sw-easycredit.tex', u'ratenkauf by easyCredit für Shopware 5.x',
+    (master_doc, 'sw-easycredit.tex', u'easyCredit-Ratenkauf für Shopware 5.x',
      u'Teambank AG', 'manual'),
 ]
 
@@ -173,7 +173,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware 5.x',
+    (master_doc, 'sw-easycredit', u'easyCredit-Ratenkauf für Shopware 5.x',
      [author], 1)
 ]
 
@@ -184,7 +184,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'sw-easycredit', u'ratenkauf by easyCredit für Shopware 5.x',
+    (master_doc, 'sw-easycredit', u'easyCredit-Ratenkauf für Shopware 5.x',
      author, 'sw-easycredit', 'One line description of project.',
      'Miscellaneous'),
 ]

@@ -23,7 +23,7 @@ class OrderRefunded extends OrderStatusChanged
                 $order = $eventArgs->getEntity();
                 $transactionId = $order->getTransactionId();
                 if (empty($transactionId)) {
-                    throw new \Exception('Die zugehörige ratenkauf by easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
+                    throw new \Exception('Die zugehörige easyCredit-Ratenkauf Transaktion-ID dieser Bestellung ist nicht vorhanden.');
                 }
 
                 $merchantClient = Shopware()->Container()->get('easyCreditMerchant');
@@ -34,7 +34,7 @@ class OrderRefunded extends OrderStatusChanged
                     );
             } catch (ApiException $e) {
                 if ($e->getResponseObject() instanceof ConstraintViolation) {
-                    $error = 'ratenkauf by easyCredit: ';
+                    $error = 'easyCredit-Ratenkauf: ';
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
                         $error .= $violation['message'];
                     }

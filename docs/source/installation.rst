@@ -4,7 +4,7 @@
 Installation
 ============
 
-Die Extension für ratenkauf by easyCredit kann im Plugin-Manager entweder über den direkten Download aus dem *Shopware Community Store* oder über den Datei-Upload des bereitgestellten Archives über *Plugin Hochladen* installiert werden.
+Die Extension für easyCredit-Ratenkauf kann im Plugin-Manager entweder über den direkten Download aus dem *Shopware Community Store* oder über den Datei-Upload des bereitgestellten Archives über *Plugin Hochladen* installiert werden.
 Alternativ ist auch die Installation über die Kommandozeile möglich.
 
 Shopware Community Store

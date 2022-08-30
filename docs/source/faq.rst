@@ -52,7 +52,7 @@ Beispiel für eine "Eigene Berechnung" ohne Berücksichtigung des Artikeltyps
 
 In diesem Fall werden für jeden Einzelartikel einer Bestellposition 15,99 EUR als Versandkosten berechnet.
 
-Das `ratenkauf by easyCredit`-Plugin fügt nach erfolgreicher Ratenberechnung zur Transparenz für den Kunden eine Position `Zinsen für Ratenzahlung` in den Warenkorb ein. Im Beispiel werden auf diese Position ebenfalls Versandkosten in Höhe von 15,99 EUR berechnet, die aber vor der Ratenberechnung nicht aufgeschlagen wurden. Dadurch unterscheidet sich der Gesamtbetrag vor und nach der Ratenberechnung und das Plugin erkennt eine Betragsänderung, die wiederum eine erneute Ratenberechnung erforderlich macht.
+Das `easyCredit-Ratenkauf`-Plugin fügt nach erfolgreicher Ratenberechnung zur Transparenz für den Kunden eine Position `Zinsen für Ratenzahlung` in den Warenkorb ein. Im Beispiel werden auf diese Position ebenfalls Versandkosten in Höhe von 15,99 EUR berechnet, die aber vor der Ratenberechnung nicht aufgeschlagen wurden. Dadurch unterscheidet sich der Gesamtbetrag vor und nach der Ratenberechnung und das Plugin erkennt eine Betragsänderung, die wiederum eine erneute Ratenberechnung erforderlich macht.
 
 Beispiel für eine "Eigene Berechnung" mit Berücksichtigung des Artikeltyps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +70,7 @@ Für eine korrekte Berechnung der Versandkosten ist es daher notwendig den Artik
 Die CASE-Anweisung bewirkt in diesem Fall, dass die Versandkosten nur für Artikel berechnet werden, die den `modus` = 0 haben. Bei anderen Artikeltypen werden keine Versandkosten aufgeschlagen.
 
 .. warning::
-  Diese Anpassung ist nicht nur für ratenkauf by easyCredit wichtig. Ist der Modus in "Eigene Berechnung" nicht berücksichtigt, kann dies auch zu Versandkosten-Aufschlägen bei Gutscheinen oder anderen Zusatzpositionen führen.
+  Diese Anpassung ist nicht nur für easyCredit-Ratenkauf wichtig. Ist der Modus in "Eigene Berechnung" nicht berücksichtigt, kann dies auch zu Versandkosten-Aufschlägen bei Gutscheinen oder anderen Zusatzpositionen führen.
 
 .. note::
 
