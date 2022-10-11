@@ -57,13 +57,13 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         ]);
     }
 
-    public function getUniqueIdBySecuredTransaction($transactionId, $secToken) {
+    public function getTransactionInfoBySecuredTransaction($transactionId, $secToken) {
         $sql = '
-            SELECT temporaryID FROM s_order o INNER JOIN s_order_attributes oa ON o.id = oa.orderID
+            SELECT temporaryID, easycredit_token FROM s_order o INNER JOIN s_order_attributes oa ON o.id = oa.orderID
             WHERE o.transactionID=? AND oa.easycredit_sectoken = ?
             AND o.status!=-1
         ';
-        return Shopware()->Db()->fetchOne($sql, [
+        return Shopware()->Db()->fetchRow($sql, [
             $transactionId,
             $secToken,
         ]);
@@ -77,11 +77,13 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
         $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
 
-        $this->saveSecToken($orderId);
+        $this->saveOrderAttributes($orderId);
 
         try {
             $checkout = $this->container->get('easyCreditCheckout');
-            $captureResult = $checkout->authorize($orderNumber);
+            if (!$checkout->authorize($orderNumber)) {
+                throw new \Exception('The transaction could not be authorized.');
+            }
 
             $this->redirect(array(
                 'controller' => 'checkout',
@@ -142,16 +144,30 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $secToken = $this->Request()->getParam('secToken', null);
         $transactionId = $this->Request()->getParam('transactionId', null);
 
-        if ($paymentUniqueId = $this->getUniqueIdBySecuredTransaction($transactionId, $secToken)) {
-
-            $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
-
-            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId, false);
-            $this->setPaymentClearedDate($transactionId);
-
-            return $this->Response()->setStatusCode(200);
+        $transactionInfo = $this->getTransactionInfoBySecuredTransaction($transactionId, $secToken);
+        if (!$transactionInfo) {
+            return $this->respondWithStatus('transaction could not be found', 404);
         }
-        $this->Response()->setStatusCode(404);
+
+        $checkout = $this->container->get('easyCreditCheckout');
+        $tx = $checkout->loadTransaction($transactionInfo['easycredit_token']);
+
+        if ($tx->getStatus() !== \Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
+            return $this->respondWithStatus('payment status of transaction not updated as transaction status is not AUTHORIZED', 409);
+        }
+
+        $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
+
+        $this->savePaymentStatus($transactionId, $transactionInfo['temporaryID'], $paymentStatusId, false);
+        $this->setPaymentClearedDate($transactionId);
+
+        return $this->respondWithStatus('payment status successfully set');
+    }
+
+    public function respondWithStatus($content, $code = 200) {
+        http_response_code($code);
+        echo $content;
+        exit;
     }
 
     protected function setPaymentClearedDate($transactionId) {
@@ -209,13 +225,14 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         );
     }
 
-    public function saveSecToken($orderId) {
+    public function saveOrderAttributes($orderId) {
         $orderAttributeModel = $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
             array('orderId' => $orderId)
         );
         /** @phpstan-ignore-next-line */
         if ($orderAttributeModel instanceof \Shopware\Models\Attribute\Order) {
             $orderAttributeModel->setEasycreditSectoken($this->session->EasyCredit["sec_token"]);
+            $orderAttributeModel->setEasycreditToken($this->session->EasyCredit["token"]);
             $this->em->persist($orderAttributeModel);
             $this->em->flush();
         }
