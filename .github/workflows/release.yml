@@ -20,8 +20,11 @@ jobs:
          echo "::set-output name=filepath::$(ls dist/* | head -1)"
          echo "::set-output name=filename::$(basename `ls dist/* | head -1`)"
 
-         CHANGELOG=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
-         echo "::set-output name=changelog::$CHANGELOG"
+         t=$(cat docs/source/changelog.rst  | php -r 'preg_match_all("#([v\d\.]+)\n[-]+\n(.+?)\n\n#s", file_get_contents("php://stdin"), $matches); echo trim($matches[2][0]);')
+         t="${t//'%'/'%25'}"
+         t="${t//$'\n'/'%0A'}"
+         t="${t//$'\r'/'%0D'}"
+         echo "::set-output name=changelog::$t"
       shell: bash
     - name: Create Release
       id: create-release

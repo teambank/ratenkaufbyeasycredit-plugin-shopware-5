@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v2.0.3
+------
+
+* eine Bestellung kann nur abgeschlossen werden, wenn der Transaktionstatus PREAUTHORIZED ist, andernfalls erhält der Kunde eine Fehlermeldung
+* eine Bestellung wird nur als bezahlt markiert, wenn der Transaktionsstatus bei Aufruf des AuthorizationCallback AUTHORIZED ist
+* in der Transaktionsübersicht werden keine abgebrochenen Bestellungen mehr angezeigt
+* das Ratenrechner-Widget wird in bestimmten Fällen nicht mehr doppelt angezeigt
+
 v2.0.2
 ------
 

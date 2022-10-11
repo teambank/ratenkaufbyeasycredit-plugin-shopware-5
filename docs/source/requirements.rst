@@ -13,8 +13,8 @@ Versionskompatibilität
 
 Das Plugin hat neben Shopware 5.x keine weiteren Abhängigkeiten. Es wurde für die folgenden Versionen mit dem Responsive Template getestet:
 
-* 5.0.x
-* 5.1.x
+* 5.0.x (<= v1.8.7)
+* 5.1.x (<= v1.8.7)
 * 5.2.x
 * 5.3.x
 * 5.4.x
