@@ -48,6 +48,8 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
             ->addSelect('paymentStatus')
             ->addSelect('attribute');
 
+        $builder->where("sOrder.transactionId != ''");
+
         return $builder;
     }
 
