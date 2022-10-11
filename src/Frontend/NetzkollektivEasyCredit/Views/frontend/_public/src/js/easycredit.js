@@ -111,7 +111,7 @@
             return;
         }
 
-        $(target).parent().find("[id^=easycredit-pp-plugin-placeholder]").remove();
+        $(target).siblings('easycredit-widget').remove();
         $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
     };
 
