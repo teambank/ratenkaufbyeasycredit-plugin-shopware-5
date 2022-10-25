@@ -18,7 +18,8 @@ class Backend implements SubscriberInterface
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit' => 'onGetControllerPathPaymentEasycredit',
             'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange',
             'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields',
+            'Shopware\Models\Config\Element::postPersist' => 'renameConfigField'
         );
     }
 
@@ -93,12 +94,31 @@ class Backend implements SubscriberInterface
         $request = $controller->Request();
 
         if ($request->getActionName() == 'load') {
+            $this->migrateConfigField();
             $this->bootstrap->updateSpecialFieldTypes();
             $this->bootstrap->registerTemplateDir();
             $view->extendsTemplate('backend/plugin_manager/helper/easycredit_intro.js');
         }
     }
 
+    public function migrateConfigField () {
+        // move config values to renamed config element && remove old config element
+        $fieldId = (int) Shopware()->Db()->fetchOne("SELECT e.id FROM s_core_config_elements e
+            INNER JOIN s_core_config_forms f ON e.form_id = f.id WHERE f.name= 'NetzkollektivEasyCredit' AND e.name = 'easycreditApiToken'
+        ");
+        if ($fieldId > 0) {
+            Shopware()->Db()->query("
+                UPDATE IGNORE
+                    s_core_config_values vls INNER JOIN s_core_config_elements element ON element.id = vls.element_id
+                    Set element_id = (
+                        SELECT id FROM s_core_config_elements _element WHERE _element.name = 'easycreditApiPassword'
+                    )
+                WHERE element.id = ?;
+                DELETE FROM s_core_config_values WHERE element_id = ?;
+                DELETE FROM s_core_config_elements WHERE id = ?;
+            ", [$fieldId, $fieldId, $fieldId]);
+        }
+    }
 
     public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
         return $this->Path() . 'Controllers/Backend/PaymentEasycredit.php';
