@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v2.0.4
+------
+
+* behebt ein Problem, bei dem das Konfigurationsfeld API-Passwort doppelt angezeigt 
+* Werte des alten Feldes werden automatisch in das neue Feld migriert (bei Multistore-Konfigurationen mit Vererbungen sind die Zugangsdaten ggf. zusätzlich manuell zu prüfen)
+* obsolete CSS-Definitionen wurden entfernt
+
 v2.0.3
 ------
 
