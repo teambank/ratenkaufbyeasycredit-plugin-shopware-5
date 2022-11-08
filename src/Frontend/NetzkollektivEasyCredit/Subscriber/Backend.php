@@ -18,8 +18,7 @@ class Backend implements SubscriberInterface
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit' => 'onGetControllerPathPaymentEasycredit',
             'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange',
             'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields',
-            'Shopware\Models\Config\Element::postPersist' => 'renameConfigField'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields'
         );
     }
 
