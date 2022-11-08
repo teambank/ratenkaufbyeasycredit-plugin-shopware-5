@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.0.5
+------
+
+* behebt ein Problem beim Update auf v2.0.4
+
 v2.0.4
 ------
 
