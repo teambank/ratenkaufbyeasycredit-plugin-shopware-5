@@ -111,8 +111,11 @@
             return;
         }
 
-        $(target).siblings('easycredit-widget').remove();
-        $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
+        if ($(target).siblings('easycredit-widget').length == 0) {
+            $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
+            return;
+        }
+        $(target).siblings('easycredit-widget').get(0).setAttribute('amount', amount);
     };
 
     var handleShippingPaymentConfirm = function () {

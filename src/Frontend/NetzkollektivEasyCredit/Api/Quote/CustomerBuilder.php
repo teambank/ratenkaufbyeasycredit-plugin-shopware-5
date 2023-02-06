@@ -83,20 +83,15 @@ class CustomerBuilder
     }
 
     public function build() {
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\Customer([
+        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\Customer(array_filter([
             'gender' => $this->getPrefix(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'birthDate' => $this->getDob(),
-            'contact' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
-                'email' => $this->getEmail(),
-                //'mobilePhoneNumber' => '0123456789',
-                //'phoneNumbersConfirmed' => true
-            ]),
-            //'bank' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Bank([
-            //    'iban' => 'DE88100900001234567892'
-            //]),
+            'contact' => $this->getEmail() ? new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
+                'email' => $this->getEmail()
+            ]) : null,
             'companyName' => $this->getCompany() ? $this->getCompany() : null
-        ]);
+        ]));
     }
 }

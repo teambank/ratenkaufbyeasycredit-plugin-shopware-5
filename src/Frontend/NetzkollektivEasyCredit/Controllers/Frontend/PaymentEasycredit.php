@@ -15,16 +15,23 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     private $em;
 
+    protected $helper;
+
     /**
      * {@inheritdoc}
      */
     public function init()
     {
         $this->container = Shopware()->Container();
+        $this->helper = new EasyCredit_Helper();
         $this->plugin = $this->container->get('plugins')->Frontend()->NetzkollektivEasyCredit();
         $this->session = $this->container->get('session');
         $this->order = Shopware()->Modules()->Order();
         $this->em = Shopware()->Container()->get('models');
+    }
+
+    protected function getModule($moduleName) {
+        return $this->container->get('modules')->getModule($moduleName);
     }
 
     public function getPaymentShortName()
@@ -109,9 +116,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     public function returnAction()
     {
         $checkout = $this->container->get('easyCreditCheckout');
-
         try {
-            $checkout->loadTransaction();
+            $transaction = $checkout->loadTransaction();
             $approved = $checkout->isApproved();
         } catch (Exception $e) {
             $this->plugin->getStorage()->set('apiError', $e->getMessage());
@@ -125,8 +131,22 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             return;
         }
 
+        if ($this->plugin->getStorage()->get('express')) {
+            $customerService = new EasyCredit_CustomerService();
+            $customer = $customerService->createCustomer($transaction);
+            $customerService->loginCustomer($customer);
+        }
+
         $this->plugin->addInterest();
         $this->redirectCheckoutConfirm();
+    }
+
+    public function createOrder($transaction) {
+
+
+        $customerService = new EasyCredit_CustomerService();
+        $customerService->createCustomer($transaction);
+
     }
 
     public function cancelAction() {
@@ -164,10 +184,51 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return $this->respondWithStatus('payment status successfully set');
     }
 
+    public function expressAction() {
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $basket = $this->getModule('basket');
+
+        if ($productNumber = $this->Request()->getParam('sAdd')) {
+            $basket->sDeleteBasket();
+            $basket->sAddArticle($productNumber, (int) $this->Request()->getParam('sQuantity', 1));
+        }
+
+        $this->session->offsetSet('sPaymentID', $this->plugin->getPayment()->getId());
+
+        $checkoutController = $this->getCheckoutController();
+        $checkoutController->getSelectedCountry();
+        $checkoutController->getSelectedDispatch();
+
+        /** @var sAdmin $admin */
+        $admin = $this->getModule('admin');
+        $countries = $admin->sGetCountryList();
+        $shipping = $admin->sGetPremiumShippingcosts(\reset($countries));
+
+        $basket->sGetBasket();
+
+        $this->plugin->getStorage()->set('express', 1);
+    }
+
     public function respondWithStatus($content, $code = 200) {
         http_response_code($code);
         echo $content;
         exit;
+    }
+
+    /**
+     * @return Shopware_Controllers_Frontend_Checkout
+     */
+    private function getCheckoutController()
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
+        $checkoutController = Enlight_Class::Instance(Shopware_Controllers_Frontend_Checkout::class, [$this->request, $this->response]);
+        $checkoutController->init();
+        $checkoutController->setView($this->View());
+        $checkoutController->setContainer($this->container);
+        $checkoutController->setFront($this->front);
+
+        return $checkoutController;
     }
 
     protected function setPaymentClearedDate($transactionId) {
