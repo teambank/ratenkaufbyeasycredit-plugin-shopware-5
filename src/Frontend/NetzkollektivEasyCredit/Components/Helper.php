@@ -1,6 +1,8 @@
 <?php
 class EasyCredit_Helper
 {
+    protected $container;
+
     public function __construct() {
         $this->container = Shopware()->Container();
     }
@@ -15,6 +17,10 @@ class EasyCredit_Helper
 
     public function getSession() {
         return $this->container->get('session');
+    }
+
+    public function getPluginSession() {
+        return $this->getSession()->offsetGet('EasyCredit');
     }
 
     public function getContainer() {

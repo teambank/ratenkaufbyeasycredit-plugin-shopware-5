@@ -1,4 +1,6 @@
 <?php
+use Shopware\Components\Model\ModelManager;
+use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -312,6 +314,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     protected function _createPaymentConfigForm()
     {
         $pluginForm = $this->Form();
+
+        if (!class_exists('EasyCredit_BackendFormBuilder')) {
+            // fix for SW <= 5.2
+            require_once __DIR__.'/Components/BackendFormBuilder.php';
+        }
         $builder = new EasyCredit_BackendFormBuilder();
         $builder->build($pluginForm);
     }
@@ -412,8 +419,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     protected function _getUser()
     {
-        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
-            return Shopware()->Session()->sOrderVariables['sUserData'];
+        if (!empty(Shopware()->Session()->offsetGet('sOrderVariables')['sUserData'])) {
+            return Shopware()->Session()->offsetGet('sOrderVariables')['sUserData'];
         } else {
             return Shopware()->Modules()->Admin()->sGetUserData();
         }
@@ -432,7 +439,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function addInterest($refresh = true) {
-        $interestAmount = Shopware()->Session()->EasyCredit['interest_amount'];
+        $interestAmount = Shopware()->Session()->offsetGet('EasyCredit')['interest_amount'];
         if ($interestAmount === null) {
             return;
         }

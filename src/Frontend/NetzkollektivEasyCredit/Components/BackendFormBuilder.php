@@ -60,7 +60,7 @@ class EasyCredit_BackendFormBuilder
             )
         );
 
-        if (is_file(__DIR__ . '/../Views/backend/plugins/easycredit/test.js')) {
+        if (is_file(__DIR__ . '/../../Views/backend/plugins/easycredit/test.js')) {
             $form->setElement(
                 'button',
                 'easycreditButtonClientTest',

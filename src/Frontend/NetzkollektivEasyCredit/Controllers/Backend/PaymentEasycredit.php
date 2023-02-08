@@ -1,9 +1,10 @@
 <?php
+use Teambank\RatenkaufByEasyCreditApiV3\Integration\Checkout;
 
 abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends Shopware_Controllers_Backend_ExtJs {
     public function verifyCredentialsAction() {
         /**
-         * @var \Netzkollektiv\EasyCredit\Checkout $checkout
+         * @var Checkout $checkout
          */
         $checkout = $this->get('easyCreditCheckout');
 

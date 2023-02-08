@@ -3,14 +3,18 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
 use Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap as Bootstrap;
 use Enlight\Event\SubscriberInterface;
+use Shopware\Models\Order\Repository as OrderRepository;
 
 class Backend implements SubscriberInterface
 {
     protected $bootstrap;
 
+    protected $helper;
+
     public function __construct(Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
+        $this->helper = new \EasyCredit_Helper();
     }
 
     public static function getSubscribedEvents() {
@@ -60,7 +64,9 @@ class Backend implements SubscriberInterface
             return;
         }
 
-        $query = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')->getOrdersQuery(array(array('property' => 'orders.id', 'value' => $id)), array());
+        /** @var OrderRepository */
+        $repository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        $query = $repository->getOrdersQuery(array(array('property' => 'orders.id', 'value' => $id)), array());
 
         $orderData = $query->getArrayResult();
 
@@ -120,15 +126,6 @@ class Backend implements SubscriberInterface
     }
 
     public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
-        return $this->Path() . 'Controllers/Backend/PaymentEasycredit.php';
+        return $this->helper->getPlugin()->Path() . 'Controllers/Backend/PaymentEasycredit.php';
     }
-
-    public function Path() {
-        return $this->getPlugin()->Path();
-    }
-
-    public function getPlugin() {
-        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
-    }
-
 }

@@ -8,7 +8,7 @@ class Storage implements \Teambank\RatenkaufByEasyCreditApiV3\Integration\Storag
         if (Shopware()->Config()->get('easycreditDebugLogging')) {
             Shopware()->Container()->get('pluginlogger')->debug('Storage::set('.$key.') => '.$value);
         }
-        if (!isset(Shopware()->Session()->EasyCredit) || !is_array(Shopware()->Session()->EasyCredit)) {
+        if (Shopware()->Session()->offsetGet('EasyCredit') === null || !is_array(Shopware()->Session()->offsetGet('EasyCredit'))) {
             Shopware()->Session()->offsetSet('EasyCredit', array());
         }
         Shopware()->Session()->offsetSet('EasyCredit', array_merge(Shopware()->Session()->offsetGet('EasyCredit'), array(
@@ -19,9 +19,9 @@ class Storage implements \Teambank\RatenkaufByEasyCreditApiV3\Integration\Storag
 
     public function get($key) {
         if (Shopware()->Config()->get('easycreditDebugLogging')) {
-            Shopware()->Container()->get('pluginlogger')->debug('Storage::get('.$key.') => '.Shopware()->Session()->EasyCredit[$key]);
+            Shopware()->Container()->get('pluginlogger')->debug('Storage::get('.$key.') => '.Shopware()->Session()->offsetGet('EasyCredit')[$key]);
         }
-        return Shopware()->Session()->EasyCredit[$key];
+        return Shopware()->Session()->offsetGet('EasyCredit')[$key];
     }
 
     public function all()

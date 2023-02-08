@@ -28,6 +28,7 @@
 
                     var form = $('<form>')
                         .attr('action', me.opts.url)
+                        .attr('method','post')
                         .hide();
 
                     if ($('form[name=sAddToBasket]').length > 0) {

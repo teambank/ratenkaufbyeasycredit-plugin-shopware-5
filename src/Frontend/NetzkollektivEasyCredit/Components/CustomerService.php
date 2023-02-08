@@ -1,6 +1,7 @@
 <?php
 use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation;
 
+use Symfony\Component\Form\FormFactoryInterface;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Customer\Address;
 use Shopware\Bundle\AccountBundle\Form\Account\AddressFormType;
@@ -9,6 +10,14 @@ use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
 class EasyCredit_CustomerService
 {
     protected $helper;
+
+    protected $swConfig;
+
+    protected $connection;
+
+    protected $contextService;
+
+    protected $registerService;
 
     /**
      * @var FormFactoryInterface

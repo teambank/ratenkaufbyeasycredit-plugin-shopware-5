@@ -12,7 +12,7 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
         $this->init();
         $this->container = Shopware()->Container();
         $this->setView(new \Enlight_View_Default(
-            Shopware()->Container()->get('Template')
+            Shopware()->Container()->get('template')
         ));
     }
     
@@ -113,7 +113,7 @@ class QuoteBuilder {
         $_items = [];
         foreach ($items as $item) {
             $itemBuilder = new Quote\ItemBuilder($item);
-            $quoteItem = $itemBuilder->build($item);
+            $quoteItem = $itemBuilder->build();
             if ($quoteItem->getPrice() <= 0) {
                 continue;
             }

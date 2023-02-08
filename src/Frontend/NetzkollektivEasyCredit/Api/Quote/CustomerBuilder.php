@@ -2,6 +2,7 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
 use Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter;
+use Shopware\Models\Customer\Repository as CustomerRepository;
 
 class CustomerBuilder
 {
@@ -75,8 +76,9 @@ class CustomerBuilder
             return 0;
         }
 
-        $query = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer')
-            ->getCustomerDetailQuery($this->_user->getId());
+        /** @var CustomerRepository */
+        $customerRepository = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer');
+        $query = $customerRepository->getCustomerDetailQuery($this->_user->getId());
         $data = $query->getOneOrNullResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
         return $data['orderCount'];
