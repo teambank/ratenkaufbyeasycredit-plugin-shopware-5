@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.1.0
+------
+
+* Express-Checkout: der Ratenkauf kann direkt von der Produktdetailseite oder aus dem Warenkorb heraus gestartet werden
+
+
 v2.0.5
 ------
 

@@ -28,10 +28,10 @@
 
                     var form = $('<form>')
                         .attr('action', me.opts.url)
-                        .attr('method','post')
                         .hide();
 
                     if ($('form[name=sAddToBasket]').length > 0) {
+                        form.attr('method','post');
                         var formData = new FormData($('form[name=sAddToBasket]').get(0));
 
                         for (var key of formData.keys()) {
