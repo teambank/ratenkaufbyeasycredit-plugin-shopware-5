@@ -2,6 +2,7 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
 use Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter;
+use Shopware\Models\Customer\Repository as CustomerRepository;
 
 class CustomerBuilder
 {
@@ -75,28 +76,24 @@ class CustomerBuilder
             return 0;
         }
 
-        $query = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer')
-            ->getCustomerDetailQuery($this->_user->getId());
+        /** @var CustomerRepository */
+        $customerRepository = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer');
+        $query = $customerRepository->getCustomerDetailQuery($this->_user->getId());
         $data = $query->getOneOrNullResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
         return $data['orderCount'];
     }
 
     public function build() {
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\Customer([
+        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\Customer(array_filter([
             'gender' => $this->getPrefix(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'birthDate' => $this->getDob(),
-            'contact' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
-                'email' => $this->getEmail(),
-                //'mobilePhoneNumber' => '0123456789',
-                //'phoneNumbersConfirmed' => true
-            ]),
-            //'bank' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\Bank([
-            //    'iban' => 'DE88100900001234567892'
-            //]),
+            'contact' => $this->getEmail() ? new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
+                'email' => $this->getEmail()
+            ]) : null,
             'companyName' => $this->getCompany() ? $this->getCompany() : null
-        ]);
+        ]));
     }
 }

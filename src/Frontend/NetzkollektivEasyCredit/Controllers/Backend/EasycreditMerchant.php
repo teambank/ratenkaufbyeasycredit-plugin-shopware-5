@@ -18,16 +18,13 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
      */
     protected $alias = 'sOrder';
 
-    public function getPlugin() {
-        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
-    }
-
     /**
      * @return QueryBuilder
      */
     private function prepareOrderQueryBuilder(QueryBuilder $builder)
     {
-        $paymentId = $this->getPlugin()->getPayment()->getId();
+        $helper = new EasyCredit_Helper();
+        $paymentId = $helper->getPayment()->getId();
 
         $builder->innerJoin(
             'sOrder.payment',

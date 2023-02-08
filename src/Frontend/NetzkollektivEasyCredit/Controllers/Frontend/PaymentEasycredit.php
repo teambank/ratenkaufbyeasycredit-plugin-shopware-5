@@ -15,16 +15,22 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     private $em;
 
+    protected $helper;
+
     /**
      * {@inheritdoc}
      */
     public function init()
     {
         $this->container = Shopware()->Container();
-        $this->plugin = $this->container->get('plugins')->Frontend()->NetzkollektivEasyCredit();
+        $this->helper = new EasyCredit_Helper();
         $this->session = $this->container->get('session');
         $this->order = Shopware()->Modules()->Order();
         $this->em = Shopware()->Container()->get('models');
+    }
+
+    protected function getModule($moduleName) {
+        return $this->container->get('modules')->getModule($moduleName);
     }
 
     public function getPaymentShortName()
@@ -71,7 +77,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function indexAction()
     {
-        $transactionId = $this->session->EasyCredit["transaction_id"];
+        $transactionId = $this->helper->getPluginSession()["transaction_id"];
         $paymentUniqueId = $this->createPaymentUniqueId();
 
         $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
@@ -92,12 +98,12 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             ));
 
         } catch (\Exception $e) {
-            $orderStatusId = $this->plugin->Config()->get('easycreditOrderErrorStatus');
+            $orderStatusId = $this->helper->getPlugin()->Config()->get('easycreditOrderErrorStatus');
             $this->order->setOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
 
             $this->container->get('pluginlogger')->error($e->getMessage());
-            $this->plugin->getStorage()->set('apiError', 'Die Zahlung mit <strong>easyCredit-Ratenkauf</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
-            $this->plugin->getStorage()->set('apiErrorSkipSuffix', true);
+            $this->helper->getPlugin()->getStorage()->set('apiError', 'Die Zahlung mit <strong>easyCredit-Ratenkauf</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
+            $this->helper->getPlugin()->getStorage()->set('apiErrorSkipSuffix', true);
             $this->redirect(array(
                 'controller' => 'checkout',
                 'action' => 'cart'
@@ -109,24 +115,37 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     public function returnAction()
     {
         $checkout = $this->container->get('easyCreditCheckout');
-
         try {
-            $checkout->loadTransaction();
+            $transaction = $checkout->loadTransaction();
             $approved = $checkout->isApproved();
         } catch (Exception $e) {
-            $this->plugin->getStorage()->set('apiError', $e->getMessage());
+            $this->helper->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             $this->_redirToPaymentSelection();
             return;
         }
 
         if (!$approved) {
-            $this->plugin->getStorage()->set('apiError', 'easyCredit-Ratenkauf wurde nicht genehmigt.');
+            $this->helper->getPlugin()->getStorage()->set('apiError', 'easyCredit-Ratenkauf wurde nicht genehmigt.');
             $this->_redirToPaymentSelection();
             return;
         }
 
-        $this->plugin->addInterest();
+        if ($this->helper->getPlugin()->getStorage()->get('express')) {
+            $customerService = new EasyCredit_CustomerService();
+            $customer = $customerService->createCustomer($transaction);
+            $customerService->loginCustomer($customer);
+        }
+
+        $this->helper->getPlugin()->addInterest();
         $this->redirectCheckoutConfirm();
+    }
+
+    public function createOrder($transaction) {
+
+
+        $customerService = new EasyCredit_CustomerService();
+        $customerService->createCustomer($transaction);
+
     }
 
     public function cancelAction() {
@@ -156,12 +175,38 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             return $this->respondWithStatus('payment status of transaction not updated as transaction status is not AUTHORIZED', 409);
         }
 
-        $paymentStatusId = $this->plugin->Config()->get('easycreditPaymentStatus');
+        $paymentStatusId = $this->helper->getPlugin()->Config()->get('easycreditPaymentStatus');
 
         $this->savePaymentStatus($transactionId, $transactionInfo['temporaryID'], $paymentStatusId, false);
         $this->setPaymentClearedDate($transactionId);
 
         return $this->respondWithStatus('payment status successfully set');
+    }
+
+    public function expressAction() {
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
+        $basket = $this->getModule('basket');
+
+        if ($productNumber = $this->Request()->getParam('sAdd')) {
+            $basket->sDeleteBasket();
+            $basket->sAddArticle($productNumber, (int) $this->Request()->getParam('sQuantity', 1));
+        }
+
+        $this->session->offsetSet('sPaymentID', $this->helper->getPayment()->getId());
+
+        $checkoutController = $this->getCheckoutController();
+        $checkoutController->getSelectedCountry();
+        $checkoutController->getSelectedDispatch();
+
+        /** @var sAdmin $admin */
+        $admin = $this->getModule('admin');
+        $countries = $admin->sGetCountryList();
+        $shipping = $admin->sGetPremiumShippingcosts(\reset($countries));
+
+        $basket->sGetBasket();
+
+        $this->helper->getPlugin()->getStorage()->set('express', 1);
     }
 
     public function respondWithStatus($content, $code = 200) {
@@ -170,8 +215,22 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         exit;
     }
 
+    /**
+     * @return Shopware_Controllers_Frontend_Checkout
+     */
+    private function getCheckoutController()
+    {
+        /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
+        $checkoutController = Enlight_Class::Instance(Shopware_Controllers_Frontend_Checkout::class, [$this->request, $this->response]);
+        $checkoutController->init();
+        $checkoutController->setView($this->View());
+        $checkoutController->setContainer($this->container);
+        $checkoutController->setFront($this->front);
+
+        return $checkoutController;
+    }
+
     protected function setPaymentClearedDate($transactionId) {
-        /** @phpstan-ignore-next-line */
         if (defined('\Shopware::VERSION') && version_compare(\Shopware::VERSION,'5.1.0') == -1) {
             return;
         }
@@ -189,15 +248,15 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     public function addInterestSurcharge() {
-        if (!isset($this->session->EasyCredit["interest_amount"])
-            || empty($this->session->EasyCredit["interest_amount"])
+        if (!isset($this->helper->getPluginSession()["interest_amount"])
+            || empty($this->helper->getPluginSession()["interest_amount"])
            ) {
             return;
         }
 
         $interest_order_name = 'sw-payment-ec-interest';
 
-        $interest_amount = round($this->session->EasyCredit["interest_amount"], 2);
+        $interest_amount = round($this->helper->getPluginSession()["interest_amount"], 2);
 
         $this->container->get('db')->delete(
             's_order_basket',
@@ -229,10 +288,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $orderAttributeModel = $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
             array('orderId' => $orderId)
         );
-        /** @phpstan-ignore-next-line */
+
         if ($orderAttributeModel instanceof \Shopware\Models\Attribute\Order) {
-            $orderAttributeModel->setEasycreditSectoken($this->session->EasyCredit["sec_token"]);
-            $orderAttributeModel->setEasycreditToken($this->session->EasyCredit["token"]);
+            $orderAttributeModel->setEasycreditSectoken($this->helper->getPluginSession()["sec_token"]);
+            $orderAttributeModel->setEasycreditToken($this->helper->getPluginSession()["token"]);
             $this->em->persist($orderAttributeModel);
             $this->em->flush();
         }

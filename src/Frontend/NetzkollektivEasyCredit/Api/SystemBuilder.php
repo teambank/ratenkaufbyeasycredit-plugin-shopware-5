@@ -3,19 +3,25 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
 class SystemBuilder {
 
+    private $helper;
+
+    public function __construct() {
+        $this->helper = new \EasyCredit_Helper();
+    }
+
     public function getSystemVendor() {
         return 'Shopware';
     }
 
     public function getSystemVersion() {
         if (defined('\Shopware::VERSION')) {
-            return \Shopware::VERSION; /** @phpstan-ignore-line */
+            return \Shopware::VERSION;
         }
         return Shopware()->Container()->getParameter('shopware.release.version');
     }
 
     public function getModuleVersion() {
-        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit()->getVersion();
+        return $this->helper->getPlugin()->getVersion();
     }
 
     public function build () {

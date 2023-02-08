@@ -12,7 +12,7 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
         $this->init();
         $this->container = Shopware()->Container();
         $this->setView(new \Enlight_View_Default(
-            Shopware()->Container()->get('Template')
+            Shopware()->Container()->get('template')
         ));
     }
     
@@ -113,7 +113,7 @@ class QuoteBuilder {
         $_items = [];
         foreach ($items as $item) {
             $itemBuilder = new Quote\ItemBuilder($item);
-            $quoteItem = $itemBuilder->build($item);
+            $quoteItem = $itemBuilder->build();
             if ($quoteItem->getPrice() <= 0) {
                 continue;
             }
@@ -156,6 +156,10 @@ class QuoteBuilder {
         ]);
     }
 
+    protected function isExpress() {
+        return $this->storage->get('express');
+    }
+
     public function build(): Transaction {
         return new Transaction([
             'financingTerm' => $this->getDuration(),
@@ -163,15 +167,15 @@ class QuoteBuilder {
                 'orderValue' => $this->getGrandTotal(),
                 'orderId' => $this->getId(),
                 'numberOfProductsInShoppingCart' => 1,
-                'invoiceAddress' => $this->getInvoiceAddress(),
-                'shippingAddress' => $this->getShippingAddress(),
+                'invoiceAddress' => $this->isExpress() ? null : $this->getInvoiceAddress(),
+                'shippingAddress' => $this->isExpress() ? null : $this->getShippingAddress(),
                 'shoppingCartInformation' => $this->getItems()
             ]),
             'shopsystem' => $this->getSystem(),
             'customer' => $this->getCustomer()->build(),
             'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
                 'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTime) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
-                'orderDoneWithLogin' => !$this->getCustomer()->isLoggedIn(),
+                'orderDoneWithLogin' => $this->getCustomer()->isLoggedIn(),
                 'numberOfOrders' => $this->getCustomer()->getOrderCount(),
                 'logisticsServiceProvider' => $this->getShippingMethod()      
             ]),
