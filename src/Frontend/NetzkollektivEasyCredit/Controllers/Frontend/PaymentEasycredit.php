@@ -134,6 +134,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $customerService = new EasyCredit_CustomerService();
             $customer = $customerService->createCustomer($transaction);
             $customerService->loginCustomer($customer);
+
+            $this->helper->getPlugin()->getStorage()->set('express', false);
+            $checkout->finalizeExpress($this->helper->getPlugin()->getQuote());
         }
 
         $this->helper->getPlugin()->addInterest();
