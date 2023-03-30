@@ -118,7 +118,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function updateSpecialFieldTypes($type = 'easycreditIntro') {
-        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easycreditBehavior','easycreditCredentials','easycreditMarketing','easycreditClickAndCollectIntro');", 
+        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easyCreditMarketingIntro','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
           array(
             $type
           )
@@ -170,7 +170,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return new ArrayCollection(array(
             $jsDir . 'jquery.easycredit-address-editor.js',
             $jsDir . 'easycredit-express-button.js',
-            $jsDir . 'easycredit.js'
+            $jsDir . 'easycredit.js',
+            $jsDir . 'easycredit-marketing.js'
         ));
     }
 

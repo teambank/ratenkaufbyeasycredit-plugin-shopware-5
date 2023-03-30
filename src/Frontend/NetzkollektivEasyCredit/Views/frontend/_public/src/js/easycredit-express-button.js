@@ -42,34 +42,8 @@
                     $('body').append(form);
                     form.submit();
                 });
-
-                /* if ($(expressButton).closest('.container--ajax-cart').length > 0) {
-                    me.fixOffCanvasModal(expressButton);
-                } */
             });
         },
-
-        /* fixOffCanvasModal (expressButton) {
-            var button = expressButton.shadowRoot.querySelector('easycredit-modal');
-
-            var callback = (mutationList, observer) => {
-            for (const mutation of mutationList) {
-                if (mutation.type === 'attributes' &&
-                    mutation.target.classList.contains('ec-modal')
-                ) {
-                if (mutation.target.classList.contains('show')) {
-                    document.querySelector('.container--ajax-cart').style.transform = 'none';
-                    document.querySelector('.container--ajax-cart').style.transformStyle = 'initial';
-                } else {
-                    document.querySelector('.container--ajax-cart').style.transform = '';
-                    document.querySelector('.container--ajax-cart').style.transformStyle = '';
-                }
-                }
-            }
-            };
-            var observer = new MutationObserver(callback);
-            observer.observe(button, { attributes: true, subtree: true });
-        }, */
     })
 
     /**
