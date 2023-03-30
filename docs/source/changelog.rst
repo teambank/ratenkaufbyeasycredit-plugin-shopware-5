@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v2.1.1
+------
+
+* umfangreiche Marketing-Komponenten wurden eingefügt und sind über das Backend konfigurierbar
+* die Einstellung für das Ratenrechner-Widget wird wieder berücksichtigt
+* der Button zum Überprüfen der Zugangsdaten ist wieder vorhanden
+
 v2.1.0
 ------
 
