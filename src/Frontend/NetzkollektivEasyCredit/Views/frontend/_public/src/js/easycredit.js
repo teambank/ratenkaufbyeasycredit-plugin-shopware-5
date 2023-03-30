@@ -1,5 +1,6 @@
 (function () {
     var webshopId = $('meta[name=easycredit-api-key]').attr('content');
+    var widgetActive = $('meta[name=easycredit-widget-active]').attr('content') === 'true';
 
     var onHydrated = function (selector, cb) {
         if (!document.querySelector(selector)) {
@@ -151,7 +152,7 @@
 
 
     var addSubscriber =  function(){
-        if (webshopId) {
+        if (webshopId && widgetActive) {
             $.subscribe('plugin/swAjaxProductNavigation/onInit', addPpToDetailPage);
             $.subscribe('plugin/swLoadingIndicator/onCloseFinished', addPpToDetailPage);
         }

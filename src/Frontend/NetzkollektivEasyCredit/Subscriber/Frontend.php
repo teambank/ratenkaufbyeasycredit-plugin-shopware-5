@@ -175,9 +175,34 @@ class Frontend implements SubscriberInterface
         $isEasyCreditAllowed = !$sAdmin->sManageRisks($paymentId, $sBasket->sGetBasket(), $sAdmin->sGetUserData() ?: []);
 
         if ($apiKey && $isEasyCreditAllowed) {
+            $modalIsOpen = 'true';
+            if ( $this->config->get('easyCreditMarketingModalSettingsDelay') ) {
+                if ( $this->config->get('easyCreditMarketingModalSettingsDelay') > 0 ) {
+                    $modalIsOpen = 'false';
+                }
+            }
+
+            // Express Checkout
             $view->assign('EasyCreditExpressProduct', $this->config->get('easyCreditExpressProduct'));
             $view->assign('EasyCreditExpressCart', $this->config->get('easyCreditExpressCart'));
+            // Widget
             $view->assign('EasyCreditWidget', $this->config->get('easycreditModelWidget'));
+            // Marketing - Modal
+            $view->assign('EasyCreditMarketingModal', $this->config->get('easyCreditMarketingModal'));
+            $view->assign('EasyCreditMarketingModalIsOpen', $modalIsOpen);
+            $view->assign('EasyCreditMarketingModalSettingsSnoozeFor', $this->config->get('easyCreditMarketingModalSettingsSnoozeFor'));
+            $view->assign('EasyCreditMarketingModalSettingsDelay', $this->config->get('easyCreditMarketingModalSettingsDelay') * 1000);
+            $view->assign('EasyCreditMarketingModalSettingsMedia', $this->config->get('easyCreditMarketingModalSettingsMedia'));
+            // Marketing - Card
+            $view->assign('EasyCreditMarketingCard', $this->config->get('easyCreditMarketingCard'));
+            $view->assign('EasyCreditMarketingCardSearch', $this->config->get('easyCreditMarketingCardSearch'));
+            $view->assign('EasyCreditMarketingCardSettingsMedia', $this->config->get('easyCreditMarketingCardSettingsMedia'));
+            $view->assign('EasyCreditMarketingCardSettingsPosition', $this->config->get('easyCreditMarketingCardSettingsPosition'));
+            // Marketing - Flashbox
+            $view->assign('EasyCreditMarketingFlashbox', $this->config->get('easyCreditMarketingFlashbox'));
+            $view->assign('EasyCreditMarketingFlashboxSettingsMedia', $this->config->get('easyCreditMarketingFlashboxSettingsMedia'));
+            // Marketing - Bar
+            $view->assign('EasyCreditMarketingBar', $this->config->get('easyCreditMarketingBar'));
         }
     }
 

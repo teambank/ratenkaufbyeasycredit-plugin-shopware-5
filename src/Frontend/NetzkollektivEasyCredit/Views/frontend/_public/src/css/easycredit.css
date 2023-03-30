@@ -11,7 +11,11 @@ easycredit-widget {
     .paypal-unified-ec--button-container {
        margin-top: 0.9em;
     }
- }
+}
+
+.ajax--cart .button--container .easycredit-express-button-container {
+   margin-top: 0.9em;
+}
 
 
 /* express button styles */
@@ -30,4 +34,13 @@ easycredit-widget {
 
 .content--basket easycredit-express-button {
     float:right;
+}
+
+/* marketing styles */
+body.easycredit-box-top {
+    padding-top: 50px !important;
+}
+easycredit-box-modal {
+    position: relative;
+    z-index: 3501;
 }

@@ -22,7 +22,9 @@ class Backend implements SubscriberInterface
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_PaymentEasycredit' => 'onGetControllerPathPaymentEasycredit',
             'Enlight_Controller_Action_Backend_Order_Save' => 'preventShippingAddressChange',
             'Enlight_Controller_Action_PostDispatchSecure_Backend_Order' => 'afterOrderSave',
-            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields'
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_Config' => 'addConfigFields',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addConfigFields',
+            'Enlight_Controller_Action_PostDispatch_Backend_Index' => 'onPostDispatchBackendIndex'
         );
     }
 
@@ -92,6 +94,8 @@ class Backend implements SubscriberInterface
 
     public function addConfigFields(\Enlight_Event_EventArgs $args)
     {
+        $event = $args->getName();
+
         /** @var \Shopware_Controllers_Backend_Customer $controller */
         $controller = $args->getSubject();
 
@@ -102,7 +106,11 @@ class Backend implements SubscriberInterface
             $this->migrateConfigField();
             $this->bootstrap->updateSpecialFieldTypes();
             $this->bootstrap->registerTemplateDir();
-            $view->extendsTemplate('backend/plugin_manager/helper/easycredit_intro.js');
+            if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_Config' ) {
+                $view->extendsTemplate('backend/easycredit_config/helper/easycredit_intro.js');
+            } else if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' ) {
+                $view->extendsTemplate('backend/plugin_manager/helper/easycredit_intro.js');
+            }
         }
     }
 
@@ -123,6 +131,26 @@ class Backend implements SubscriberInterface
                 DELETE FROM s_core_config_elements WHERE id = ?;
             ", [$fieldId, $fieldId, $fieldId]);
         }
+    }
+
+    public function onPostDispatchBackendIndex($args)
+    {
+        $action = $args->getSubject();
+        $request = $action->Request();
+        $response = $action->Response();
+        $view = $action->View();
+
+        if (!$request->isDispatched()
+            || $response->isException()
+            || $request->getActionName() !== 'index'
+            || !$view->hasTemplate()
+        ) {
+            return;
+        }
+
+        $router = $action->Front()->Router();
+        $this->bootstrap->registerTemplateDir();
+        $view->extendsTemplate('backend/index/backend-easycredit.tpl');
     }
 
     public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {

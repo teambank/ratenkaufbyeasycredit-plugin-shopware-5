@@ -1,0 +1,278 @@
+/* Colors - Base */
+/* Colors - eC */
+/* Colors - Typo (SW5) */
+.base-element-easycreditintro {
+  /* Headings */
+  /* Typo */
+  /* Links */
+  /* Buttons */
+  /* Intro */
+  /* Click & Collect */
+  /* Marketing */
+  /* - Intro */
+  /* - Express */
+  /* - Widget */
+  /* - Modal */
+  /* - Card */
+  /* - Flashbox */
+  /* - Bar */
+}
+.base-element-easycreditintro .x-panel-body {
+  padding: 0 25px 0 0;
+  border: 0;
+}
+.base-element-easycreditintro.x-panel.has-tabs {
+  height: auto !important;
+}
+.base-element-easycreditintro.x-panel.has-tabs > .x-panel-body {
+  height: auto !important;
+}
+.base-element-easycreditintro h2, .base-element-easycreditintro h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  color: #475c6a;
+  font-size: calc(13px * 1.2);
+  line-height: 1.2;
+}
+.base-element-easycreditintro h2 {
+  scroll-margin-top: 30px;
+}
+.base-element-easycreditintro h3 {
+  font-size: calc(13px * 1.1);
+}
+.base-element-easycreditintro p,
+.base-element-easycreditintro ul {
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #010101;
+}
+.base-element-easycreditintro p:last-child,
+.base-element-easycreditintro ul:last-child {
+  margin-bottom: 0;
+}
+.base-element-easycreditintro ul {
+  list-style: none;
+}
+.base-element-easycreditintro ul li {
+  margin-bottom: 5px;
+}
+.base-element-easycreditintro a {
+  color: #0e6bbb;
+}
+.base-element-easycreditintro a[target=_blank]:not(.easycredit-intro__image):after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.285em;
+  width: 0.715em;
+  height: 0.715em;
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath fill='%23758CA3' fill-rule='evenodd' d='M12.586 2H10a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-2 0V3.414l-6.793 6.793a1 1 0 11-1.414-1.414L12.586 2zM6 1a1 1 0 110 2H3a1 1 0 00-1 1v9a1 1 0 001 1h8.967a1 1 0 001-.99L13 9.99a1 1 0 112 .02l-.033 3.023a3 3 0 01-3 2.967H3a3 3 0 01-3-3V4a3 3 0 013-3h3z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 0.715em 0.715em;
+  mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath fill='%23758CA3' fill-rule='evenodd' d='M12.586 2H10a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-2 0V3.414l-6.793 6.793a1 1 0 11-1.414-1.414L12.586 2zM6 1a1 1 0 110 2H3a1 1 0 00-1 1v9a1 1 0 001 1h8.967a1 1 0 001-.99L13 9.99a1 1 0 112 .02l-.033 3.023a3 3 0 01-3 2.967H3a3 3 0 01-3-3V4a3 3 0 013-3h3z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: 0.715em 0.715em;
+  background-color: #0e6bbb;
+}
+.base-element-easycreditintro .btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #0066B3;
+  border: 0;
+  border-radius: 20px;
+  transition: all 0.1s cubic-bezier(0.73, 0.32, 0.14, 0.99);
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff !important;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.base-element-easycreditintro .btn.btn-primary {
+  background-color: #F37122;
+}
+.base-element-easycreditintro .btn:hover, .base-element-easycreditintro .btn:active, .base-element-easycreditintro .btn:focus, .base-element-easycreditintro .btn:visited {
+  background-color: #0066B3 !important;
+  color: #fff !important;
+}
+.base-element-easycreditintro .btn:hover.btn-primary, .base-element-easycreditintro .btn:active.btn-primary, .base-element-easycreditintro .btn:focus.btn-primary, .base-element-easycreditintro .btn:visited.btn-primary {
+  background-color: #F37122 !important;
+}
+.base-element-easycreditintro .btn:hover.btn-primary {
+  background-color: #ef620d !important;
+}
+.base-element-easycreditintro .btn:active, .base-element-easycreditintro .btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(243, 113, 34, 0.4) !important;
+}
+.base-element-easycreditintro .btn:disabled, .base-element-easycreditintro .btn.disabled {
+  cursor: default;
+  pointer-events: none;
+  background-color: rgba(243, 113, 34, 0.5) !important;
+  color: #fff;
+}
+.base-element-easycreditintro .easycredit-intro {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 35px 30px;
+  background-color: #fff;
+  border-radius: 15px;
+}
+.base-element-easycreditintro .easycredit-intro h2, .base-element-easycreditintro .easycredit-intro h3,
+.base-element-easycreditintro .easycredit-intro p, .base-element-easycreditintro .easycredit-intro ul {
+  color: #002C5A;
+}
+.base-element-easycreditintro .easycredit-intro h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: calc(13px * 2);
+}
+.base-element-easycreditintro .easycredit-intro h3 {
+  font-size: calc(13px * 1.2);
+}
+.base-element-easycreditintro .easycredit-intro a {
+  color: #0066B3;
+}
+.base-element-easycreditintro .easycredit-intro__tabs {
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #E5EAEE;
+}
+.base-element-easycreditintro .easycredit-intro__tab {
+  flex: 0 0 auto;
+  position: relative;
+  padding: 0 16px 8px;
+  white-space: nowrap;
+  font-size: 13px;
+  text-decoration: none !important;
+}
+.base-element-easycreditintro .easycredit-intro__tab:first-child {
+  margin-left: -16px;
+}
+.base-element-easycreditintro .easycredit-intro__tab:not(.active) {
+  cursor: pointer;
+  color: #002C5A;
+}
+.base-element-easycreditintro .easycredit-intro__tab.active {
+  font-weight: 600;
+  color: #002C5A;
+}
+.base-element-easycreditintro .easycredit-intro__tab.active:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: 2px;
+  width: calc(100% - 32px);
+  border-bottom: 2px solid #002C5A;
+}
+.base-element-easycreditintro .easycredit-intro__tab-content:not(.active) {
+  display: none;
+}
+.base-element-easycreditintro .easycredit-intro__tab-content p + .btn {
+  margin-top: 20px;
+}
+.base-element-easycreditintro .easycredit-intro__grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-column-gap: 48px;
+}
+.base-element-easycreditintro .easycredit-intro__tab-content .easycredit-intro__grid {
+  padding-top: 24px;
+}
+.base-element-easycreditintro .easycredit-intro__image {
+  display: block;
+  width: 100%;
+}
+.base-element-easycreditintro .easycredit-intro__image .image {
+  background-color: transparent;
+  background-position: right top;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.base-element-easycreditintro .easycredit-intro__image .image:after {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: 75%;
+}
+.base-element-easycreditintro .easycredit-intro__image.bg {
+  background-color: #D9DFE6;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 15px;
+}
+.base-element-easycreditintro .easycredit-intro__image.bg:after {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: 75%;
+}
+.base-element-easycreditintro .intro {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+.base-element-easycreditintro .intro .easycredit-intro__image img {
+  display: block;
+  margin-left: auto;
+  width: 120px;
+  border-radius: 0;
+  box-shadow: none;
+}
+.base-element-easycreditintro .clickandcollect {
+  margin-bottom: 0;
+}
+.base-element-easycreditintro .clickandcollect .easycredit-intro__image.bg {
+  background-color: #002C5A;
+  background-image: url("../../images/ratenkauf-clickandcollect.png");
+}
+.base-element-easycreditintro .clickandcollect .easycredit-intro__image.bg:after {
+  padding-bottom: 65%;
+}
+.base-element-easycreditintro .marketing {
+  margin-bottom: 0;
+}
+.base-element-easycreditintro .marketing-intro .easycredit-intro__image .image {
+  background-image: url("../../images/easycredit-marketing-modal.png");
+  border-radius: 7px;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.25);
+}
+.base-element-easycreditintro .marketing-intro .easycredit-intro__image .image:after {
+  padding-bottom: 75%;
+}
+.base-element-easycreditintro .marketing-express .easycredit-intro__image.bg,
+.base-element-easycreditintro .marketing-widget .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-express-button.png");
+  background-position: center bottom 30px;
+  background-size: 70% auto;
+}
+.base-element-easycreditintro .marketing-widget .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-widget.png");
+}
+.base-element-easycreditintro .marketing-modal .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-modal.png");
+  background-size: 80% auto;
+}
+.base-element-easycreditintro .marketing-card .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-card.png");
+  background-size: auto 80%;
+}
+.base-element-easycreditintro .marketing-flashbox .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-flashbox.png");
+  background-position: center bottom;
+  background-size: 80% auto;
+}
+.base-element-easycreditintro .marketing-bar .easycredit-intro__image.bg {
+  background-image: url("../../images/easycredit-marketing-bar.png");
+  background-position: center top;
+  background-size: 100% auto;
+}
+
+/* Plugin Manager */
+.store-plugin-detail-configuration-container .easycredit-intro {
+  background-color: rgba(0, 44, 90, 0.05) !important;
+}
+
+/*# sourceMappingURL=easycredit-config.css.map */

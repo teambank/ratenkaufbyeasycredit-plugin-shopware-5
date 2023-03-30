@@ -70,7 +70,6 @@ class BackendMerchant implements SubscriberInterface
                 ).'?id={transactionId}'
             ]
         )));
-        $view->extendsTemplate('backend/index/backend-merchant.tpl');
     }
 
     public function onGetControllerPath() {

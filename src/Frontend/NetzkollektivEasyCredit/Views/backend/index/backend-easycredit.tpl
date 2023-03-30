@@ -3,11 +3,12 @@
 
     <style type="text/css">
     .easycredit--icon {
-        background-image: url({link file='backend/_resources/img/easycredit-icon.svg'});
+        background-image: url({link file='backend/_resources/images/easycredit-icon.svg'});
         background-repeat: no-repeat;
         background-size: contain;
     }
     </style>
+    <link rel="stylesheet" type="text/css" href="{link file='backend/_resources/resources/css/easycredit-config.css'}" />
 {/block}
 
 {block name="backend/base/header/javascript"}
