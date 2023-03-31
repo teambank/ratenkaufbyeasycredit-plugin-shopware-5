@@ -31,7 +31,7 @@ cp -r sw-easycredit/src/Frontend/NetzkollektivEasyCredit engine/Shopware/Plugins
 This extension aims to be as compatible as possible with current, future versions of Shopware 5. This version is regularly tested with Shopware versions:
 
 * >= v5.2.x 
-* <= v5.7.13
+* <= v5.7.17
 
 Earlier versions of Shopware 5 may work, but are not actively tested anymore.
 

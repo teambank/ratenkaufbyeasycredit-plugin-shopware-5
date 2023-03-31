@@ -27,7 +27,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '2.1.1';
+        return '2.1.2';
     }
 
     public function getInfo()
@@ -118,7 +118,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     }
 
     public function updateSpecialFieldTypes($type = 'easycreditIntro') {
-        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easyCreditMarketingIntro','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
+        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easycreditMarketing','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
           array(
             $type
           )

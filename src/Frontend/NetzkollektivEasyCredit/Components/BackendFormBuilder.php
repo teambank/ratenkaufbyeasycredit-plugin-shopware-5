@@ -215,7 +215,7 @@ class EasyCredit_BackendFormBuilder
 
         $form->setElement(
             'button',//'easycreditIntro',
-            'easyCreditMarketingIntro',
+            'easycreditMarketing',
             array(
                 'label' => 'Marketing',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
@@ -450,7 +450,7 @@ class EasyCredit_BackendFormBuilder
 
         $form->setElement(
             'button',//'easycreditIntro',
-            'easyCreditClickAndCollectIntro',
+            'easycreditClickAndCollectIntro',
             array(
                 'label' => 'Click & Collect',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,

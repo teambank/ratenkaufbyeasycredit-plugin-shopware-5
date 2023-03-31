@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.2
+------
+
+* behebt einen Case sensitivity-Fehler, der ein erfolgreiches Update verhinderte
+
 v2.1.1
 ------
 
