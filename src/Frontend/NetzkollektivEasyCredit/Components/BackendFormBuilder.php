@@ -336,7 +336,8 @@ class EasyCredit_BackendFormBuilder
             array(
                 'label' => 'Eigenes Bild verwenden',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'position' => $position++
+                'position' => $position++,
+                'readOnly' => false
             )
         );
 
@@ -390,7 +391,8 @@ class EasyCredit_BackendFormBuilder
             array(
                 'label' => 'Eigenes Bild verwenden',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'position' => $position++
+                'position' => $position++,
+                'readOnly' => false
             )
         );
 
@@ -422,7 +424,8 @@ class EasyCredit_BackendFormBuilder
             array(
                 'label' => 'Eigenes Bild verwenden',
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'position' => $position++
+                'position' => $position++,
+                'readOnly' => false
             )
         );
 
