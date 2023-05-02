@@ -15,13 +15,12 @@
 
 {/block}
 
-{block name="frontend_index_body_classes"}
-    {$smarty.block.parent}
+{block name="frontend_index_body_classes"}{$smarty.block.parent} {strip}
 
     {if $EasyCreditMarketingBar}
         easycredit-box-top
     {/if}
-{/block}
+{/strip}{/block}
 
 {block name='frontend_index_after_body'}
     {$smarty.block.parent}
