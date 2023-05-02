@@ -18,14 +18,13 @@ Statusmeldung über den Transaktionsmanager
 
 Zur Meldung des Transaktionsstatus wählen Sie den gewünschten Status und senden Sie das Formular ab. Der Transaktionsmanager aktualisiert nach Absenden die Historie und die Transaktionsdetails oberhalb.
 
-Bei Rückabwicklung wählen Sie bitte den Grund und geben Sie bei einer Teil-Rückabwicklung den entsprechenden Betrag ein.
-
 .. image:: ./_static/merchant-tx-manager-options.png
+           :scale: 50%
 
 Statusmeldung über die Bestellverarbeitung
 ----------------------------------------------------
 
-Neben der expliziten Meldung über den :ref:`Transaktionsmanager` integriert die Extension die Statusmeldung auch in die Bestellverarbeitung von Shopware. Bei der Änderung des Bestellstatus meldet das Plugin den Status implizit je nach entsprechender Einstellung. Die Einstellungen sind unter :ref:`Plugin konfigurieren` zu finden.
+Neben der expliziten Meldung über den :ref:`Transaktionsmanager` integriert die Extension die Statusmeldung auch in die Bestellverarbeitung von Shopware. Bei der Änderung des Bestellstatus meldet das Plugin den Status automatisch je nach entsprechender Einstellung. Die Einstellungen sind unter :ref:`Verhalten konfigurieren` zu finden.
 
 .. image:: ./_static/merchant-auto-settings.png
 

@@ -15,7 +15,7 @@ Eine Zahlung über easyCredit-Ratenkauf ist unter den folgenden Bedingungen mög
 Bestellvorgang
 --------------
 
-easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlvorgang angezeigt. Nach Bestätigung der Zustimmungserklärung und Auswahl der Anrede wird der Nutzer auf das Zahlungsterminal von easyCredit-Ratenkauf weitergeleitet. Die Anrede muss nur ausgewählt werden, wenn diese nicht bereits bei der Adresseingabe abgefragt wurde und somit zur Verfügung steht.
+easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlvorgang angezeigt. Nach Bestätigung der Zustimmungserklärung wird der Kunde auf das Zahlungsterminal von easyCredit-Ratenkauf weitergeleitet.
 
 .. image:: ./_static/usage-customer-payment-methods.png
 
@@ -24,6 +24,6 @@ easyCredit-Ratenkauf wird als Zahlungsmethode im Bezahlvorgang angezeigt. Nach B
 Überprüfung der Bestellung
 --------------------------
 
-Nach Rückleitung vom Zahlungsterminal gelangt der Nutzer auf eine Bestätigungsseite (/easycredit/checkout/review) auf der er seine gesamte Bestellung nochmal überprüfen kann. Hier werden ihm inbesondere der aktualisierte Gesamtbetrag und die anfallenden Zinsen transparent angezeigt. Auch hat er nochmal einen Überblick über die gewählten Raten. Nach Bestätigung der Bestellung erhält der Kunde die vom System erstellte Bestellbestätigungsemail (sofern eingestellt).
+Nach Rückleitung vom Zahlungsterminal gelangt der Nutzer auf die Bestätigungsseite, auf der er seine gesamte Bestellung nochmal überprüfen kann. Hier werden ihm inbesondere der aktualisierte Gesamtbetrag und die anfallenden Zinsen transparent angezeigt. Auch hat er nochmal einen Überblick über die gewählten Raten. Nach Bestätigung der Bestellung erhält der Kunde die vom System erstellte Bestellbestätigungsemail (sofern eingestellt).
 
 .. image:: ./_static/usage-customer-review.png
