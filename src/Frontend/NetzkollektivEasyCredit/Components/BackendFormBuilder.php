@@ -261,6 +261,18 @@ class EasyCredit_BackendFormBuilder
         );
 
         $form->setElement(
+            'boolean',
+            'easyCreditExpressOffCanvas',
+            array(
+                'label' => 'Zeige Express-Button im Off-Canvas Warenkorb',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit dem easyCredit-Ratenkauf direkt aus dem Off-Canvas Warenkorb zu bezahlen.',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
             'button',//'easycreditIntro',
             'easyCreditMarketingWidgetHeading',
             array(
@@ -276,6 +288,30 @@ class EasyCredit_BackendFormBuilder
             'easycreditModelWidget',
             array(
                 'label' => 'Zeige Ratenrechner-Widget neben Produktpreis',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditModelWidgetCart',
+            array(
+                'label' => 'Zeige Ratenrechner-Widget im Warenkorb',
+                'value' => true,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'boolean',
+            'easycreditModelWidgetOffCanvas',
+            array(
+                'label' => 'Zeige Ratenrechner-Widget im Off-Canvas Warenkorb',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',

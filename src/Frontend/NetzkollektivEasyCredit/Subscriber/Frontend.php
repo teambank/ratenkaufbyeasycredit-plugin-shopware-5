@@ -185,8 +185,11 @@ class Frontend implements SubscriberInterface
             // Express Checkout
             $view->assign('EasyCreditExpressProduct', $this->config->get('easyCreditExpressProduct'));
             $view->assign('EasyCreditExpressCart', $this->config->get('easyCreditExpressCart'));
+            $view->assign('EasyCreditExpressOffCanvas', $this->config->get('easyCreditExpressOffCanvas'));
             // Widget
             $view->assign('EasyCreditWidget', $this->config->get('easycreditModelWidget'));
+            $view->assign('EasyCreditWidgetCart', $this->config->get('easycreditModelWidgetCart'));
+            $view->assign('EasyCreditWidgetOffCanvas', $this->config->get('easycreditModelWidgetOffCanvas'));
             // Marketing - Modal
             $view->assign('EasyCreditMarketingModal', $this->config->get('easyCreditMarketingModal'));
             $view->assign('EasyCreditMarketingModalIsOpen', $modalIsOpen);
