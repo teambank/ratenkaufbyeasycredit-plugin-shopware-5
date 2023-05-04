@@ -11,6 +11,7 @@ use Enlight\Event\SubscriberInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Shopware\Bundle\CartBundle\CartKey;
 
 class Frontend implements SubscriberInterface
 {
@@ -54,8 +55,39 @@ class Frontend implements SubscriberInterface
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend'                     => 'addEasyCreditModelWidget',
             'sBasket::sInsertSurchargePercent::replace'                                 => 'sInsertSurchargePercent',
-            'Shopware_Modules_Order_SendMail_BeforeSend'                                => 'onOrderSave'
+            'Shopware_Modules_Order_SendMail_BeforeSend'                                => 'onOrderSave',
+            'Shopware_Modules_Admin_Execute_Risk_Rule_sRiskORDERVALUEMORE'              => 'interceptRiskRuleMore',
+            'Shopware_Modules_Admin_Execute_Risk_Rule_sRiskORDERVALUELESS'              => 'interceptRiskRuleLess'
         );
+    }
+
+    public function interceptRiskRuleMore(\Enlight_Event_EventArgs $args) {
+        return $this->interceptRiskRule($args, '>=');
+    }
+
+    public function interceptRiskRuleLess(\Enlight_Event_EventArgs $args) {
+        return $this->interceptRiskRule($args, '<=');
+    }
+
+    public function interceptRiskRule(\Enlight_Event_EventArgs $args, $operator) {
+        if ($args->get('paymentID') != $this->helper->getPayment()->getId()) { // explicitely not !==, paymentId can be string
+            return null;
+        }
+
+        $order = $args->get('basket');
+        $value = $args->get('value');
+
+        $basketValue = $order[CartKey::AMOUNT_NUMERIC] - $this->helper->getPluginSession()["interest_amount"];
+
+        if (Shopware()->System()->sCurrency['factor']) {
+            $basketValue /= Shopware()->System()->sCurrency['factor'];
+        }
+
+        if ($operator === '>=') {
+            return $basketValue >= $value;
+        } else if ($operator === '<=') {
+            return $basketValue <= $value;
+        }
     }
 
     public function sInsertSurchargePercent(\Enlight_Hook_HookArgs $arguments) {
