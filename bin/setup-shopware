@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -eu
+
+git clone --depth=1 -b v5.7.17 https://github.com/shopware/shopware.git /opt/shopware
+cd /opt/shopware
+
+echo "
+DB_USER=root
+DB_PASSWORD=root
+DB_HOST=127.0.0.1
+DB_NAME=shopware
+DB_PORT=3306
+SW_HOST=localhost
+SW_BASE_PATH=
+SELENIUM_HOST=selenium
+ELASTICSEARCH_HOST=elasticsearch
+" > .env
+make init
+
+echo 'donwloading demo-data ...'
+php bin/console sw:store:download SwagDemoDataDE
+echo 'installing demo data ...'
+php bin/console sw:plugin:install --activate SwagDemoDataDE

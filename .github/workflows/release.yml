@@ -14,8 +14,8 @@ jobs:
       id: build-release
       run: |
          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-         chmod +x ./bin/release.sh
-         ./bin/release.sh
+         chmod +x ./bin/release
+         ./bin/release
          echo "build $(ls dist/* | head -1)"
          echo "::set-output name=filepath::$(ls dist/* | head -1)"
          echo "::set-output name=filename::$(basename `ls dist/* | head -1`)"
