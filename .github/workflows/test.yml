@@ -1,0 +1,63 @@
+name: Test
+
+on:
+  push:
+    branches:
+    - 'main'
+    - 'automate'
+
+jobs:
+  ci-current:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 15
+      fail-fast: false
+      matrix:
+        include:
+          - shopware-version: 'v5.7.17'
+            php-version: 8.2
+
+    name: Shopware ${{ matrix.shopware-version }} @ ${{ matrix.php-version }}
+
+    container:
+      image: netzkollektivgmbh/docker-shopware:php-${{ matrix.php-version }}
+    env:
+      PLUGIN_DIR: /opt/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
+      SW_DIR: /opt/shopware
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Debug
+        run: |
+          php -v
+          php -m
+          composer -V
+          env
+      - name: Initialize
+        run: |
+          ls -lia $GITHUB_WORKSPACE/bin
+          chmod +x $GITHUB_WORKSPACE/bin/*
+          $GITHUB_WORKSPACE/bin/init-mysql
+          $GITHUB_WORKSPACE/bin/setup-shopware
+
+          cd $SW_DIR
+      - name: Link plugin with shopware installation and install composer deps
+        run:  |
+          composer config --working-dir=$GITHUB_WORKSPACE --no-plugins allow-plugins.phpstan/extension-installer true
+          composer update --working-dir=$GITHUB_WORKSPACE -n
+
+          cp -r $GITHUB_WORKSPACE/src/Frontend/NetzkollektivEasyCredit $PLUGIN_DIR 
+      - name: Install & activate Plugin
+        run: |
+          cd $SW_DIR
+          $GITHUB_WORKSPACE/bin/setup-plugin
+
+          php bin/console sw:generate:attributes
+          php bin/console orm:generate:proxies
+      - name: Deactivate & uninstall Plugin
+        run: |
+          cd $SW_DIR
+          php bin/console sw:plugin:deactivate NetzkollektivEasyCredit
+          php bin/console sw:plugin:uninstall NetzkollektivEasyCredit
+          php bin/console sw:cache:clear

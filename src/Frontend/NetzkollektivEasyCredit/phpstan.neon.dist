@@ -5,11 +5,11 @@ parameters:
     - vendor
     - ../../../../../../vendor
     - ../../../../../../engine
-    - ../../../../../../var/cache/production_202211020949/doctrine
-    - ../../../../../../var/cache/production_202211020949/proxies
+    - ../../../../../../var/cache/production___REVISION__/doctrine
+    - ../../../../../../var/cache/production___REVISION__/proxies
   symfony:
     constant_hassers: false
-    container_xml_path: ../../../../../../var/cache/production_202211020949/container.xml
+    container_xml_path: ../../../../../../var/cache/production___REVISION__/container.xml
   doctrine:
     queryBuilderClass: Shopware\Components\Model\QueryBuilder
     repositoryClass: Shopware\Components\Model\ModelRepository

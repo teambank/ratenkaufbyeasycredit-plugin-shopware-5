@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -eu
+
+ln -s $GITHUB_WORKSPACE $PLUGIN_DIR
+ls -lia $PLUGIN_DIR
+
+php bin/console sw:plugin:refresh
+php bin/console sw:plugin:list
+php bin/console sw:plugin:install NetzkollektivEasyCredit
+php bin/console sw:plugin:activate NetzkollektivEasyCredit
