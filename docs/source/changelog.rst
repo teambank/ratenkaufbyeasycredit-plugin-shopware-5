@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v2.1.3
+------
+
+* Ratenrechner-Widget & Express-Button können nun auch im OffCanvas-Warenkorb angezeigt werden
+* das Plugin definiert nun eine eigene Berechnung für die Betragsregeln des Risiko-Managements bei der die Zinsen herausgerechnet werden
+* eigene Bilder in den Marketing-Komponenten können nun auf das Standardbild zurückgesetzt werden
+* behebt einen Fehler bei dem Body-Klassen ohne Leerzeichen zusammengefügt wurden (Block `frontend_index_body_classes`)
+* PHP 8.2 Kompatbilität
+
 v2.1.2
 ------
 
