@@ -222,6 +222,8 @@ class Frontend implements SubscriberInterface
             $view->assign('EasyCreditWidget', $this->config->get('easycreditModelWidget'));
             $view->assign('EasyCreditWidgetCart', $this->config->get('easycreditModelWidgetCart'));
             $view->assign('EasyCreditWidgetOffCanvas', $this->config->get('easycreditModelWidgetOffCanvas'));
+            $view->assign('EasyCreditDisableFlexprice', (new \EasyCredit_FlexpriceService())->shouldDisableFlexprice($view->getAssign('sArticle') ? [$view->getAssign('sArticle')] : null));
+
             // Marketing - Modal
             $view->assign('EasyCreditMarketingModal', $this->config->get('easyCreditMarketingModal'));
             $view->assign('EasyCreditMarketingModalIsOpen', $modalIsOpen);
@@ -480,6 +482,7 @@ class Frontend implements SubscriberInterface
         $isSelected = $this->helper->getPlugin()->isSelected($view->sUserData['additional']['user']['paymentID']);
         $view->assign('EasyCreditIsSelected', ($isSelected) ? 'true' : 'false');
         $view->assign('EasyCreditPaymentPlan', $this->getPaymentPlan());
+        $view->assign('EasyCreditDisableFlexprice', (new \EasyCredit_FlexpriceService())->shouldDisableFlexprice());
 
         if (!$error && $isSelected) {
             if (isset($this->helper->getPluginSession()["addressError"])

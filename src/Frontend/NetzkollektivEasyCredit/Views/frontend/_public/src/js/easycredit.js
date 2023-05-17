@@ -1,6 +1,7 @@
 (function () {
     var webshopId = $('meta[name=easycredit-api-key]').attr('content');
     var widgetActive = $('meta[name=easycredit-widget-active]').attr('content') === 'true';
+    var disableFlexprice = $('meta[name=easycredit-disable-flexprice]').attr('content') === 'true';
 
     var onHydrated = function (selector, cb) {
         if (!document.querySelector(selector)) {
@@ -113,7 +114,8 @@
         }
 
         if ($(target).siblings('easycredit-widget').length == 0) {
-            $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" />');
+            var disableFlexpriceAttr = (disableFlexprice) ? 'disable-flexprice="true"' : '';
+            $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" '+disableFlexpriceAttr+'/>');
             return;
         }
         $(target).siblings('easycredit-widget').get(0).setAttribute('amount', amount);

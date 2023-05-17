@@ -8,5 +8,6 @@
         is-active="{$EasyCreditIsSelected}" 
         alert="{$EasyCreditError}"
         payment-plan="{$EasyCreditPaymentPlan}"
+        {if $EasyCreditDisableFlexprice}disable-flexprice="true"{/if}
     />
 {/if}

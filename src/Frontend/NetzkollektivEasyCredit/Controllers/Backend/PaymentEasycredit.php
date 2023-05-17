@@ -25,6 +25,9 @@ abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends S
         try {
            $checkout->verifyCredentials($apiKey, $apiPassword, $apiSignature);
 
+           $flexpriceService = new EasyCredit_FlexpriceService();
+           $flexpriceService->updateConfiguration();
+
            $valid = true;
            $message = '';
         } catch (\Exception $e) {
