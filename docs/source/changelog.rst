@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.4
+------
+
+* Integration von Ausnahmemöglichkeiten von Zins-Flex
+
 v2.1.3
 ------
 

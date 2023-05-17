@@ -212,7 +212,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     public function respondWithStatus($content, $code = 200) {
         http_response_code($code);
         echo $content;
-        exit;
+        exit; // NOSONAR
     }
 
     /**

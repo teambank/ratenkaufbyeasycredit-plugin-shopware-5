@@ -105,7 +105,7 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
 
         http_response_code($code);
         echo json_encode($content);
-        exit;
+        exit; // NOSONAR
     }
 
     public function transactionsAction()

@@ -348,7 +348,7 @@ class Frontend implements SubscriberInterface
 
         if ($url = $this->getRedirectUrl()) {
             header('Location: '.$url);
-            exit;
+            exit; // NOSONAR
         }
 
         $action->redirect(array(
