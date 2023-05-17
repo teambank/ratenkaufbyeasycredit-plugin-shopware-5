@@ -77,7 +77,7 @@ class EasyCredit_BackendFormBuilder
                 'button',
                 'easycreditButtonClientTest',
                 array(
-                    'label' => '<strong>Jetzt API-Zugangsdaten testen<strong>',
+                    'label' => '<strong>Jetzt API-Zugangsdaten testen & Kennung synchronisieren<strong>',
                     'handler' => "function(btn) {"
                         . file_get_contents(__DIR__ . '/../Views/backend/plugins/easycredit/test.js') . "}",
                     'position' => $position++

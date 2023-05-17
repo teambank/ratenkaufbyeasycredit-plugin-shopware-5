@@ -169,8 +169,9 @@ class QuoteBuilder {
                 'numberOfProductsInShoppingCart' => 1,
                 'invoiceAddress' => $this->isExpress() ? null : $this->getInvoiceAddress(),
                 'shippingAddress' => $this->isExpress() ? null : $this->getShippingAddress(),
-                'shoppingCartInformation' => $this->getItems()
-            ]),
+                'shoppingCartInformation' => $this->getItems(),
+                'withoutFlexprice' => (new \EasyCredit_FlexpriceService())->shouldDisableFlexprice()
+           ]),
             'shopsystem' => $this->getSystem(),
             'customer' => $this->getCustomer()->build(),
             'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
