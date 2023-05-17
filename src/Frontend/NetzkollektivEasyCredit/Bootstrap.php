@@ -364,7 +364,11 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 null
             );
         }
-        $em->getConfiguration()->getMetadataCacheImpl()->deleteAll();
+        
+        $metaDataCache = $em->getConfiguration()->getMetadataCacheImpl();
+        if ($metaDataCache !== null && method_exists($metaDataCache, 'deleteAll')) {
+            $metaDataCache->deleteAll();
+        }
         $em->generateAttributeModels(['s_order_attributes']);
     }
 

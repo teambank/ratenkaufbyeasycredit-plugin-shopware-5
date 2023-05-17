@@ -14,6 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - shopware-version: 'v5.2.27'
+          - php-version: 7.4
           - shopware-version: 'v5.7.17'
             php-version: 8.2
 
@@ -53,8 +55,15 @@ jobs:
           cd $SW_DIR
           $GITHUB_WORKSPACE/bin/setup-plugin
 
+          php bin/console sw:cache:clear
           php bin/console sw:generate:attributes
           php bin/console orm:generate:proxies
+      - name: Static Analyze
+        run: |
+          cd $PLUGIN_DIR
+          REVISION=`basename $SW_DIR/var/cache/production_* | sed 's/production_//g'`
+          sed "s/__REVISION__/$REVISION/g" phpstan.neon.dist > phpstan.neon
+          php vendor/bin/phpstan -v analyze .
       - name: Deactivate & uninstall Plugin
         run: |
           cd $SW_DIR

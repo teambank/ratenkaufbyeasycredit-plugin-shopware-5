@@ -52,7 +52,9 @@ class EasyCredit_FlexpriceService
 
         if ($refreshMeta) {
             $metaDataCache = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
-            $metaDataCache->deleteAll();
+            if ($metaDataCache !== null && method_exists($metaDataCache, 'deleteAll')) {
+                $metaDataCache->deleteAll();
+            }
             Shopware()->Models()->generateAttributeModels( array_keys($this->_attributes) );
         }
     }
