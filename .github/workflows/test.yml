@@ -48,6 +48,12 @@ jobs:
           composer update --working-dir=$GITHUB_WORKSPACE -n
 
           cp -r $GITHUB_WORKSPACE/src/Frontend/NetzkollektivEasyCredit $PLUGIN_DIR 
+      - name: Static Analyze
+        run: |
+          cd $PLUGIN_DIR
+          REVISION=`basename $SW_DIR/var/cache/production_* | sed 's/production_//g'`
+          sed "s/__REVISION__/$REVISION/g" phpstan.neon.dist > phpstan.neon
+          php $PLUGIN_DIR/vendor/bin/phpstan analyze $PLUGIN_DIR
       - name: Install & activate Plugin
         run: |
           cd $SW_DIR
