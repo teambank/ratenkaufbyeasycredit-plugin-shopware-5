@@ -5,11 +5,11 @@ parameters:
     - vendor
     - ../../../../../../vendor
     - ../../../../../../engine
-    - ../../../../../../var/cache/production___REVISION__/doctrine
-    - ../../../../../../var/cache/production___REVISION__/proxies
+    - ../../../../../../var/cache/production_202211020949/doctrine
+    - ../../../../../../var/cache/production_202211020949/proxies
   symfony:
     constant_hassers: false
-    container_xml_path: ../../../../../../var/cache/production___REVISION__/container.xml
+    container_xml_path: ../../../../../../var/cache/production_202211020949/container.xml
   doctrine:
     queryBuilderClass: Shopware\Components\Model\QueryBuilder
     repositoryClass: Shopware\Components\Model\ModelRepository
@@ -25,6 +25,10 @@ parameters:
           - 'Subscriber/OrderShipped.php'
     - # Legacy methods < SW 5.2
         message: '#Call to an undefined method Shopware\\Components\\Model\\ModelManager::addAttribute\(\)#'
+        paths:
+          - Bootstrap.php 
+    - # Legacy method < SW 5.2
+        message: '#Call to an undefined method Doctrine\\Common\\Cache\\Cache::deleteAll\(\)#'
         paths:
           - Bootstrap.php 
     - # Legacy method < SW 5.2
