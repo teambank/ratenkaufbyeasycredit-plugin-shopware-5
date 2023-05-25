@@ -93,14 +93,13 @@ class EasyCredit_FlexpriceService
                 return false;
             }
 
-            $query = $this->helper->getContainer()->get(\Doctrine\DBAL\Connection::class)->createQueryBuilder();
+            $query = $this->helper->getContainer()->get('dbal_connection')->createQueryBuilder();
             $query->select('MAX(ca.easycredit_disable_zinsflex)')
               ->from('s_articles_categories', 'ac')
               ->join('ac', 's_categories_attributes', 'ca', 'ca.categoryID = ac.categoryID')
               ->where('ac.articleID IN (:ids)')
               ->setParameter(':ids', $productIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-
-            $disable = $query->execute()->fetchOne();
+            $disable = current($query->execute()->fetchAll(\PDO::FETCH_COLUMN));
             return ($disable > 0);
         }
 

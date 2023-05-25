@@ -11,7 +11,6 @@ use Enlight\Event\SubscriberInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\ContextService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Shopware\Bundle\CartBundle\CartKey;
 
 class Frontend implements SubscriberInterface
 {
@@ -77,7 +76,7 @@ class Frontend implements SubscriberInterface
         $order = $args->get('basket');
         $value = $args->get('value');
 
-        $basketValue = $order[CartKey::AMOUNT_NUMERIC] - $this->helper->getPluginSession()["interest_amount"];
+        $basketValue = $order['AmountNumeric'] - $this->helper->getPluginSession()["interest_amount"];
 
         if (Shopware()->System()->sCurrency['factor']) {
             $basketValue /= Shopware()->System()->sCurrency['factor'];
