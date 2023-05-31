@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.5
+------
+
+* Verbesserung der Kompatibilität mit älteren Shopware-Versionen (Zins-Flex)
+
 v2.1.4
 ------
 
