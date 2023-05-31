@@ -1,5 +1,6 @@
 parameters:
   checkMissingIterableValueType: false
+  reportUnmatchedIgnoredErrors: false
   level: 2
   scanDirectories:
     - vendor
@@ -13,9 +14,9 @@ parameters:
   doctrine:
     queryBuilderClass: Shopware\Components\Model\QueryBuilder
     repositoryClass: Shopware\Components\Model\ModelRepository
+    objectManagerLoader: ../../../../../../tests/phpstan-doctrine-model-manager.php
   excludePaths:
     - vendor
-    - ratenkaufbyeasycredit-plugin-shopware-5
   ignoreErrors:
     - # Legacy DI registration not recognized by phpstan
         message: '#is not registered in the container#'
@@ -27,6 +28,10 @@ parameters:
         message: '#Call to an undefined method Shopware\\Components\\Model\\ModelManager::addAttribute\(\)#'
         paths:
           - Bootstrap.php 
+    - # Legacy method < SW 5.2
+        message: '#Call to an undefined method Doctrine\\Common\\Cache\\Cache::deleteAll\(\)#'
+        paths:
+          - Bootstrap.php
     - # Legacy method < SW 5.2
         message: '#Call to an undefined method Enlight_Event_EventArgs::getSubject\(\)#'
         paths:

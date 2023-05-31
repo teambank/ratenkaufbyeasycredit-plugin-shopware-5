@@ -9,27 +9,64 @@ on:
 jobs:
   ci-current:
     runs-on: ubuntu-latest
+    timeout-minutes: 6
     strategy:
       max-parallel: 15
       fail-fast: false
       matrix:
         include:
-          - shopware-version: 'v5.2.27'
-          - php-version: 7.4
+
+          # versions <= 5.5 use ant build process instead of Makefile
+          #- shopware-version: 'v5.2.27'
+          #  php-version: '5.6'
+          #- shopware-version: 'v5.3.7'
+          #  php-version: '7.0'
+          #- shopware-version: 'v5.4.6'
+          #  php-version: '7.1'
+          #- shopware-version: 'v5.5.10'
+          #  php-version: '7.2'
+
+          - shopware-version: 'v5.7.6'
+            php-version: '7.4'
+
+          # throws:      Child process error (exit code 255): PHP Fatal error:  Cannot declare          
+          # class ReflectionEnum, because the name is already in use in                    
+          # /opt/shopware/vendor/laminas/laminas-code/polyfill/ReflectionEnumPolyfill.php  
+          # on line 8
+          #- shopware-version: 'v5.7.11'
+          #  php-version: '8.0'
+
+          - shopware-version: 'v5.7.13'
+            php-version: '8.1'
           - shopware-version: 'v5.7.17'
-            php-version: 8.2
+            php-version: '8.2'
 
     name: Shopware ${{ matrix.shopware-version }} @ ${{ matrix.php-version }}
 
-    container:
-      image: netzkollektivgmbh/docker-shopware:php-${{ matrix.php-version }}
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: shopware
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     env:
       PLUGIN_DIR: /opt/shopware/engine/Shopware/Plugins/Local/Frontend/NetzkollektivEasyCredit
       SW_DIR: /opt/shopware
-      
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@master
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, curl, dom, fileinfo, gd, iconv, intl, json, xml, mbstring, pdo, phar, zip, sodium
+          tools: composer:2.1.5
+          coverage: none
       - name: Debug
         run: |
           php -v
@@ -38,15 +75,12 @@ jobs:
           env
       - name: Initialize
         run: |
-          ls -lia $GITHUB_WORKSPACE/bin
           chmod +x $GITHUB_WORKSPACE/bin/*
-          $GITHUB_WORKSPACE/bin/init-mysql
-          $GITHUB_WORKSPACE/bin/setup-shopware
+          $GITHUB_WORKSPACE/bin/setup-shopware ${{ matrix.shopware-version }}
 
           cd $SW_DIR
       - name: Link plugin with shopware installation and install composer deps
         run:  |
-          composer config --working-dir=$GITHUB_WORKSPACE --no-plugins allow-plugins.phpstan/extension-installer true
           composer update --working-dir=$GITHUB_WORKSPACE -n
 
           cp -r $GITHUB_WORKSPACE/src/Frontend/NetzkollektivEasyCredit $PLUGIN_DIR 
@@ -63,6 +97,8 @@ jobs:
           cd $PLUGIN_DIR
           REVISION=`basename $SW_DIR/var/cache/production_* | sed 's/production_//g'`
           sed "s/__REVISION__/$REVISION/g" phpstan.neon.dist > phpstan.neon
+
+          find . -maxdepth 1 -type l -delete
           php vendor/bin/phpstan -v analyze .
       - name: Deactivate & uninstall Plugin
         run: |

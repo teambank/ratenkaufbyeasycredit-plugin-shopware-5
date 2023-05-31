@@ -2,7 +2,8 @@
 
 set -eu
 
-git clone --depth=1 -b v5.7.17 https://github.com/shopware/shopware.git /opt/shopware
+echo "cloning Shopware $1"
+git clone --depth=1 -b $1 https://github.com/shopware/shopware.git /opt/shopware
 cd /opt/shopware
 
 echo "
@@ -16,7 +17,25 @@ SW_BASE_PATH=
 SELENIUM_HOST=selenium
 ELASTICSEARCH_HOST=elasticsearch
 " > .env
-make init
+
+EXIT_CODE=0
+dpkg --compare-versions `echo $1 | sed 's/v//'` 'gt' `echo 'v5.5.10' | sed 's/v//'` || EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ]
+  then
+  make init
+else
+  cd build/
+  sudo apt-get update && sudo apt-get -y install ant
+  cp build.properties.dist build.properties
+  echo 'db.host = 127.0.0.1' >> build.properties
+  echo 'db.user = root' >> build.properties
+  echo 'db.password = root' >> build.properties
+  echo 'db.name = shopware' >> build.properties
+  #ant build-unit
+  ant build-config
+  cat ../config.php
+  mysql -h localhost -u root -proot -e 'show databases;'
+fi
 
 echo 'donwloading demo-data ...'
 php bin/console sw:store:download SwagDemoDataDE
