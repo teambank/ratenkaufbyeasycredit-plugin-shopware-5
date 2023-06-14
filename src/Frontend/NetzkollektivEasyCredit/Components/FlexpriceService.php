@@ -6,6 +6,9 @@ class EasyCredit_FlexpriceService
     protected $db;
     protected $crudService;
 
+    protected $articleAttribute;
+    protected $categoryAttribute;
+
     protected $_attributes = [
         's_articles_attributes' => 'easyCredit-Ratenkauf: Zinsflex für diesen Artikel deaktivieren',
         's_categories_attributes' => 'easyCredit-Ratenkauf: Zinsflex für diese Kategorie deaktivieren',
@@ -59,16 +62,33 @@ class EasyCredit_FlexpriceService
         }
     }
 
+    protected function getArticleAttribute() {
+        if (!isset($this->articleAttribute)) {
+            $this->articleAttribute = $this->crudService->get('s_articles_attributes', 'easycredit_disable_zinsflex');
+        }
+        return $this->articleAttribute;
+    }
+
+    protected function getCategoryAttribute() {
+        if (!isset($this->categoryAttribute)) {
+            $this->categoryAttribute = $this->crudService->get('s_categories_attributes', 'easycredit_disable_zinsflex');
+        }
+        return $this->categoryAttribute;
+    }
+
     public function shouldDisableFlexprice($items = null) {
+        if (!$this->getArticleAttribute() && !$this->getCategoryAttribute()) {
+            return;
+        }
+
         if ($items === null) {
-            $basket = Shopware()->Modules()->Basket()->sGetBasket();
-            $items = $basket['content'];
+            $items = $this->helper->getBasket()['content'];
         }
         if ($items === null) {
             return false;
         }
 
-        if ($this->crudService->get('s_articles_attributes', 'easycredit_disable_zinsflex')) {
+        if ($this->getArticleAttribute()) {
             foreach ($items as $item) {
                 if (isset($item['additional_details']['easycredit_disable_zinsflex']) &&
                     $item['additional_details']['easycredit_disable_zinsflex']
@@ -84,7 +104,7 @@ class EasyCredit_FlexpriceService
             }
         }
 
-        if ($this->crudService->get('s_categories_attributes', 'easycredit_disable_zinsflex')) {
+        if ($this->getCategoryAttribute()) {
             $productIds = array_map(function($item) {
                 return (int)$item['articleID'];
             }, $items);

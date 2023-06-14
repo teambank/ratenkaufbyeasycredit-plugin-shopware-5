@@ -270,11 +270,15 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $template->addTemplateDir($this->Path() . $viewDir.'/');
     }
 
+    protected $paymentsCache = null;
     public function getPayment()
     {
-        return $this->Payments()->findOneBy(
-            array('name' => 'easycredit')
-        );
+        if (null === $this->paymentsCache) {
+            $this->paymentsCache = $this->Payments()->findOneBy(
+                array('name' => 'easycredit')
+            );
+        }
+        return $this->paymentsCache;
     }
 
     protected function _createPayment()
@@ -404,7 +408,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return $this->getInterestAmount() !== false;
     }
 
-
     public function isValid() {
         $quote = $this->getQuote();
         return $this->isInterestInBasket()
@@ -417,18 +420,14 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->removeInterest();
     }
 
-    public function getQuote() {
-        $quote = new Api\QuoteBuilder();
-        return $quote->build();
-    }
+    protected $quoteCache = null;
 
-    protected function _getUser()
-    {
-        if (!empty(Shopware()->Session()->offsetGet('sOrderVariables')['sUserData'])) {
-            return Shopware()->Session()->offsetGet('sOrderVariables')['sUserData'];
-        } else {
-            return Shopware()->Modules()->Admin()->sGetUserData();
+    public function getQuote() {
+        if ($this->quoteCache === null) {
+            $quote = new Api\QuoteBuilder();
+            $this->quoteCache = $quote->build();
         }
+        return $this->quoteCache;
     }
 
     public function isResponsive() {
@@ -437,7 +436,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function isSelected($paymentId = null) {
         if ($paymentId == null) {
-            $user = $this->_getUser();
+            $helper = new \EasyCredit_Helper();
+            $user = $helper->getUser();
             $paymentId = $user['additional']['payment']['id'];
         }
         return $paymentId == $this->getPayment()->getId();

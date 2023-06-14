@@ -194,7 +194,6 @@ class Frontend implements SubscriberInterface
         }
 
         $sAdmin = $this->helper->getModule('Admin');
-        $sBasket = $this->helper->getModule('Basket');
 
         $paymentId = $this->helper->getPayment()->getId();
 
@@ -203,7 +202,7 @@ class Frontend implements SubscriberInterface
             $view->assign('EasyCreditApiKey', $apiKey);
         }
 
-        $isEasyCreditAllowed = !$sAdmin->sManageRisks($paymentId, $sBasket->sGetBasket(), $sAdmin->sGetUserData() ?: []);
+        $isEasyCreditAllowed = !$sAdmin->sManageRisks($paymentId, $this->helper->getBasket(), $this->helper->getUser() ?: []);
 
         if ($apiKey && $isEasyCreditAllowed) {
             $modalIsOpen = 'true';
@@ -440,20 +439,10 @@ class Frontend implements SubscriberInterface
         }
     }
 
-
-    protected function _getUser()
-    {
-        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
-            return Shopware()->Session()->sOrderVariables['sUserData'];
-        } else {
-            return Shopware()->Modules()->Admin()->sGetUserData();
-        }
-    }
-
     protected function _getActiveBillingAddressId() {
         $activeBillingAddressId = Shopware()->Session()->offsetGet('checkoutBillingAddressId');
         if (empty($activeBillingAddressId)) {
-            $user = $this->_getUser();
+            $user = $this->helper->getUser();
             $activeBillingAddressId = (is_array($user) && isset($user['additional']['user']['default_billing_address_id'])) ? $user['additional']['user']['default_billing_address_id'] : '';
         }
         return $activeBillingAddressId; 
