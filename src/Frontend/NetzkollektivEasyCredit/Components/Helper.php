@@ -34,4 +34,26 @@ class EasyCredit_Helper
     public function getPayment () {
         return $this->getPlugin()->getPayment();
     }
+
+    protected function getVariable($var, $module) {
+        if (Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('s'.$var)) {
+            return Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('s'.$var);
+        }
+        if (isset(Shopware()->Session()->offsetGet('sOrderVariables')['s'.$var])) {
+            return Shopware()->Session()->offsetGet('sOrderVariables')['s'.$var];
+        }
+        return Shopware()->Modules()->{$module}()->{'sGet'.$var}();
+    }
+
+    public function getBasket() {
+        return $this->getVariable('Basket', 'Basket');
+    }
+
+    public function getUser() {
+        return $this->getVariable('UserData', 'Admin');
+    }
+
+    public function getSelectedDispatch() {
+        return Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('sDispatch');
+    }
 }

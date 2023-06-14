@@ -9,17 +9,15 @@ class CustomerBuilder
     protected $_user = null;
 
     protected $_userData;
+    protected $helper;
 
     public function __construct() {
         if (isset(Shopware()->Session()->sUserId) && !empty(Shopware()->Session()->sUserId)) {
             $this->_user = Shopware()->Models()->find('Shopware\Models\Customer\Customer', Shopware()->Session()->sUserId);
         }
 
-        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
-            $this->_userData = Shopware()->Session()->sOrderVariables['sUserData'];
-        } else {
-            $this->_userData = Shopware()->Modules()->Admin()->sGetUserData();
-        }
+        $this->helper = new \EasyCredit_Helper();
+        $this->_userData = $this->helper->getUser();
     }
 
     public function getPrefix()

@@ -27,21 +27,14 @@ class QuoteBuilder {
     protected $user;
     protected $config;
     protected $storage;
+    protected $helper;
 
     public function __construct() {
-        $this->basket = Shopware()->Modules()->Basket()->sGetBasket(); 
-        $this->user = $this->_getUser();
+        $this->helper = new \EasyCredit_Helper();
+        $this->basket = $this->helper->getBasket();
+        $this->user = $this->helper->getUser();
         $this->config = Shopware()->Config();
         $this->storage = new Storage();
-    }
-
-    protected function _getUser()
-    {
-        if (!empty(Shopware()->Session()->sOrderVariables['sUserData'])) {
-            return Shopware()->Session()->sOrderVariables['sUserData'];
-        } else {
-            return Shopware()->Modules()->Admin()->sGetUserData();
-        }
     }
 
     public function getId() {
@@ -49,8 +42,7 @@ class QuoteBuilder {
     }
 
     public function getShippingMethod() {
-        $controller = new FakeCheckoutController();
-        $dispatch = $controller->getSelectedDispatch();
+        $dispatch = $this->helper->getSelectedDispatch();
         if (isset($dispatch['name'])) {
             $shippingMethod = strip_tags($dispatch['name']);
             if ($this->getIsClickAndCollect()) {
@@ -61,18 +53,22 @@ class QuoteBuilder {
     }
 
     public function getIsClickAndCollect() {
-        $controller = new FakeCheckoutController();
-        $dispatch = $controller->getSelectedDispatch();
+        $dispatch = $this->helper->getSelectedDispatch();
         return (
             isset($dispatch['id'])
             && $dispatch['id'] == $this->config->get('easycreditClickAndCollectShippingMethod')
         );
     }
 
+    protected $grandTotal;
+
     public function getGrandTotal() {
-        $controller = new FakeCheckoutController();
-        $basket = $controller->getBasket();
-        return empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        if ($this->grandTotal === null) {
+            $controller = new FakeCheckoutController();
+            $basket = $controller->getBasket();
+            $this->grandTotal = empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
+        }
+        return $this->grandTotal;
     }
 
     public function getDuration() {
