@@ -8,7 +8,7 @@ Nach Aktivieren der Debug Logging Option in den Plugin-Einstellungen, wird kein 
 -----------------------------------------------------------------------------------------------------------------
 
 Das Log Level im Production Modus von Shopware ist standardmäßig so eingestellt, dass nur kritische Fehler in den Logfiles erscheinen.
-Durch folgende Anpassung des Log Levels in der `config.php` werden auch weniger kritische Nachricht geloggt:
+Durch folgende Anpassung des Log Levels in der `config.php` werden auch weniger kritische Nachrichten geloggt:
 
 .. code-block:: php
 

@@ -15,10 +15,10 @@ Das Plugin hat neben Shopware 5.x keine weiteren Abhängigkeiten. Es wurde für 
 
 * 5.0.x (<= v1.8.7)
 * 5.1.x (<= v1.8.7)
-* 5.2.x
-* 5.3.x
-* 5.4.x
-* 5.5.x
+* 5.2.x (PHP >= 7.0)
+* 5.3.x (PHP >= 7.0)
+* 5.4.x (PHP >= 7.0)
+* 5.5.x (PHP >= 7.0)
 * 5.6.x
 * 5.7.x
 

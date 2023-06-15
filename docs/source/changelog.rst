@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.6
+------
+
+* Verbesserung der Performance
+
 v2.1.5
 ------
 

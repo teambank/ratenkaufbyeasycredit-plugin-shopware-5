@@ -63,4 +63,4 @@ Sollten Ihnen die Zugangsdaten bereits vorliegen, können Sie diese gleich bei d
 .. code-block:: console
 
     $ ./bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiKey 1.de.1234.4321
-    $ ./bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiToken abc-def-ghi
+    $ ./bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiPassword abc-def-ghi
