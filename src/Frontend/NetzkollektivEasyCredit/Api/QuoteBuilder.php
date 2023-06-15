@@ -108,6 +108,10 @@ class QuoteBuilder {
     {
         $_items = [];
         foreach ($items as $item) {
+            if ($item['ordernumber'] === 'sw-payment-ec-interest') {
+                continue;
+            }
+
             $itemBuilder = new Quote\ItemBuilder($item);
             $quoteItem = $itemBuilder->build();
             if ($quoteItem->getPrice() <= 0) {
@@ -115,8 +119,13 @@ class QuoteBuilder {
             }
             $_items[] = $quoteItem;
         }
-
         return $_items;
+    }
+
+    protected function getTotalQuantity() {
+        return array_reduce($this->getItems(), function ($value, $item) { 
+            return $value + $item->getQuantity();
+        });
     }
 
     public function getSystem() {
@@ -162,7 +171,7 @@ class QuoteBuilder {
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
                 'orderId' => $this->getId(),
-                'numberOfProductsInShoppingCart' => 1,
+                'numberOfProductsInShoppingCart' => $this->getTotalQuantity(),
                 'invoiceAddress' => $this->isExpress() ? null : $this->getInvoiceAddress(),
                 'shippingAddress' => $this->isExpress() ? null : $this->getShippingAddress(),
                 'shoppingCartInformation' => $this->getItems(),

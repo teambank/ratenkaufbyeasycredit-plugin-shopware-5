@@ -435,6 +435,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return $this->quoteCache;
     }
 
+    public function clearQuoteCache() {
+        $this->quoteCache = null;
+    }
+
     public function isResponsive() {
         return Shopware()->Shop()->getTemplate()->getVersion() >= 3;
     }

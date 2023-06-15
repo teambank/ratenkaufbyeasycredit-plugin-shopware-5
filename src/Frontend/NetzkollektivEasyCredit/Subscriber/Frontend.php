@@ -538,6 +538,21 @@ class Frontend implements SubscriberInterface
             return $this->_redirToPaymentSelection($action);
         }
 
+        if (!$this->helper->getPlugin()->isAmountValid()) {
+            try {
+                $checkout->update($this->helper->getPlugin()->getQuote());
+                $this->helper->getPlugin()->clearQuoteCache();
+                return $action->redirect(array(
+                    'controller' => 'checkout',
+                    'action' => 'confirm'
+                ));
+            } catch (\Throwable $e) {
+                $this->container->get('pluginlogger')->error($e->getMessage());
+                $this->helper->getPlugin()->getStorage()->set('apiError', self::INTEREST_REMOVED_ERROR);
+                return $this->_redirToPaymentSelection($action);
+            }
+        }
+
         if (!$this->helper->getPlugin()->isValid()) {
             $this->helper->getPlugin()->getStorage()->set('apiError', self::INTEREST_REMOVED_ERROR);
             return $this->_redirToPaymentSelection($action);
