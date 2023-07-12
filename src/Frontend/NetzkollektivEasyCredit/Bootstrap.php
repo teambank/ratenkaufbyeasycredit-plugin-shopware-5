@@ -208,7 +208,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'handler' => $stack
             ]);
         }
-        return new ApiV3\Client();
+        return new ApiV3\Client(
+            Shopware()->Config()->get('easycreditDebugLogging') ? Shopware()->Container()->get('pluginlogger') : null
+        );
     }
 
     public function getConfig() {
