@@ -3,7 +3,7 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
 use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ConstraintViolation;
+use Teambank\RatenkaufByEasyCreditApiV3\Model\PaymentConstraintViolation;
 use Teambank\RatenkaufByEasyCreditApiV3\Integration\AddressValidationException;
 
 use GuzzleHttp\Exception\ConnectException;
@@ -414,10 +414,10 @@ class Frontend implements SubscriberInterface
 
                 return false;
             } catch (ApiException $e) {
-                if ($e->getResponseObject() instanceof ConstraintViolation) {
+                if ($e->getResponseObject() instanceof PaymentConstraintViolation) {
                     $errors = [];
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
-                        $errors[$violation['field']] = $violation['message'];
+                        $errors[$violation['field']] = $violation['messageDE'] ?? $violation['message'];
                     }
                     if (in_array('orderDetails.invoiceAddress', array_keys($errors)) ||
                         in_array('orderDetails.shippingAddress', array_keys($errors))
