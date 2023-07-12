@@ -100,8 +100,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     /**
      * Activate the plugin easycredit plugin.
      * Sets the active flag in the payment row.
-     *
-     * @return bool
      */
     public function enable()
     {

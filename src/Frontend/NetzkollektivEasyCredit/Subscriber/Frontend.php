@@ -417,7 +417,7 @@ class Frontend implements SubscriberInterface
                 if ($e->getResponseObject() instanceof PaymentConstraintViolation) {
                     $errors = [];
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
-                        $errors[$violation['field']] = $violation['messageDE'] ?? $violation['message'];
+                        $errors[$violation->getField()] = $violation->getMessageDE() ? $violation->getMessageDE() :  $violation->getMessage();
                     }
                     if (in_array('orderDetails.invoiceAddress', array_keys($errors)) ||
                         in_array('orderDetails.shippingAddress', array_keys($errors))

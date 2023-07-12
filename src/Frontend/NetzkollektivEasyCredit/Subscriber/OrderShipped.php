@@ -35,7 +35,7 @@ class OrderShipped extends OrderStatusChanged
                 if ($e->getResponseObject() instanceof ConstraintViolation) {
                     $error = 'easyCredit-Ratenkauf: ';
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
-                        $error .= $violation['message'];
+                        $error .= $violation->getMessage();
                     }
                     return $this->handleError($error);
                 }

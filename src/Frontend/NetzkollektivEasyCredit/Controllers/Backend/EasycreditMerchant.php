@@ -9,7 +9,7 @@ use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
 abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends Shopware_Controllers_Backend_Application {
 
     /**
-     * @var string
+     * {@inheritdoc}
      */
     protected $model = Order::class;
 
