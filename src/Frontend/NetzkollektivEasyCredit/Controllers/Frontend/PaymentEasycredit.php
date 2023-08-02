@@ -193,14 +193,16 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $basket->sAddArticle($productNumber, (int) $this->Request()->getParam('sQuantity', 1));
         }
 
+        /** @var sAdmin $admin */
+        $admin = $this->getModule('admin');
+
         $this->session->offsetSet('sPaymentID', $this->helper->getPayment()->getId());
+        $admin->sUpdatePayment($this->helper->getPayment()->getId());
 
         $checkoutController = $this->getCheckoutController();
         $checkoutController->getSelectedCountry();
         $checkoutController->getSelectedDispatch();
 
-        /** @var sAdmin $admin */
-        $admin = $this->getModule('admin');
         $countries = $admin->sGetCountryList();
         $shipping = $admin->sGetPremiumShippingcosts(\reset($countries));
 

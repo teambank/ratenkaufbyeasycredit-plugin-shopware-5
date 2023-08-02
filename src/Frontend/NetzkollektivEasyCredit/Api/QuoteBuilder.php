@@ -7,17 +7,12 @@ use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
 
 class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
-
     public function __construct() {
         $this->init();
         $this->container = Shopware()->Container();
         $this->setView(new \Enlight_View_Default(
             Shopware()->Container()->get('template')
         ));
-    }
-    
-    public function getSelectedPayment() {
-        return 'easycredit';
     }
 }
 
@@ -64,8 +59,8 @@ class QuoteBuilder {
 
     public function getGrandTotal() {
         if ($this->grandTotal === null) {
-            $controller = new FakeCheckoutController();
-            $basket = $controller->getBasket();
+            /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
+            $basket = (new FakeCheckoutController())->setFront(Shopware()->Front())->getBasket();
             $this->grandTotal = empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
         }
         return $this->grandTotal;
