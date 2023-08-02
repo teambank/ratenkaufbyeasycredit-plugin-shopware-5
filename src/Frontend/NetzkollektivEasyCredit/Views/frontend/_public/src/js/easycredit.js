@@ -134,6 +134,9 @@
                 return false;
             });
             $('form[name=shippingPaymentForm]').submit(function() {
+                if (!$('easycredit-checkout').closest('.payment--method.block.method').find('input[type=radio]').is(':checked')) {
+                    return true;
+                }
                 if (!$('easycredit-checkout').prop('isActive')
                     || $('easycredit-checkout').prop('paymentPlan') !== ''
                     || $('easycredit-checkout').prop('alert') !== ''
