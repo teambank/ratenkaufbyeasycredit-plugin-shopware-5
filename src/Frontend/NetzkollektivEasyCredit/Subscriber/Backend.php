@@ -104,12 +104,15 @@ class Backend implements SubscriberInterface
 
         if ($request->getActionName() == 'load') {
             $this->migrateConfigField();
-            $this->bootstrap->updateSpecialFieldTypes();
-            $this->bootstrap->registerTemplateDir();
-            if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_Config' ) {
-                $view->extendsTemplate('backend/easycredit_config/helper/easycredit_intro.js');
-            } else if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' ) {
-                $view->extendsTemplate('backend/plugin_manager/helper/easycredit_intro.js');
+
+            if ($this->helper->getPlugin()->assertMinimumVersion('5.0.0')) {
+                $this->bootstrap->updateSpecialFieldTypes();
+                $this->bootstrap->registerTemplateDir();
+                if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_Config' ) {
+                    $view->extendsTemplate('backend/easycredit_config/helper/easycredit_intro.js');
+                } else if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' ) {
+                    $view->extendsTemplate('backend/plugin_manager/helper/easycredit_intro.js');
+                }
             }
         }
     }

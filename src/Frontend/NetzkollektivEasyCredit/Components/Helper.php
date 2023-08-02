@@ -39,8 +39,9 @@ class EasyCredit_Helper
         if (Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('s'.$var)) {
             return Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('s'.$var);
         }
-        if (isset(Shopware()->Session()->offsetGet('sOrderVariables')['s'.$var])) {
-            return Shopware()->Session()->offsetGet('sOrderVariables')['s'.$var];
+        $orderVariables = Shopware()->Session()->offsetGet('sOrderVariables');
+        if (isset($orderVariables['s'.$var])) {
+            return $orderVariables['s'.$var];
         }
         return Shopware()->Modules()->{$module}()->{'sGet'.$var}();
     }
