@@ -30,9 +30,10 @@
                         .attr('action', me.opts.url)
                         .hide();
 
-                    if ($('form[name=sAddToBasket]').length > 0) {
+                    var addToBasketForm = $(this).closest('form[name=sAddToBasket]');
+                    if (addToBasketForm.length > 0) {
                         form.attr('method','post');
-                        var formData = new FormData($('form[name=sAddToBasket]').get(0));
+                        var formData = new FormData(addToBasketForm.get(0));
 
                         for (var key of formData.keys()) {
                             form.append($('<input>').attr('name',key).attr('value', formData.get(key)));
@@ -59,6 +60,9 @@
     });
 
     $.subscribe('plugin/swInfiniteScrolling/onLoadPreviousFinished', function() {
+        window.StateManager.addPlugin('.easycredit-express-button-container', 'easycreditExpressButton');
+    });
+    $.subscribe('plugin/swResponsive/onCartRefreshSuccess', function() {
         window.StateManager.addPlugin('.easycredit-express-button-container', 'easycreditExpressButton');
     });
     $.subscribe('plugin/swCollapseCart/onLoadCartFinished', function() {
