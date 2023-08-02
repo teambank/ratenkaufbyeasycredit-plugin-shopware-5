@@ -8,89 +8,25 @@ class ItemBuilder
 
     private $categoryId;
     private $articleId;
-    private $manufacturer;
 
-    private $name;
-    private $qty;
-    private $price;
     private $categoryName;
-    private $sku;
 
     public function __construct($shopwareItem)
     {
-
         $this->db = Shopware()->Db();
-        $this->rawItem = $shopwareItem;
-
-        $this->name = $this->rawItem['articlename'];
-        $this->qty = $this->rawItem['quantity'];
-
-        $this->price = (isset($this->rawItem['additional_details']['price_numeric'])) ?
-            $this->rawItem['additional_details']['price_numeric']
-          : $this->rawItem['priceNumeric'];
-
-        $this->manufacturer = $this->rawItem['additional_details']['supplierName'];
-        $this->sku = $this->rawItem['id'];
-
-        $this->articleId = $this->rawItem['articleID'];
-        $this->loadCategory();
+        $this->product = $shopwareItem;
     }
 
-    private function getCategoryId() {
-        $query = 'SELECT categoryID from s_articles_categories WHERE articleID = ?';
+    private function getCategoryName() {
+		if ($this->categoryName === null) {
+            $query = 'SELECT description FROM s_categories c
+                INNER JOIN s_articles_categories ac ON ac.categoryID = c.id WHERE articleID = ?'; 
 
-        $categoryId = $this->db->fetchOne(
-            $query,
-            array($this->articleId)
-        );
-
-        return $categoryId;
-    }
-
-    private function getCategoryDescriptions() {
-        $query = 'SELECT description FROM s_categories WHERE id = ?';
-
-        $categoryDescription = $this->db->fetchOne(
-            $query,
-            array($this->categoryId)
-        );
-
-        return $categoryDescription;
-    }
-
-    private function loadCategory() {
-        $this->categoryId = $this->getCategoryId();
-
-        if (!$this->categoryId) {
-            $this->categoryName = '';
-            return;
+            $this->categoryName = $this->db->fetchOne(
+                $query,
+                array($this->product['articleID'])
+            );
         }
-
-        $this->categoryName = $this->getCategoryDescriptions();
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getQty()
-    {
-        return $this->qty;
-    }
-
-    public function getPrice()
-    {
-        return $this->price;
-    }
-
-    public function getManufacturer()
-    {
-        return $this->manufacturer;
-    }
-
-    public function getCategory()
-    {
         return $this->categoryName;
     }
 
@@ -98,12 +34,12 @@ class ItemBuilder
     {
         $skus = array();
         foreach (array('articleID','ordernumber','ean','suppliernumber') as $key) {
-            if (!isset($this->rawItem[$key]) || $this->rawItem[$key] === '') {
+            if (!isset($this->product[$key]) || $this->product[$key] === '') {
                 continue;
             }
             $skus[] = new \Teambank\RatenkaufByEasyCreditApiV3\Model\ArticleNumberItem([
                 'numberType' => $key,
-                'number' => $this->rawItem[$key]
+                'number' => $this->product[$key]
             ]);
         }
         return $skus;
@@ -111,11 +47,19 @@ class ItemBuilder
 
     public function build() {
         return new \Teambank\RatenkaufByEasyCreditApiV3\Model\ShoppingCartInformationItem([
-            'productName' => $this->getName(),
-            'quantity' => $this->getQty(),
-            'price' => $this->getPrice(),
-            'manufacturer' => $this->getManufacturer(),
-            'productCategory' => $this->getCategory(),
+            'productName' => $this->product['articlename'],
+            'productUrl' => $url = Shopware()->Front()->Router()->assemble([
+                'module' => 'frontend',
+                'controller' => 'detail',
+                'sArticle' => $this->product['articleID'],
+            ]),
+            'productImageUrl' => $this->product['image']['source'], 
+            'quantity' => $this->product['quantity'],
+            'price' => (isset($this->product['additional_details']['price_numeric'])) ?
+                $this->product['additional_details']['price_numeric']
+              : $this->product['priceNumeric'],
+            'manufacturer' => $this->product['additional_details']['supplierName'],
+            'productCategory' => $this->getCategoryName(),
             'articleNumber' => $this->getSkus()
         ]);      
     }
