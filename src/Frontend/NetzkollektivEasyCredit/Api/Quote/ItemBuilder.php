@@ -4,10 +4,8 @@ namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 class ItemBuilder
 {
     private $db;
-    private $rawItem;
 
-    private $categoryId;
-    private $articleId;
+    private $product;
 
     private $categoryName;
 

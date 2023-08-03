@@ -59,8 +59,11 @@ class QuoteBuilder {
 
     public function getGrandTotal() {
         if ($this->grandTotal === null) {
-            /** @var Shopware_Controllers_Frontend_Checkout $checkoutController */
-            $basket = (new FakeCheckoutController())->setFront(Shopware()->Front())->getBasket();
+            /** @var \Shopware_Controllers_Frontend_Checkout $checkoutController */
+            $checkoutController = new FakeCheckoutController();
+            $checkoutController->setFront(Shopware()->Front());
+            
+            $basket = $checkoutController->getBasket();
             $this->grandTotal = empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
         }
         return $this->grandTotal;
