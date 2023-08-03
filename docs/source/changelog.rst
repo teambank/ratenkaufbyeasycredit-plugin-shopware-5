@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v2.1.7
+------
+
+* Verbesserung der Kompatibilität mit Drittanbieter-Plugin
+* Fehlermeldungen werden nun, wenn verfügbar, in deutscher Sprache ausgegeben
+* bei Ratenkauf-Initialisierung wird die Produkt-URL und die URL des Hauptbildes übertragen
+* der Betrag bei Express Checkout wird nun versionsübergreifend inkl. Zahlungsartenaufschlag berechnet
+* die Bestellnummer / Session-ID wird nun bei Überlänge abgeschnitten
+* das Debug-Logging funktioniert nun auch mit älteren Shopware-Versionen
+
 v2.1.6
 ------
 
