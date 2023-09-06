@@ -137,7 +137,16 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         $this->helper->getPlugin()->addInterest();
-        $this->redirectCheckoutConfirm();
+
+        if ($this->getPlugin()->isResponsive()) {
+            $this->redirectCheckoutConfirm();
+        } else {
+            // Fake Post Request to save payment (Emotion)
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $_POST['register']['payment'] = $this->getPlugin()->getPayment()->getId();
+            $_GET['sTarget'] = 'checkout';
+            $this->forward('savePayment','account');
+        }
     }
 
     public function createOrder($transaction) {
@@ -308,10 +317,26 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         );
     }
 
+    public function getPlugin() {
+        return Shopware()->Plugins()->Frontend()->NetzkollektivEasyCredit();
+    }
+
     protected function _redirToPaymentSelection() {
-        $this->redirect(array(
-            'controller'=>'checkout',
-            'action'=>'shippingPayment'
-        ));
+        if ($this->getPlugin()->isResponsive()) {
+
+            $this->redirect(array(
+                'controller'=>'checkout',
+                'action'=>'shippingPayment'
+            ));
+
+        } else {
+
+            $this->redirect(array(
+                'controller'=>'account',
+                'action' => 'payment',
+                'sTarget' => 'checkout'
+            ));
+
+        }
     }
 }
