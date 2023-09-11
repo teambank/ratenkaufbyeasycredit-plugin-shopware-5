@@ -17,7 +17,10 @@ class EasyCredit_FlexpriceService
     public function __construct () {
         $this->helper = new EasyCredit_Helper();
         $this->db = Shopware()->Db();
-        $this->crudService = $this->helper->getContainer()->get('shopware_attribute.crud_service');
+        
+        if ($this->helper->getContainer()->has('shopware_attribute.crud_service')) {
+            $this->crudService = $this->helper->getContainer()->get('shopware_attribute.crud_service');
+        }
     }
 
     public function updateConfiguration() {
@@ -77,6 +80,9 @@ class EasyCredit_FlexpriceService
     }
 
     public function shouldDisableFlexprice($items = null) {
+        if ($this->crudService === null) {
+            return;
+        }
         if (!$this->getArticleAttribute() && !$this->getCategoryAttribute()) {
             return;
         }

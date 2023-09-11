@@ -28,14 +28,20 @@ class Backend implements SubscriberInterface
         );
     }
 
-    public function afterOrderSave(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function afterOrderSave($args) {
         if ($args->getSubject()->Request()->getActionName() != 'save') {
             return;
         }
         $this->handleMerchantStatusChangedError($args);
     }
 
-    public function handleMerchantStatusChangedError(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function handleMerchantStatusChangedError($args) {
         $key = 'easycreditMerchantStatusChangedError';
         if ($GLOBALS[$key]) {
 
@@ -50,7 +56,10 @@ class Backend implements SubscriberInterface
         }
     }
 
-    public function preventShippingAddressChange(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function preventShippingAddressChange($args) {
         $_this = $args->get('subject');
 
         $postData = $_this->Request()->getParams();
@@ -92,7 +101,10 @@ class Backend implements SubscriberInterface
         }
     }
 
-    public function addConfigFields(\Enlight_Event_EventArgs $args)
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function addConfigFields($args)
     {
         $event = $args->getName();
 
@@ -105,7 +117,7 @@ class Backend implements SubscriberInterface
         if ($request->getActionName() == 'load') {
             $this->migrateConfigField();
 
-            if ($this->helper->getPlugin()->assertMinimumVersion('5.0.0')) {
+            if (is_callable($this->helper->getPlugin(),'assertMinimumVersion') && $this->helper->getPlugin()->assertMinimumVersion('5.0.0')) {
                 $this->bootstrap->updateSpecialFieldTypes();
                 $this->bootstrap->registerTemplateDir();
                 if ( $event == 'Enlight_Controller_Action_PostDispatchSecure_Backend_Config' ) {
@@ -156,7 +168,10 @@ class Backend implements SubscriberInterface
         $view->extendsTemplate('backend/index/backend-easycredit.tpl');
     }
 
-    public function onGetControllerPathPaymentEasycredit(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function onGetControllerPathPaymentEasycredit($args) {
         return $this->helper->getPlugin()->Path() . 'Controllers/Backend/PaymentEasycredit.php';
     }
 }

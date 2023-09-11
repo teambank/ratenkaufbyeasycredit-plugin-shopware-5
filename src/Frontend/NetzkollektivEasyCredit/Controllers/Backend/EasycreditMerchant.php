@@ -60,8 +60,9 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
 
     /**
      * {@inheritdoc}
+     * @param mixed[] $wholeParams
      */
-    protected function getList($offset, $limit, $sort = [], $filter = [], array $wholeParams = [])
+    protected function getList($offset, $limit, $sort = [], $filter = [], $wholeParams = [])
     {
         //Sets the initial sort to orderTime descending
         if (!$sort) {
@@ -153,6 +154,8 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
             $this->respondWithJson($e->getResponseBody(), $e->getCode());
         } catch (\Throwable $e) {
             return $this->respondWithJson(['error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return $this->respondWithJson(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -177,6 +180,8 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
         } catch (ApiException $e) {
             return $this->respondWithJson($e->getResponseBody(), $e->getCode());
         } catch (\Throwable $e) {
+            return $this->respondWithJson(['error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {
             return $this->respondWithJson(['error' => $e->getMessage()], 500);
         }
     }

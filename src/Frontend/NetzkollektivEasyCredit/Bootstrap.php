@@ -179,7 +179,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         ));
     }
 
-    public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function onDispatchLoopStartup($args) {
         $modelEventManager = Shopware()->Container()->get('models')->getConnection()->getEventManager();
         $modelEventManager->addEventSubscriber(new Subscriber\OrderShipped());
         $modelEventManager->addEventSubscriber(new Subscriber\OrderRefunded());
@@ -187,6 +190,10 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->get('events')->addSubscriber(new Subscriber\Frontend($this));
         $this->get('events')->addSubscriber(new Subscriber\Backend($this));
         $this->get('events')->addSubscriber(new Subscriber\BackendMerchant($this));
+
+        if (Shopware()->Container()->has('shop') && !$this->isResponsive()) {
+            $this->get('events')->addSubscriber(new Subscriber\FrontendEmotion($this));
+        }
     }
 
     protected function getClient () {

@@ -16,7 +16,10 @@ class OrderShipped extends OrderStatusChanged
         return 'easycreditMarkShipped';
     }
     
-    public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
+    /**
+     * @param \Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs
+     */
+    public function _onOrderStatusChanged($eventArgs) {
         try {
             try {
                 $order = $eventArgs->getEntity();

@@ -21,7 +21,14 @@ class AddressBuilder {
     }
 
     public function getStreet() {
-        return trim($this->_address['street'].' '.$this->_address['street_number']);
+        $streetNumber = '';
+        if (isset($this->_address['streetnumber'])) { // SW4
+            $streetNumber = $this->_address['streetnumber']; 
+        }
+        if (isset($this->_address['street_number'])) {
+            $streetNumber = $this->_address['street_number'];
+        }
+        return trim($this->_address['street'].' '.$streetNumber);
     }
 
     public function getStreetAdditional() {

@@ -106,6 +106,10 @@ class QuoteBuilder {
     {
         $_items = [];
         foreach ($items as $item) {
+            if ($item['ordernumber'] === 'sw-payment-ec-interest') {
+                continue;
+            }
+
             $itemBuilder = new Quote\ItemBuilder($item);
             $quoteItem = $itemBuilder->build();
             if ($quoteItem->getPrice() <= 0) {
@@ -154,13 +158,16 @@ class QuoteBuilder {
         return $this->storage->get('express');
     }
 
-    public function build(): Transaction {
+    /**
+     * @return \Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction
+     */
+    public function build() {
         return new Transaction([
             'financingTerm' => $this->getDuration(),
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
                 'orderId' => $this->getId(),
-                'numberOfProductsInShoppingCart' => 1,
+                'numberOfProductsInShoppingCart' => count($this->getItems()),
                 'invoiceAddress' => $this->isExpress() ? null : $this->getInvoiceAddress(),
                 'shippingAddress' => $this->isExpress() ? null : $this->getShippingAddress(),
                 'shoppingCartInformation' => $this->getItems(),

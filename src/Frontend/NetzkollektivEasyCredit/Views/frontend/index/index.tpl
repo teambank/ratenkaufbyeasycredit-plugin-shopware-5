@@ -14,8 +14,8 @@
     <meta name="easycredit-disable-flexprice" content="true" />
     {/if}
 
-    <script type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"></script>
-    <script nomodule src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.js"></script>
+    <script type="module" src="https://easycredit-ratenkauf-webcomponents.netzkollektiv.com/easycredit-components/easycredit-components.esm.js"></script>
+    <script nomodule src="https://easycredit-ratenkauf-webcomponents.netzkollektiv.com/easycredit-components/easycredit-components.js"></script>
 
 {/block}
 

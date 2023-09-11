@@ -3,11 +3,8 @@ use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Shopware\Models\Customer\Customer;
-use Shopware\Models\Customer\Address;
-use Shopware\Bundle\AccountBundle\Form\Account\AddressFormType;
-use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
 
-class EasyCredit_CustomerService
+class EasyCredit_CustomerServiceEmotion
 {
     protected $helper;
 
@@ -19,18 +16,10 @@ class EasyCredit_CustomerService
 
     protected $registerService;
 
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
     public function __construct() {
         $this->helper = new EasyCredit_Helper();
         $this->swConfig = $this->helper->getContainer()->get('config');
         $this->connection = $this->helper->getEntityManager()->getConnection();
-        $this->formFactory = $this->helper->getContainer()->get('shopware.form.factory');
-        $this->contextService = $this->helper->getContainer()->get('shopware_storefront.context_service');
-        $this->registerService = $this->helper->getContainer()->get('shopware_account.register_service');
     }
 
     /**
@@ -42,12 +31,20 @@ class EasyCredit_CustomerService
         $contact = $customer->getContact();
         $address = $transaction->getTransaction()->getOrderDetails()->getShippingAddress();
 
-        $countryId = $this->getCountryId($address->getCountry());
+        $countryData = $this->getCountryData($address->getCountry());
 
         $customerModel = $this->registerCustomer([
-            'email' => $contact->getEmail(),
-            'password' => null,
-            'accountmode' => 1,
+            "auth" => array(
+                "password" => md5(uniqid(rand())),
+                "email" => $contact->getEmail(),
+                "accountmode" => 1,
+                "encoderName" => "md5"
+            ),
+            "payment" => array(
+                "object" => array(
+                    "id" => $this->helper->getPayment()->getId()
+                )
+            ),
             'salutation' => $this->getSalutation($customer->getGender()),
             'firstname' => $address->getFirstname(),
             'lastname' => $address->getLastname(),
@@ -55,8 +52,8 @@ class EasyCredit_CustomerService
             'additionalAddressLine1' => null,
             'zipcode' => $address->getZip(),
             'city' => $address->getCity(),
-            'country' => $countryId,
-            'state' => null,
+            'country' => $countryData['id'],
+            'state' => $countryData['areaID'],
             'phone' => $contact->getMobilePhoneNumber(),
         ]);
         return $customerModel;
@@ -67,40 +64,32 @@ class EasyCredit_CustomerService
      */
     private function registerCustomer(array $customerData)
     {
-        $customer = new Customer();
-        $personalForm = $this->formFactory->create(PersonalFormType::class, $customer);
-        $personalForm->submit($customerData);
+        $userId = $this->helper->getModule('admin')->sSaveRegisterMainData($customerData);
 
-        $customer->setPaymentId($this->helper->getPayment()->getId());
+        $billingData = array('billing' => $customerData);
+        if (preg_match('/^([\S\s]+?)\s+([\d\-\s]*?\s*[\w])?$/', $customerData['street'], $matches)) {
+            $billingData['billing']['street'] = $matches[1];
+            $billingData['billing']['streetnumber'] = $matches[2];
+        }
+        $this->helper->getModule('admin')->sSaveRegisterBilling($userId, $billingData);
 
-        $address = new Address();
-        $addressForm = $this->formFactory->create(AddressFormType::class, $address);
-        $addressForm->submit($customerData);
-
-        $context = $this->contextService->getShopContext();
-        $shop = $context->getShop();
-
-        $this->registerService->register($shop, $customer, $address);
-
-        return $customer;
+        return $customerData;
     }
 
-    /**
-     * @param \Shopware\Models\Customer\Customer $customerModel
-     */
-    public function loginCustomer($customerModel)
+    public function loginCustomer($customerData)
     {
         $request = $this->helper->getContainer()->get('front')->Request();
-        $request->setPost('email', $customerModel->getEmail());
-        $request->setPost('passwordMD5', $customerModel->getPassword());
+        $request->setPost('email', $customerData['auth']['email']);
+        $request->setPost('passwordMD5', $customerData['auth']['password']);
         $this->helper->getModule('admin')->sLogin(true);
 
         // Set country and area to session, so the cart will be calculated correctly,
         // e.g. the country changed and has different taxes
         $session = $this->helper->getSession();
-        $customerShippingCountry = $customerModel->getDefaultShippingAddress()->getCountry();
-        $session->offsetSet('sCountry', $customerShippingCountry->getId());
-        $session->offsetSet('sArea', $customerShippingCountry->getArea()->getId());
+        $session->offsetSet('sRegister', $customerData);
+        $session->offsetSet('sRegisterFinished', true);
+        $session->offsetSet('sCountry', $customerData['country']);
+        $session->offsetSet('sArea', $customerData['state']);
     }
 
 
@@ -129,11 +118,11 @@ class EasyCredit_CustomerService
     /**
      * @param string $countryCode
      *
-     * @return int
+     * @return array
      */
-    private function getCountryId($countryCode)
+    private function getCountryData($countryCode)
     {
-        $sql = 'SELECT id FROM s_core_countries WHERE countryiso=:countryCode';
-        return (int) $this->connection->fetchColumn($sql, ['countryCode' => $countryCode]);
+        $sql = 'SELECT id, areaID FROM s_core_countries WHERE countryiso=:countryCode';
+        return current($this->connection->fetchAll($sql, ['countryCode' => $countryCode]));
     }
 }

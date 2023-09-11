@@ -16,7 +16,10 @@ class OrderRefunded extends OrderStatusChanged
         return 'easycreditMarkRefunded';
     }
 
-    public function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs) {
+    /**
+     * @param \Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs
+     */
+    public function _onOrderStatusChanged($eventArgs) {
 
         try {
             try {

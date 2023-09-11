@@ -23,7 +23,10 @@ abstract class OrderStatusChanged implements EventSubscriber
         $GLOBALS['easycreditMerchantStatusChangedError'] = $error;
     }
 
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    /**
+     * @param \Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs
+     */
+    public function preUpdate($eventArgs)
     {
         $order = $eventArgs->getEntity();
         if (!($order instanceof Order)
@@ -42,7 +45,10 @@ abstract class OrderStatusChanged implements EventSubscriber
         }
     }
 
-    abstract protected function _onOrderStatusChanged(PreUpdateEventArgs $eventArgs);
+    /**
+     * @param \Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs
+     */
+    abstract protected function _onOrderStatusChanged($eventArgs);
 
     protected function config($key) {
         return $this->get('config')->getByNamespace('NetzkollektivEasyCredit', $key);

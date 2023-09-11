@@ -131,9 +131,14 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         }
 
         if ($this->helper->getPlugin()->getStorage()->get('express')) {
-            $customerService = new EasyCredit_CustomerService();
+            $customerService = $this->getPlugin()->isResponsive() ? new EasyCredit_CustomerService() : new EasyCredit_CustomerServiceEmotion();
             $customer = $customerService->createCustomer($transaction);
             $customerService->loginCustomer($customer);
+
+            $this->helper->getPlugin()->getStorage()->set('express', false);
+            $checkout->finalizeExpress(
+                $this->helper->getPlugin()->getQuote()
+            );
         }
 
         $this->helper->getPlugin()->addInterest();
@@ -147,14 +152,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $_GET['sTarget'] = 'checkout';
             $this->forward('savePayment','account');
         }
-    }
-
-    public function createOrder($transaction) {
-
-
-        $customerService = new EasyCredit_CustomerService();
-        $customerService->createCustomer($transaction);
-
     }
 
     public function cancelAction() {

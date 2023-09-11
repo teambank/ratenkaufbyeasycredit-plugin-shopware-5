@@ -47,10 +47,8 @@ class Frontend implements SubscriberInterface
     public static function getSubscribedEvents() {
         return array(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentEasycredit'   => 'onGetControllerPathFrontend',
-            'Enlight_Controller_Action_Frontend_Account_SavePayment'                    => 'onSavePayment', // SW4
             'Enlight_Controller_Action_Frontend_Checkout_SaveShippingPayment'           => 'onSaveShippingPayment',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_PaymentEasycredit'   => 'onExpressCheckoutStart',
-            'Enlight_Controller_Action_PostDispatch_Frontend_Account'                   => 'onFrontendAccountPostDispatch', // SW4
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout'            => 'onFrontendCheckoutPostDispatch',
             'Enlight_Controller_Action_PostDispatchSecure_Frontend_Address'             => 'onFrontendAddressPostDispatch',
             'Shopware_Modules_Order_SaveOrder_FilterParams'                             => 'setEasycreditOrderStatus',
@@ -62,15 +60,24 @@ class Frontend implements SubscriberInterface
         );
     }
 
-    public function interceptRiskRuleMore(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function interceptRiskRuleMore($args) {
         return $this->interceptRiskRule($args, '>=');
     }
 
-    public function interceptRiskRuleLess(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function interceptRiskRuleLess($args) {
         return $this->interceptRiskRule($args, '<=');
     }
 
-    public function interceptRiskRule(\Enlight_Event_EventArgs $args, $operator) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function interceptRiskRule($args, $operator) {
         if ($args->get('paymentID') != $this->helper->getPayment()->getId()) { // explicitely not !==, paymentId can be string
             return null;
         }
@@ -91,7 +98,10 @@ class Frontend implements SubscriberInterface
         }
     }
 
-    public function sInsertSurchargePercent(\Enlight_Hook_HookArgs $arguments) {
+    /**
+     * @param \Enlight_Hook_HookArgs $arguments
+     */
+    public function sInsertSurchargePercent($arguments) {
 
         // remove interest from basket, so that the surcharge is not calculated based on amount including interest
 
@@ -110,7 +120,10 @@ class Frontend implements SubscriberInterface
         
     }
 
-    public function onOrderSave(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function onOrderSave($args) {
 
         $orderVariables = $args->get('variables');
         if (!isset($orderVariables['additional']['payment']['name'])
@@ -178,7 +191,10 @@ class Frontend implements SubscriberInterface
         return $this->helper->getPlugin()->Path() . 'Controllers/Frontend/PaymentEasycredit.php';
     }
 
-    public function addEasyCreditModelWidget(\Enlight_Event_EventArgs $arguments) {
+    /**
+     * @param \Enlight_Event_EventArgs $arguments
+     */
+    public function addEasyCreditModelWidget($arguments) {
         $action = $arguments->getSubject();
 
         $request = $action->Request();
@@ -207,7 +223,6 @@ class Frontend implements SubscriberInterface
         if (!$this->getPlugin()->isResponsive()) {
             $view->extendsTemplate('frontend/index/index_pp.tpl');
         }
-        $view->assign('EasyCreditShopwareLt53', version_compare(\Shopware::VERSION, '5.3.0', '<'));
 
         $isEasyCreditAllowed = !$sAdmin->sManageRisks($paymentId, $this->helper->getBasket(), $this->helper->getUser() ?: []);
 
@@ -248,7 +263,10 @@ class Frontend implements SubscriberInterface
         }
     }
 
-    public function setEasycreditOrderStatus(\Enlight_Event_EventArgs $arguments) {
+    /**
+     * @param \Enlight_Event_EventArgs $arguments
+     */
+    public function setEasycreditOrderStatus($arguments) {
         $orderParams = $arguments->getReturn();
         $newOrderState = $this->config->get('easycreditOrderStatus');
 
@@ -276,46 +294,12 @@ class Frontend implements SubscriberInterface
         return $orderParams;
     }
 
-
     /**
-     * Handle redirect to payment terminal, Emotion Template only
+     * Handle redirect to payment terminal
+     * Responsive
      * @param \Enlight_Event_EventArgs $arguments
      */
-    public function onSavePayment(\Enlight_Event_EventArgs $arguments) {
-        if ($this->getPlugin()->isResponsive()) {
-            return;
-        } 
-
-        $action = $arguments->getSubject();
-        $request = $action->Request();
-        $view = $action->View();
-        if (!$request->isPost()) {
-            return;
-        }
-
-        $values = $request->getPost('register');
-        $paymentId = $values['payment'];
-
-        if (!$this->getPlugin()->isSelected($paymentId)) {
-            $this->getPlugin()->clear();
-            return;
-        }
-
-        $agreementChecked = $request->getParam('sEasycreditAgreement');
-        if (empty($agreementChecked)) {
-            return;
-        }
-
-        if ($request->getParam('sTarget') !== 'checkout') {
-            return;
-        }
-        return $this->_handleRedirect($paymentId, $action);
-    }
-
-    /**
-     * Handle redirect to payment terminal, Responsive only
-     */
-    public function onSaveShippingPayment(\Enlight_Event_EventArgs $arguments)
+    public function onSaveShippingPayment($arguments)
     {
         if (!$this->getPlugin()->isResponsive()) {
             return;
@@ -351,7 +335,10 @@ class Frontend implements SubscriberInterface
         return $this->_handleRedirect($action);
     }
 
-    public function onExpressCheckoutStart(\Enlight_Event_EventArgs $arguments) {
+    /**
+     * @param \Enlight_Event_EventArgs $arguments
+     */
+    public function onExpressCheckoutStart($arguments) {
         $action = $arguments->getSubject();
         $request = $action->Request();
 
@@ -403,37 +390,15 @@ class Frontend implements SubscriberInterface
     }
 
     /**
-     * Add legal text, agreement & amount logic to payment selection, Emotion only
+     * Checkout related modifications
      * @param \Enlight_Event_EventArgs $arguments
      */
-    public function onFrontendAccountPostDispatch(\Enlight_Event_EventArgs $arguments) {
-        if ($this->getPlugin()->isResponsive()) {
+    public function onFrontendCheckoutPostDispatch($arguments)
+    {
+        if (!$this->getPlugin()->isResponsive()) {
             return;
         }
 
-        $action = $arguments->getSubject();
-        $request = $action->Request();
-        $view = $action->View();
-
-        $this->_registerTemplateDir();
-
-        switch ($request->getActionName()) {
-            case 'payment':
-
-                if ($error = $this->_displayError($action)) {
-                    $view->sErrorFlag = 1;
-                    $view->sErrorMessages = $error;
-                }
-                $this->_extendPaymentTemplate($action, $view);
-                break;
-        }
-    }
-
-    /**
-     * Checkout related modifications, both templates
-     */
-    public function onFrontendCheckoutPostDispatch(\Enlight_Event_EventArgs $arguments)
-    {
         $action = $arguments->getSubject();
         $request = $action->Request();
         $view = $action->View();
@@ -446,7 +411,7 @@ class Frontend implements SubscriberInterface
                     return;
                 }
 
-                $this->_onCheckoutConfirm($view, $action);
+                $this->onCheckoutConfirm($action, $view);
                 $this->_extendConfirmTemplate($view);
                 break;
 
@@ -457,10 +422,6 @@ class Frontend implements SubscriberInterface
                 break;
 
             case 'shippingPayment':
-                if (!$this->getPlugin()->isResponsive()) {
-                    return;
-                }
-
                 if ($error = $this->_displayError($action)) {
                     $view->assign('sBasketInfo', $error);
                 }
@@ -482,7 +443,6 @@ class Frontend implements SubscriberInterface
                     $this->_getUrl('return'),
                     $this->_getUrl('reject')
                 );
-
                 return $checkout->getRedirectUrl();
             } catch (ConnectException $e) {
                 $this->container->get('pluginlogger')->error($e->getMessage());
@@ -532,6 +492,7 @@ class Frontend implements SubscriberInterface
 
         try {
             $this->helper->getPlugin()->getStorage()->set('express', false);
+
             $checkout->isAvailable(
                 $this->helper->getPlugin()->getQuote()
             );
@@ -560,7 +521,10 @@ class Frontend implements SubscriberInterface
         }
     }
 
-    public function onFrontendAddressPostDispatch(\Enlight_Event_EventArgs $args) {
+    /**
+     * @param \Enlight_Event_EventArgs $args
+     */
+    public function onFrontendAddressPostDispatch($args) {
         $action = $args->getSubject();
         $request = $action->Request();
         $view = $action->View();
@@ -603,7 +567,7 @@ class Frontend implements SubscriberInterface
         }
     }
 
-    protected function _onCheckoutConfirm($view, $action) {
+    protected function onCheckoutConfirm($action, $view) {
         if (!is_null($this->helper->getPluginSession()["apiError"])
             || !is_null($this->helper->getPluginSession()["addressError"])
         ) {
@@ -642,9 +606,8 @@ class Frontend implements SubscriberInterface
             ));
         } else {
             $action->redirect(array(
-                'controller' => 'account',
-                'action' => 'payment',
-                'sTarget'=>'checkout'
+                'controller' => 'checkout',
+                'action' => 'confirm'
             ));
         }
     }
@@ -658,11 +621,7 @@ class Frontend implements SubscriberInterface
     }
 
     protected function _extendConfirmTemplate($view) {
-        if (!$this->getPlugin()->isResponsive()) {
-            $view->extendsTemplate('frontend/checkout/confirm_easycredit.tpl');
-        }
         $view
-            ->assign('EasyCreditThemeVersion',Shopware()->Shop()->getTemplate()->getVersion())
             ->assign('EasyCreditPaymentPlan', $this->getPaymentPlan())
             ->assign('EasyCreditDisableAddressChange', true);
     }
@@ -677,7 +636,7 @@ class Frontend implements SubscriberInterface
         $template->addTemplateDir($this->helper->getPlugin()->Path() . $viewDir.'/');
 
         if (!$this->getPlugin()->isResponsive()) {
-            $template->addTemplateDir($this->helper->getPlugin()->Path() . 'Views/emotion/');
+            $template->addTemplateDir($this->helper->getPlugin()->Path() . 'ViewsEmotion/');
         }
     }
 
