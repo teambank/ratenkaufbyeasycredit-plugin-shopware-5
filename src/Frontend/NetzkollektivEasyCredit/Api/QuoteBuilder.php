@@ -33,7 +33,7 @@ class QuoteBuilder {
     }
 
     public function getId() {
-        return \mb_substr(Shopware()->Session()->get('sessionId'), 0, 50);
+        return \mb_substr(Shopware()->Session()->offsetGet('sessionId'), 0, 50);
     }
 
     public function getShippingMethod() {

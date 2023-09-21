@@ -39,8 +39,8 @@ jQuery(function($) {
 
     var handleShippingPaymentConfirm = function () {
         onHydrated('easycredit-checkout', function (easyCreditCheckout) {
-            $(easyCreditCheckout, 'form.payment').submit(function(e){
-                var form = $('form.payment')
+            $(easyCreditCheckout, "form.payment[action*='savePayment']").submit(function(e){
+                var form = $("form.payment[action*='savePayment']")
                 form.append('<input type="hidden" name="easycredit[submit]" value="1" />')
                 if (e.detail && e.detail.numberOfInstallments) {
                     form.append('<input type="hidden" name="easycredit[number-of-installments]" value="'+ e.detail.numberOfInstallments +'" />')

@@ -558,7 +558,7 @@ class Frontend implements SubscriberInterface
                 }
                 Shopware()->Session()->offsetSet('EasyCredit', $data);
 
-                $data = Shopware()->Session()->get('sOrderVariables')['sUserData'];
+                $data = Shopware()->Session()->offsetGet('sOrderVariables')['sUserData'];
                 if (isset($data['sUserData'])) {
                     unset($data['sUserData']);
                 }

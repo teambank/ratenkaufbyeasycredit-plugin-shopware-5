@@ -27,7 +27,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getVersion()
     {
-        return '1.9.0';
+        return '1.9.1';
     }
 
     public function getInfo()
@@ -491,7 +491,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         Shopware()->Db()->delete(
             's_order_basket',
             array(
-                'sessionID = ?' => $session->get('sessionId'),
+                'sessionID = ?' => $session->offsetGet('sessionId'),
                 'ordernumber = ?' => self::INTEREST_ORDERNUM
             )
         );

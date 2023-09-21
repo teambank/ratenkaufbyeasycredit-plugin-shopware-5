@@ -146,7 +146,7 @@ class FrontendEmotion extends Frontend
         $checkout = $this->container->get('easyCreditCheckout');
 
         if (!$checkout->isInitialized()) {
-            $this->helper->getPlugin()->getStorage()->set('apiError', $this->helper->getPlugin()->getLabel(). ' wurde nicht initialisiert.');
+            $this->helper->getPlugin()->getStorage()->set('apiError', 'Bitte klicken Sie auf "Weiter zum Ratenkauf" um die Raten für Ihre Bestellung zu berechnen.');
             return $this->_redirToPaymentSelection($action);
         }
 

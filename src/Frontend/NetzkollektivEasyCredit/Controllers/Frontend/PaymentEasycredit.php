@@ -269,7 +269,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->container->get('db')->delete(
             's_order_basket',
             array(
-                'sessionID = ?' => $this->session->get('sessionId'),
+                'sessionID = ?' => $this->session->offsetGet('sessionId'),
                 'ordernumber = ?' => $interest_order_name
             )
         );
