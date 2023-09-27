@@ -24,6 +24,9 @@ class EasyCredit_FlexpriceService
     }
 
     public function updateConfiguration() {
+        if (!$this->crudService) {
+	    return;
+	}
 
         $container = $this->helper->getContainer();
 

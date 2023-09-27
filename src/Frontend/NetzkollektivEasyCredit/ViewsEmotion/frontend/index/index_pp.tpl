@@ -9,7 +9,9 @@
 {block name="frontend_detail_buy"}
     {$smarty.block.parent}
 
-    {include file='frontend/plugins/payment/easycredit/express-button.tpl'}
+    {if $EasyCreditExpressProduct}
+        {include file='frontend/plugins/payment/easycredit/express-button.tpl'}
+    {/if}
 {/block}
 
 {block name='frontend_detail_data_price_info'}
@@ -39,7 +41,9 @@
 {/block}
 
 {block name="frontend_checkout_cart_deliveryfree"}
-    {include file='frontend/plugins/payment/easycredit/express-button.tpl'}
+    {if $EasyCreditExpressCart}
+        {include file='frontend/plugins/payment/easycredit/express-button.tpl'}
+    {/if}
 
     {$smarty.block.parent}
 {/block}
