@@ -42,6 +42,9 @@ jQuery(function($) {
             $(easyCreditCheckout, "form.payment[action*='savePayment']").submit(function(e){
                 var form = $("form.payment[action*='savePayment']")
                 form.append('<input type="hidden" name="easycredit[submit]" value="1" />')
+                if (!e.detail) {
+                    e.detail = e.originalEvent.detail;
+                }
                 if (e.detail && e.detail.numberOfInstallments) {
                     form.append('<input type="hidden" name="easycredit[number-of-installments]" value="'+ e.detail.numberOfInstallments +'" />')
                 }

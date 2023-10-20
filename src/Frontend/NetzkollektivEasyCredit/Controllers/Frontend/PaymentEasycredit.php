@@ -155,7 +155,10 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     public function cancelAction() {
-        $this->_redirToPaymentSelection();
+        $this->redirect(array(
+            'controller'=>'checkout',
+            'action'=>'cart'
+        ));
     }
 
     public function rejectAction() {
