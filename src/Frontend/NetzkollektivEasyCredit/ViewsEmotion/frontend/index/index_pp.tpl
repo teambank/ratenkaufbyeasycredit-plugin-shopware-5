@@ -73,3 +73,50 @@
         {/if}
     {/block}
 {/block}
+
+{block name='frontend_checkout_confirm_left_payment_method'}
+
+    {if !$sRegisterFinished && $sPayment.name === 'easycredit'}
+        <form name="" method="POST" action="{url controller=account action=savePayment sTarget='checkout'}" class="payment">
+            <div id="easycredt-skip-link" class="payment-display row-padding content-border">
+                    <h2>{s name="ConfirmHeaderPayment" namespace="frontend/checkout/confirm_left"}{/s}</h2>
+                    <div class="row">
+                            <easycredit-checkout-label></easycredit-checkout-label>
+                            <p class="easycredit-info-description">
+                                <easycredit-checkout
+                                    webshop-id="{$EasyCreditApiKey}"
+                                    amount="500"
+                                    {if $EasyCreditPaymentPlan}payment-plan="{$EasyCreditPaymentPlan}"{/if}
+                                ></easycredit-checkout>
+                            </p>
+                    </div>
+
+                    {* Action buttons *}
+                    <div class="actions">
+                            <a href="{url controller=account action=payment sTarget=checkout}" class="button button-fullwidth">
+                                    {s name="ConfirmLinkChangePayment" namespace="frontend/checkout/confirm_left"}{/s}
+                            </a>
+                    </div>
+            </div>
+        </form>
+
+        {if !$EasyCreditPaymentPlan}
+        <script>
+        $('.basket-form').submit(function(e) {
+            e.preventDefault();
+
+            var url = location.href;
+            location.href = '#easycredt-skip-link';
+            history.replaceState(null,null,url);
+
+            {* open privacy acceptance modal *}
+            $('easycredit-checkout').get(0).dispatchEvent(new Event('openModal'));
+            return false;
+        });
+        </script>
+        {/if}
+    {else}
+        {$smarty.block.parent}
+    {/if}
+
+{/block}
