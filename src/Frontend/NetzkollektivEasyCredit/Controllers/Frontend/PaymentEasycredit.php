@@ -77,16 +77,21 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function indexAction()
     {
-        $transactionId = $this->helper->getPluginSession()["transaction_id"];
-        $paymentUniqueId = $this->createPaymentUniqueId();
-
-        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
-        $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
-
-        $this->saveOrderAttributes($orderId);
-
         try {
             $checkout = $this->container->get('easyCreditCheckout');
+
+	    if (!$checkout->isApproved()) {
+	        throw new \Exception('The transaction is not approved.');
+	    }
+
+	    $transactionId = $this->helper->getPluginSession()["transaction_id"];
+            $paymentUniqueId = $this->createPaymentUniqueId();
+
+            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
+            $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
+
+            $this->saveOrderAttributes($orderId);
+
             if (!$checkout->authorize($orderNumber)) {
                 throw new \Exception('The transaction could not be authorized.');
             }
