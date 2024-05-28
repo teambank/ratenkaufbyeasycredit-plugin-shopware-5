@@ -145,8 +145,7 @@ class QuoteBuilder {
         return new \Teambank\RatenkaufByEasyCreditApiV3\Model\RedirectLinks([
             'urlSuccess' => $this->_getUrl('return'),
             'urlCancellation' => $this->_getUrl('cancel'),
-            'urlDenial' => $this->_getUrl('reject'),
-            'urlAuthorizationCallback' =>  $this->_getUrl('authorize') . '?secToken='. $this->storage->get('sec_token')
+            'urlDenial' => $this->_getUrl('reject')
         ]);
     }
 

@@ -336,13 +336,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         if ($this->assertMinimumVersion('5.2.0')) {
             /** @var CrudService $service */
             $service = Shopware()->Container()->get('shopware_attribute.crud_service');
-            $service->update('s_order_attributes', 'easycredit_sectoken', 'varchar', [
-                'label' => 'easyCredit-Ratenkauf Sec Token',
-                'displayInBackend' => false,
-                'position' => 900,
-                'custom' => false,
-                'translatable' => false,
-            ]);
             $service->update('s_order_attributes', 'easycredit_token', 'varchar', [
                 'label' => 'easyCredit-Ratenkauf TransactionId (technical)',
                 'displayInBackend' => false,
@@ -351,14 +344,6 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 'translatable' => false,
             ]);
         } else {
-            $em->addAttribute(
-                's_order_attributes',
-                'easycredit',
-                'sectoken',
-                'varchar(255)',
-                true,
-                null
-            );
             $em->addAttribute(
                 's_order_attributes',
                 'easycredit',

@@ -63,18 +63,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         ]);
     }
 
-    public function getTransactionInfoBySecuredTransaction($transactionId, $secToken) {
-        $sql = '
-            SELECT temporaryID, easycredit_token FROM s_order o INNER JOIN s_order_attributes oa ON o.id = oa.orderID
-            WHERE o.transactionID=? AND oa.easycredit_sectoken = ?
-            AND o.status!=-1
-        ';
-        return Shopware()->Db()->fetchRow($sql, [
-            $transactionId,
-            $secToken,
-        ]);
-    }
-
     public function indexAction()
     {
         $transactionId = $this->helper->getPluginSession()["transaction_id"];
@@ -90,6 +78,17 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             if (!$checkout->authorize($orderNumber)) {
                 throw new \Exception('The transaction could not be authorized.');
             }
+
+            $tx = $checkout->loadTransaction();
+
+            if ($tx->getStatus() !== \Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
+                throw new \Exception('The transaction could not be authorized.');
+            }
+
+            $paymentStatusId = $this->helper->getPlugin()->Config()->get('easycreditPaymentStatus');
+
+            $this->savePaymentStatus($transactionId, $orderNumber, $paymentStatusId, false);
+            $this->setPaymentClearedDate($transactionId);
 
             $this->redirect(array(
                 'controller' => 'checkout',
@@ -141,11 +140,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
     }
 
     public function createOrder($transaction) {
-
-
         $customerService = new EasyCredit_CustomerService();
         $customerService->createCustomer($transaction);
-
     }
 
     public function cancelAction() {
@@ -154,33 +150,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function rejectAction() {
         $this->_redirToPaymentSelection();
-    }
-
-    public function authorizeAction()
-    {
-        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
-
-        $secToken = $this->Request()->getParam('secToken', null);
-        $transactionId = $this->Request()->getParam('transactionId', null);
-
-        $transactionInfo = $this->getTransactionInfoBySecuredTransaction($transactionId, $secToken);
-        if (!$transactionInfo) {
-            return $this->respondWithStatus('transaction could not be found', 404);
-        }
-
-        $checkout = $this->container->get('easyCreditCheckout');
-        $tx = $checkout->loadTransaction($transactionInfo['easycredit_token']);
-
-        if ($tx->getStatus() !== \Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
-            return $this->respondWithStatus('payment status of transaction not updated as transaction status is not AUTHORIZED', 409);
-        }
-
-        $paymentStatusId = $this->helper->getPlugin()->Config()->get('easycreditPaymentStatus');
-
-        $this->savePaymentStatus($transactionId, $transactionInfo['temporaryID'], $paymentStatusId, false);
-        $this->setPaymentClearedDate($transactionId);
-
-        return $this->respondWithStatus('payment status successfully set');
     }
 
     public function expressAction() {
@@ -292,7 +261,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         );
 
         if ($orderAttributeModel instanceof \Shopware\Models\Attribute\Order) {
-            $orderAttributeModel->setEasycreditSectoken($this->helper->getPluginSession()["sec_token"]);
             $orderAttributeModel->setEasycreditToken($this->helper->getPluginSession()["token"]);
             $this->em->persist($orderAttributeModel);
             $this->em->flush();
