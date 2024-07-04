@@ -22,7 +22,7 @@ class OrderShipped extends OrderStatusChanged
                 $order = $eventArgs->getEntity();
                 $txId = $order->getTransactionId();
                 if (empty($txId)) {
-                    throw new \Exception('Die zugehörige easyCredit-Ratenkauf Transaktion-ID dieser Bestellung ist nicht vorhanden.');
+                    throw new \Exception('Die zugehörige easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
                 }
 
                 $merchantClient = Shopware()->Container()->get('easyCreditMerchant');
@@ -33,7 +33,7 @@ class OrderShipped extends OrderStatusChanged
                     );
             } catch (ApiException $e) {
                 if ($e->getResponseObject() instanceof ConstraintViolation) {
-                    $error = 'easyCredit-Ratenkauf: ';
+                    $error = 'easyCredit: ';
                     foreach ($e->getResponseObject()->getViolations() as $violation) {
                         $error .= $violation->getMessage();
                     }

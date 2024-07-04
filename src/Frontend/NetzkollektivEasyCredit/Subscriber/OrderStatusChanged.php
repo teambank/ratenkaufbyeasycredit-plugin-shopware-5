@@ -25,16 +25,17 @@ abstract class OrderStatusChanged implements EventSubscriber
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
+        $helper = new \EasyCredit_Helper();
+
         $order = $eventArgs->getEntity();
         if (!($order instanceof Order)
             || !$eventArgs->hasChangedField('orderStatus')
             || $order->getPayment()->getId() == null
-            || !$this->get('plugins')->Frontend()->NetzkollektivEasyCredit()->isSelected($order->getPayment()->getId()) 
+            || !$helper->getPlugin()->isSelected($order->getPayment()->getId()) 
         ) {
             return;
         }
 
-        $orderStatus = $eventArgs->getNewValue('orderStatus')->getId();
         if ($this->config($this->getConfigKey())
             && $this->config($this->getConfigKey().'Status') == $eventArgs->getNewValue('orderStatus')->getId()
         ) {

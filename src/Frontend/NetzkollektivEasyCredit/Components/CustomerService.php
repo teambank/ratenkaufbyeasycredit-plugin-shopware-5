@@ -55,20 +55,22 @@ class EasyCredit_CustomerService
             'country' => $countryId,
             'state' => null,
             'phone' => $contact->getMobilePhoneNumber(),
-        ]);
+        ], $transaction);
         return $customerModel;
     }
 
     /**
      * @return Customer
      */
-    private function registerCustomer(array $customerData)
+    private function registerCustomer(array $customerData, TransactionInformation $transaction)
     {
         $customer = new Customer();
         $personalForm = $this->formFactory->create(PersonalFormType::class, $customer);
         $personalForm->submit($customerData);
 
-        $customer->setPaymentId($this->helper->getPayment()->getId());
+        $customer->setPaymentId($this->helper->getMethodByPaymentType(
+            $transaction->getTransaction()->getPaymentType()
+        )->getId());
 
         $address = new Address();
         $addressForm = $this->formFactory->create(AddressFormType::class, $address);

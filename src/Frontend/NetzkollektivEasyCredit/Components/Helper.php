@@ -31,8 +31,21 @@ class EasyCredit_Helper
         return $this->container->get('models');
     }
 
-    public function getPayment () {
-        return $this->getPlugin()->getPayment();
+    public function getPaymentMethods () {
+        return $this->getPlugin()->getPaymentMethods();
+    }
+
+    public function getPaymentMethodIds () {
+        return array_map(function ($payment) {
+            return $payment->getId();
+        }, $this->getPaymentMethods());        
+    }
+
+    public function getActivePaymentMethods()
+    {
+        return array_filter($this->getPaymentMethods(), function ($payment) {
+            return $payment->getActive();
+        });
     }
 
     protected function getVariable($var, $module) {
@@ -55,5 +68,43 @@ class EasyCredit_Helper
 
     public function getSelectedDispatch() {
         return Shopware()->Front()->Plugins()->ViewRenderer()->Action()->View()->getAssign('sDispatch');
+    }
+
+    public function getSelectedPayment()
+    {
+        if ($paymentId = $this->getSession()->offsetGet('sPaymentID')) {
+            return $paymentId;
+        }
+        if ($paymentId = $this->getUser()['additional']['payment']['id']) {
+            return $paymentId;
+        }
+    }
+
+    public function getPaymentType($paymentId) {
+        $methods = $this->getPaymentMethods();
+        foreach ($methods as $method) {
+            if ($method->getId() !== (int) $paymentId) {
+                continue;
+            }
+
+            if ($method->getName() == 'easycredit_ratenkauf') {
+                return 'INSTALLMENT_PAYMENT';
+            }
+            if ($method->getName() == 'easycredit_rechnung') {
+                return 'BILL_PAYMENT';
+            }
+        }
+    }
+
+    public function getMethodByPaymentType($paymentType) {
+        return current(array_filter($this->getPaymentMethods(), function ($payment) use ($paymentType) {
+            $type = $this->getPaymentType($payment->getId());
+            if ($paymentType === $type ||
+                $paymentType === str_replace('_PAYMENT', '', $type)
+            ) {
+                return true;
+            }
+            return false;
+        }));
     }
 }

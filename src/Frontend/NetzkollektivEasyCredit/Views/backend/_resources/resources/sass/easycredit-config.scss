@@ -11,29 +11,40 @@ $color-ec-darkblue15: #D9DFE6;
 $color-ec-darkblue20: #CCD5DE;
 $color-ec-darkblue50: #8095AC;
 
+/* Colors - SW5 */
+$color-sw5-bg-grey: #f2f4f6;
+$color-sw5-bg-grey-75: #F5F7F8;
+
 /* Colors - Typo (SW5) */
 $color-font: #010101;
 $color-heading: #475c6a;
 $color-link: #0e6bbb;
 
 $font-size: 13px;
+$font-size-sm: $font-size * 0.85;
+$font-size-h2: $font-size * 1.725;
 $line-height: 1.4;
-$line-height-heading: 1.2;
+$line-height-heading: 1.3;
 
-$grid-column-gap: 48px;
-
-$space: 30px;
+$space: 36px;
 
 $box-shadow: 0 4px 20px 0 rgba(0,0,0,.25);
+$box-shadow-card: 0 1px 1px rgba(0, 0, 0, 0.08), 0 2px 1px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
 
 $border-radius: 30px;
 $border-radius-sm: 15px;
+$border-radius-xs: 8px;
 
 $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
 
 .base-element-easycreditintro {
+    --grid-column-gap: 48px;
+    --grid-column-gap-m: 36px;
+    --grid-template-columns: 3fr 2fr;
+    --grid-template-columns-50-50: 1fr 1fr;
+
     .x-panel-body {
-        padding: 0 25px 0 0;
+        padding: 2px 25px 2px 2px;
         border: 0;
     }
 
@@ -84,7 +95,7 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
     a {
         color: $color-link;
 
-        &[target="_blank"]:not(.easycredit-intro__image) {
+        &[target="_blank"]:not(.easycredit-intro__image):not(.btn.btn-primary):not(.btn.btn-secondary) {
             &:after {
                 content: '';
                 display: inline-block;
@@ -106,6 +117,8 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
     /* Buttons */
     .btn {
         display: inline-block;
+        margin-bottom: 5px;
+        margin-right: 10px;
         padding: 10px 20px;
         background-color: $color-ec-secondary;
         border: 0;
@@ -120,34 +133,65 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
         &.btn-primary {
             background-color: $color-ec-primary;
         }
+        &.btn-link {
+            background-color: transparent;
+            padding-left: 0;
+            padding-right: 0;
+            color: $color-ec-secondary !important;
+        }
 
-        &:hover,
-        &:active,
-        &:focus,
-        &:visited {
-            background-color: $color-ec-secondary !important;
-            color: $color-white !important;
+        &:not(.btn-link) {
+            &:hover,
+            &:active,
+            &:focus,
+            &:visited {
+                background-color: darken($color-ec-secondary, 5%) !important;
+                color: $color-white !important;
 
-            &.btn-primary {
-                background-color: $color-ec-primary !important;
+                &.btn-primary {
+                    background-color: darken($color-ec-primary, 5%) !important;
+                }
+            }
+            &:active,
+            &:focus {
+                box-shadow: 0 0 0 0.2rem rgba($color-ec-secondary, .4) !important;
+
+                &.btn-primary {
+                    box-shadow: 0 0 0 0.2rem rgba($color-ec-primary, .4) !important;
+                }
+            }
+
+            &:disabled,
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                background-color: rgba($color-ec-secondary, .5) !important;
+                color: $color-white;
+
+                &.btn-primary {
+                    background-color: rgba($color-ec-primary, .5) !important;
+                }
             }
         }
-        &:hover {
-        &.btn-primary {
-            background-color: darken($color-ec-primary,5%) !important;
+    }
+    .btn + .btn {
+        &:last-child {
+            margin-right: 0;
         }
-        }
-        &:active,
-        &:focus {
-            box-shadow: 0 0 0 0.2rem rgba($color-ec-primary, .4) !important;
-        }
+    }
 
-        &:disabled, &.disabled {
-            cursor: default;
-            pointer-events: none;
-            background-color: rgba($color-ec-primary, .5) !important;
-            color: $color-white;
-        }
+    /* Badges */
+    .badge {
+        margin-right: 7.5px;
+        padding: 2px 5px 2px;
+        background-color: $color-ec-darkblue;
+        border-radius: 10px;
+        font-size: $font-size-sm;
+        font-weight: 600;
+        color: #fff;
+    }
+    .badge + h2 {
+        margin-top: 5px !important;
     }
 
     .easycredit-intro {
@@ -156,7 +200,8 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
         padding: 35px 30px;
 
         background-color: $color-white;
-        border-radius: $border-radius-sm;
+        border-radius: $border-radius-xs;
+        box-shadow: $box-shadow-card;
 
         h2, h3,
         p, ul {
@@ -235,8 +280,24 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
 
         &__grid {
             display: grid;
-            grid-template-columns: 3fr 2fr;
-            grid-column-gap: $grid-column-gap;
+            grid-template-columns: var(--grid-template-columns);
+            grid-column-gap: var(--grid-column-gap);
+
+            &:has(.intro-2024) {
+                grid-column-gap: 24px;
+
+                @media (max-width: 991px) {
+                    display: block;
+                }
+            }
+
+            &.grid-50-50 {
+                grid-template-columns: var(--grid-template-columns-50-50);
+            }
+
+            &:has(.easycredit-intro__image + .easycredit-intro__content) {
+                grid-column-gap: var(--grid-column-gap-m);
+            }
         }
         &__tab-content {
             .easycredit-intro__grid {
@@ -276,6 +337,78 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
                     padding-bottom: 75%;
                 }
             }
+
+            &.fill {
+                position: relative;
+                background-color: $color-ec-darkblue15;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                border-radius: $border-radius-sm;
+            }
+
+            &.aspect-2-3 {
+                &:after {
+                    content: '';
+                    display: block;
+                    width: 100%;
+                    padding-bottom: 150%;
+                }
+            }
+            &.aspect-36-2 {
+                &:after {
+                    content: '';
+                    display: block;
+                    width: 100%;
+                    padding-bottom: 55.56%;
+                }
+            }
+        }
+
+        &.dimmed {
+            background-color: $color-sw5-bg-grey-75;
+        }
+    }
+
+    /* Intro 2024 */
+    .intro-2024 {
+        --grid-column-gap: 24px;
+
+        h2 {
+            margin-bottom: 15px;
+
+            font-size: $font-size-h2;
+            line-height: $line-height-heading;
+            font-weight: 600;
+            color: $color-ec-darkblue;
+        }
+
+        p {
+            margin-bottom: 25px;
+        }
+
+        ul {
+            li {
+                margin-bottom: 8px;
+
+                a {
+                    font-weight: 600;
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .easycredit-intro__image {
+            background-image: url('../../images/card-intro-image.png');
+        }
+    }
+    .faq {
+    }
+    .bill {
+        margin-top: 0;
+
+        .easycredit-intro__image {
+            background-image: url('../../images/card-easycredit-rechnung-image.png');
         }
     }
 
@@ -398,7 +531,7 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
 /* Plugin Manager */
 .store-plugin-detail-configuration-container {
     .easycredit-intro {
-        background-color: $color-ec-darkblue5 !important;
+        // background-color: $color-ec-darkblue5 !important;
         // box-shadow: $box-shadow;
     }
 }

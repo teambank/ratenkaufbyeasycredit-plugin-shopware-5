@@ -17,7 +17,7 @@ Ext.Ajax.request({
     jsonData: true,
     success: function (response) {
         var data = Ext.decode(response.responseText),
-            title = '<span style=\"font-weight: bold;\">easyCredit-Ratenkauf</span>',
+            title = '<span style=\"font-weight: bold;\">easyCredit</span>',
             text;
 
         if (!data.status) {
@@ -26,7 +26,7 @@ Ext.Ajax.request({
             if (data.valid) {
                 text = 'Zugangsdaten korrekt. Plugin ist einsatzbereit!';
             } else {
-                text = 'Die Zugangsdaten sind inkorrekt oder Ihr Webshop ist noch nicht aktiviert. <br><br>Bitte überprüfen Sie Ihre Eingaben oder wenden Sie sich an Ihren Ansprechpartner von easyCredit-Ratenkauf.';
+                text = 'Die Zugangsdaten sind inkorrekt oder Ihr Webshop ist noch nicht aktiviert. <br><br>Bitte überprüfen Sie Ihre Eingaben oder wenden Sie sich an Ihren Ansprechpartner von easyCredit.';
             }
         }
 

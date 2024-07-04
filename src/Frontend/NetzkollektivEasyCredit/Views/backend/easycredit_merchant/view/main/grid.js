@@ -70,6 +70,11 @@ Ext.define('Shopware.apps.EasycreditMerchant.view.main.Grid', {
                 renderer: me.paymentStatusColumnRenderer,
                 draggable: false
             },
+            paymentId: {
+                header: '{s name="column/paymentMethod"}Payment method{/s}',
+                renderer: me.paymentMethodColumnRenderer,
+                draggable: false
+            },
             merchantStatus: {
                 header: '{s name="column/merchantStatus"}Merchant Status{/s}',
                 draggable: false,
@@ -188,15 +193,19 @@ Ext.define('Shopware.apps.EasycreditMerchant.view.main.Grid', {
      * @param { Ext.data.Model } record
      * @returns { String }
      */
-    paymentStatusColumnRenderer: function (value, metaData, record) {
-        var status = record.getPaymentStatus().first();
+    paymentMethodColumnRenderer: function (value, metaData, record) {
+        return record.raw.payment.description;
+        /*
+        var status = record.getOrderStatus().first();
 
         if (status instanceof Ext.data.Model) {
             return status.get('description');
         }
 
         return value;
+        */
     },
+
 
     /**
      * @param { String } value

@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class Frontend implements SubscriberInterface
 {
-    const INTEREST_REMOVED_ERROR = 'Raten müssen neu berechnet werden';
+    const INTEREST_REMOVED_ERROR = 'Der Bestellwert hat sich geändert.';
     const INTEREST_ORDERNUM = 'sw-payment-ec-interest';
 
     protected $bootstrap;
@@ -69,8 +69,8 @@ class Frontend implements SubscriberInterface
     }
 
     public function interceptRiskRule(\Enlight_Event_EventArgs $args, $operator) {
-        if ($args->get('paymentID') != $this->helper->getPayment()->getId()) { // explicitely not !==, paymentId can be string
-            return null;
+        if (!in_array((int) $args->get('paymentID'), $this->helper->getPaymentMethodIds())) {
+           return null;
         }
 
         $order = $args->get('basket');
@@ -195,22 +195,27 @@ class Frontend implements SubscriberInterface
 
         $sAdmin = $this->helper->getModule('Admin');
 
-        $paymentId = $this->helper->getPayment()->getId();
-
         $apiKey = $this->config->get('easycreditApiKey');
         if ($apiKey) {
             $view->assign('EasyCreditApiKey', $apiKey);
         }
 
-        $isEasyCreditAllowed = !$sAdmin->sManageRisks($paymentId, $this->helper->getBasket(), $this->helper->getUser() ?: []);
+        $isEasyCreditForbidden = true;
+        foreach ($this->helper->getPaymentMethodIds() as $paymentId) {
+            $isEasyCreditForbidden = $isEasyCreditForbidden && $sAdmin->sManageRisks($paymentId, $this->helper->getBasket(), $this->helper->getUser() ?: []);
+        }
 
-        if ($apiKey && $isEasyCreditAllowed) {
+        if ($apiKey && !$isEasyCreditForbidden) {
             $modalIsOpen = 'true';
             if ( $this->config->get('easyCreditMarketingModalSettingsDelay') ) {
                 if ( $this->config->get('easyCreditMarketingModalSettingsDelay') > 0 ) {
                     $modalIsOpen = 'false';
                 }
             }
+
+            $view->assign('EasyCreditActiveMethods', array_map(function($paymentMethod) {
+                return $this->helper->getPaymentType($paymentMethod->getId());
+            }, $this->helper->getActivePaymentMethods()));
 
             // Express Checkout
             $view->assign('EasyCreditExpressProduct', $this->config->get('easyCreditExpressProduct'));
@@ -409,7 +414,7 @@ class Frontend implements SubscriberInterface
             } catch (ConnectException $e) {
                 $this->container->get('pluginlogger')->error($e->getMessage());
                 $this->helper->getPlugin()->getStorage()
-                    ->set('apiError', 'easyCredit-Ratenkauf ist im Moment nicht verfügbar. Bitte probieren Sie es erneut oder wählen Sie eine andere Zahlungsart.')
+                    ->set('apiError', 'easyCredit ist im Moment nicht verfügbar. Bitte probieren Sie es erneut oder wählen Sie eine andere Zahlungsart.')
                     ->set('apiErrorSkipSuffix', true);
 
                 return false;
@@ -467,11 +472,12 @@ class Frontend implements SubscriberInterface
         $view->assign('EasyCreditError', $error);
         $view->assign('EasyCreditAmount', $this->helper->getPlugin()->getQuote()->getOrderDetails()->getOrderValue());
 
-        $isSelected = $this->helper->getPlugin()->isSelected($view->sUserData['additional']['user']['paymentID']);
-        $view->assign('EasyCreditIsSelected', ($isSelected) ? 'true' : 'false');
+        $view->assign('EasyCreditSelectedPaymentId', $view->sUserData['additional']['user']['paymentID']);
         $view->assign('EasyCreditPaymentPlan', $this->getPaymentPlan());
         $view->assign('EasyCreditDisableFlexprice', (new \EasyCredit_FlexpriceService())->shouldDisableFlexprice());
 
+        $isSelected = $this->helper->getPlugin()->isSelected($view->sUserData['additional']['user']['paymentID']);
+        
         if (!$error && $isSelected) {
             if (isset($this->helper->getPluginSession()["addressError"])
                 && $this->helper->getPluginSession()["addressError"]

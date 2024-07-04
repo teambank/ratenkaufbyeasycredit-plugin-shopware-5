@@ -2,11 +2,6 @@
 class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controllers_Frontend_Payment
 {
     /**
-     * @var Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap $plugin
-     */
-    private $plugin;
-
-    /**
      * @var Enlight_Components_Session_Namespace $session
      */
     private $session;
@@ -15,7 +10,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     private $em;
 
-    protected $helper;
+    private $helper;
 
     /**
      * {@inheritdoc}
@@ -68,15 +63,15 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function indexAction()
     {
-        $transactionId = $this->helper->getPluginSession()["transaction_id"];
-        $paymentUniqueId = $this->createPaymentUniqueId();
-
-        $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
-        $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
-
-        $this->saveOrderAttributes($orderId);
-
         try {
+            $transactionId = $this->helper->getPluginSession()["transaction_id"];
+            $paymentUniqueId = $this->createPaymentUniqueId();
+
+            $orderNumber = $this->saveOrder($transactionId, $paymentUniqueId, null, false);
+            $orderId = $this->getOrderId($transactionId, $paymentUniqueId);
+
+            $this->saveOrderAttributes($orderId);
+
             $checkout = $this->container->get('easyCreditCheckout');
             if (!$checkout->authorize($orderNumber)) {
                 throw new \Exception('The transaction could not be authorized.');
@@ -102,7 +97,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $this->order->setOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
 
             $this->container->get('pluginlogger')->error($e->getMessage());
-            $this->helper->getPlugin()->getStorage()->set('apiError', 'Die Zahlung mit <strong>easyCredit-Ratenkauf</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
+            $this->helper->getPlugin()->getStorage()->set('apiError', 'Die Zahlung mit <strong>easyCredit</strong> konnte auf Grund eines Fehlers nicht abgeschlossen werden. Bitte probieren Sie es erneut oder kontaktieren Sie den Händler.');
             $this->helper->getPlugin()->getStorage()->set('apiErrorSkipSuffix', true);
             $this->redirect(array(
                 'controller' => 'checkout',
@@ -114,10 +109,25 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
     public function returnAction()
     {
-        $checkout = $this->container->get('easyCreditCheckout');
         try {
+            $checkout = $this->container->get('easyCreditCheckout');
             $transaction = $checkout->loadTransaction();
             $approved = $checkout->isApproved();
+
+            if (!$approved) {
+                throw new \Exception('easyCredit-Ratenkauf wurde nicht genehmigt.');
+            }
+
+            if ($this->helper->getPlugin()->getStorage()->get('express')) {
+                $customerService = new EasyCredit_CustomerService();
+                $customer = $customerService->createCustomer($transaction);
+                $customerService->loginCustomer($customer);
+            }
+
+            $this->updatePaymentMethod($transaction->getTransaction()->getPaymentType());
+
+            $this->helper->getPlugin()->addInterest();
+            $this->redirectCheckoutConfirm();
         } catch (Exception $e) {
             $this->helper->getPlugin()->getStorage()->set('apiError', $e->getMessage());
             $this->_redirToPaymentSelection();
@@ -149,6 +159,19 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $customerService->createCustomer($transaction);
     }
 
+    protected function updatePaymentMethod($paymentType)
+    {
+        $paymentMethod = $this->helper->getMethodByPaymentType(
+            $paymentType
+        );
+        if (!$paymentMethod->getActive()) {
+            throw new \Exception($paymentMethod->getDescription(). ' ist derzeit nicht verfügbar. Bitte wählen Sie eine andere Zahlungsart.');
+        }
+        file_put_contents('/tmp/bla', 'setting paymentId '. $paymentMethod->getId().PHP_EOL,FILE_APPEND);
+        $this->session->offsetSet('sPaymentID', $paymentMethod->getId());
+        $this->getModule('admin')->sUpdatePayment($paymentMethod->getId());
+    }
+
     public function cancelAction()
     {
         $this->_redirToPaymentSelection();
@@ -164,24 +187,23 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $basket = $this->getModule('basket');
-
         if ($productNumber = $this->Request()->getParam('sAdd')) {
             $basket->sDeleteBasket();
             $basket->sAddArticle($productNumber, (int) $this->Request()->getParam('sQuantity', 1));
         }
 
-        /** @var sAdmin $admin */
-        $admin = $this->getModule('admin');
-
-        $this->session->offsetSet('sPaymentID', $this->helper->getPayment()->getId());
-        $admin->sUpdatePayment($this->helper->getPayment()->getId());
+        $this->updatePaymentMethod(
+            $this->Request()->getParam('easycredit')['paymentType']
+        );
 
         $checkoutController = $this->getCheckoutController();
         $checkoutController->getSelectedCountry();
         $checkoutController->getSelectedDispatch();
 
+        /** @var sAdmin $admin */
+        $admin = $this->getModule('admin');
         $countries = $admin->sGetCountryList();
-        $shipping = $admin->sGetPremiumShippingcosts(\reset($countries));
+        $admin->sGetPremiumShippingcosts(\reset($countries));
 
         $basket->sGetBasket();
 

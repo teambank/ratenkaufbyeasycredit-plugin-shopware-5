@@ -21,28 +21,40 @@
 
             me.applyDataAttributes();
 
+            const addFormField = (form, key, value) => {
+                form.append($('<input>').attr('name', key).attr('value', value));
+            }
+
+            const handleExpressButton = function(event) {
+                event.preventDefault();
+
+                var form = $('<form>')
+                    .attr('action', me.opts.url)
+                    .hide();
+
+                if (event.detail) {
+                    for (const [key, value] of Object.entries(event.detail)) {
+                        addFormField(form, `easycredit[${key}]`, value)
+                    }
+                }
+
+                var addToBasketForm = $(this).closest('form[name=sAddToBasket]');
+                if (addToBasketForm.length > 0) {
+                    form.attr('method','post');
+                    var formData = new FormData(addToBasketForm.get(0));
+
+                    for (var key of formData.keys()) {
+                        addFormField(form, key, formData.get(key));
+                    }
+                }
+
+                $('body').append(form);
+                form.submit();
+            }
+
             var expressButton = me.$el.find('easycredit-express-button').get(0);
             onHydrated(expressButton, function() {
-                me._on(expressButton, 'submit', function(event) {
-                    event.preventDefault();
-
-                    var form = $('<form>')
-                        .attr('action', me.opts.url)
-                        .hide();
-
-                    var addToBasketForm = $(this).closest('form[name=sAddToBasket]');
-                    if (addToBasketForm.length > 0) {
-                        form.attr('method','post');
-                        var formData = new FormData(addToBasketForm.get(0));
-
-                        for (var key of formData.keys()) {
-                            form.append($('<input>').attr('name',key).attr('value', formData.get(key)));
-                        }
-                    }
-
-                    $('body').append(form);
-                    form.submit();
-                });
+                me._on(expressButton, 'submit', handleExpressButton);
             });
         },
     })

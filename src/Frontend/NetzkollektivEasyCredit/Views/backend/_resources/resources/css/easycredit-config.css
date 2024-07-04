@@ -1,11 +1,18 @@
 /* Colors - Base */
 /* Colors - eC */
+/* Colors - SW5 */
 /* Colors - Typo (SW5) */
 .base-element-easycreditintro {
+  --grid-column-gap: 48px;
+  --grid-column-gap-m: 36px;
+  --grid-template-columns: 3fr 2fr;
+  --grid-template-columns-50-50: 1fr 1fr;
   /* Headings */
   /* Typo */
   /* Links */
   /* Buttons */
+  /* Badges */
+  /* Intro 2024 */
   /* Intro */
   /* Click & Collect */
   /* Marketing */
@@ -18,7 +25,7 @@
   /* - Bar */
 }
 .base-element-easycreditintro .x-panel-body {
-  padding: 0 25px 0 0;
+  padding: 2px 25px 2px 2px;
   border: 0;
 }
 .base-element-easycreditintro.x-panel.has-tabs {
@@ -28,11 +35,11 @@
   height: auto !important;
 }
 .base-element-easycreditintro h2, .base-element-easycreditintro h3 {
-  margin-top: 30px;
+  margin-top: 36px;
   margin-bottom: 10px;
   color: #475c6a;
   font-size: calc(13px * 1.2);
-  line-height: 1.2;
+  line-height: 1.3;
 }
 .base-element-easycreditintro h2 {
   scroll-margin-top: 30px;
@@ -60,7 +67,7 @@
 .base-element-easycreditintro a {
   color: #0e6bbb;
 }
-.base-element-easycreditintro a[target=_blank]:not(.easycredit-intro__image):after {
+.base-element-easycreditintro a[target=_blank]:not(.easycredit-intro__image):not(.btn.btn-primary):not(.btn.btn-secondary):after {
   content: "";
   display: inline-block;
   margin-left: 0.285em;
@@ -76,6 +83,8 @@
 }
 .base-element-easycreditintro .btn {
   display: inline-block;
+  margin-bottom: 5px;
+  margin-right: 10px;
   padding: 10px 20px;
   background-color: #0066B3;
   border: 0;
@@ -90,31 +99,56 @@
 .base-element-easycreditintro .btn.btn-primary {
   background-color: #F37122;
 }
-.base-element-easycreditintro .btn:hover, .base-element-easycreditintro .btn:active, .base-element-easycreditintro .btn:focus, .base-element-easycreditintro .btn:visited {
-  background-color: #0066B3 !important;
+.base-element-easycreditintro .btn.btn-link {
+  background-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  color: #0066B3 !important;
+}
+.base-element-easycreditintro .btn:not(.btn-link):hover, .base-element-easycreditintro .btn:not(.btn-link):active, .base-element-easycreditintro .btn:not(.btn-link):focus, .base-element-easycreditintro .btn:not(.btn-link):visited {
+  background-color: #00579a !important;
   color: #fff !important;
 }
-.base-element-easycreditintro .btn:hover.btn-primary, .base-element-easycreditintro .btn:active.btn-primary, .base-element-easycreditintro .btn:focus.btn-primary, .base-element-easycreditintro .btn:visited.btn-primary {
-  background-color: #F37122 !important;
-}
-.base-element-easycreditintro .btn:hover.btn-primary {
+.base-element-easycreditintro .btn:not(.btn-link):hover.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):active.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):focus.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):visited.btn-primary {
   background-color: #ef620d !important;
 }
-.base-element-easycreditintro .btn:active, .base-element-easycreditintro .btn:focus {
+.base-element-easycreditintro .btn:not(.btn-link):active, .base-element-easycreditintro .btn:not(.btn-link):focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 102, 179, 0.4) !important;
+}
+.base-element-easycreditintro .btn:not(.btn-link):active.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):focus.btn-primary {
   box-shadow: 0 0 0 0.2rem rgba(243, 113, 34, 0.4) !important;
 }
-.base-element-easycreditintro .btn:disabled, .base-element-easycreditintro .btn.disabled {
+.base-element-easycreditintro .btn:not(.btn-link):disabled, .base-element-easycreditintro .btn:not(.btn-link).disabled {
   cursor: default;
   pointer-events: none;
-  background-color: rgba(243, 113, 34, 0.5) !important;
+  background-color: rgba(0, 102, 179, 0.5) !important;
   color: #fff;
 }
+.base-element-easycreditintro .btn:not(.btn-link):disabled.btn-primary, .base-element-easycreditintro .btn:not(.btn-link).disabled.btn-primary {
+  background-color: rgba(243, 113, 34, 0.5) !important;
+}
+.base-element-easycreditintro .btn + .btn:last-child {
+  margin-right: 0;
+}
+.base-element-easycreditintro .badge {
+  margin-right: 7.5px;
+  padding: 2px 5px 2px;
+  background-color: #002C5A;
+  border-radius: 10px;
+  font-size: 11.05px;
+  font-weight: 600;
+  color: #fff;
+}
+.base-element-easycreditintro .badge + h2 {
+  margin-top: 5px !important;
+}
 .base-element-easycreditintro .easycredit-intro {
-  margin-top: 30px;
-  margin-bottom: 30px;
+  margin-top: 36px;
+  margin-bottom: 36px;
   padding: 35px 30px;
   background-color: #fff;
-  border-radius: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08), 0 2px 1px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .base-element-easycreditintro .easycredit-intro h2, .base-element-easycreditintro .easycredit-intro h3,
 .base-element-easycreditintro .easycredit-intro p, .base-element-easycreditintro .easycredit-intro ul {
@@ -175,8 +209,22 @@
 }
 .base-element-easycreditintro .easycredit-intro__grid {
   display: grid;
-  grid-template-columns: 3fr 2fr;
-  grid-column-gap: 48px;
+  grid-template-columns: var(--grid-template-columns);
+  grid-column-gap: var(--grid-column-gap);
+}
+.base-element-easycreditintro .easycredit-intro__grid:has(.intro-2024) {
+  grid-column-gap: 24px;
+}
+@media (max-width: 991px) {
+  .base-element-easycreditintro .easycredit-intro__grid:has(.intro-2024) {
+    display: block;
+  }
+}
+.base-element-easycreditintro .easycredit-intro__grid.grid-50-50 {
+  grid-template-columns: var(--grid-template-columns-50-50);
+}
+.base-element-easycreditintro .easycredit-intro__grid:has(.easycredit-intro__image + .easycredit-intro__content) {
+  grid-column-gap: var(--grid-column-gap-m);
 }
 .base-element-easycreditintro .easycredit-intro__tab-content .easycredit-intro__grid {
   padding-top: 24px;
@@ -209,6 +257,58 @@
   display: block;
   width: 100%;
   padding-bottom: 75%;
+}
+.base-element-easycreditintro .easycredit-intro__image.fill {
+  position: relative;
+  background-color: #D9DFE6;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 15px;
+}
+.base-element-easycreditintro .easycredit-intro__image.aspect-2-3:after {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: 150%;
+}
+.base-element-easycreditintro .easycredit-intro__image.aspect-36-2:after {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-bottom: 55.56%;
+}
+.base-element-easycreditintro .easycredit-intro.dimmed {
+  background-color: #F5F7F8;
+}
+.base-element-easycreditintro .intro-2024 {
+  --grid-column-gap: 24px;
+}
+.base-element-easycreditintro .intro-2024 h2 {
+  margin-bottom: 15px;
+  font-size: 22.425px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #002C5A;
+}
+.base-element-easycreditintro .intro-2024 p {
+  margin-bottom: 25px;
+}
+.base-element-easycreditintro .intro-2024 ul li {
+  margin-bottom: 8px;
+}
+.base-element-easycreditintro .intro-2024 ul li a {
+  font-weight: 600;
+  text-decoration: none;
+}
+.base-element-easycreditintro .intro-2024 .easycredit-intro__image {
+  background-image: url("../../images/card-intro-image.png");
+}
+.base-element-easycreditintro .bill {
+  margin-top: 0;
+}
+.base-element-easycreditintro .bill .easycredit-intro__image {
+  background-image: url("../../images/card-easycredit-rechnung-image.png");
 }
 .base-element-easycreditintro .intro {
   margin-top: 10px;
@@ -271,8 +371,5 @@
 }
 
 /* Plugin Manager */
-.store-plugin-detail-configuration-container .easycredit-intro {
-  background-color: rgba(0, 44, 90, 0.05) !important;
-}
 
 /*# sourceMappingURL=easycredit-config.css.map */

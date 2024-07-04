@@ -67,7 +67,7 @@ class EasyCredit_BackendFormBuilder
                 'required' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                 'stripCharsRe' => ' ',
-                'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit-Ratenkauf Partnerportal aktivieren.',
+                'description' => 'Die API Signatur sichert die Datenübertragung gegen Datenmanipulation von Dritten ab. Sie können die API-Signatur im easyCredit Partnerportal aktivieren.',
                 'position' => $position++
             )
         );
@@ -168,7 +168,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => '„Lieferung melden“ automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit-Ratenkauf übermittelt.',
+                'description' => 'Bei Aktivierung dieser Option wird die Lieferung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit übermittelt.',
                 'position' => $position++
             )
         );
@@ -194,7 +194,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Rückabwicklung automatisch durchführen?',
                 'value' => false,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit-Ratenkauf übermittelt.',
+                'description' => 'Bei Aktivierung dieser Option wird die Rückabwicklung bei dem in der folgenden Option eingestellten Bestellstatus automatisch an easyCredit übermittelt.',
                 'position' => $position++
             )
         );
@@ -243,7 +243,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Express-Button auf Detailseite',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit dem easyCredit-Ratenkauf direkt von der Produktseite aus zu bezahlen.',
+                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit easyCredit direkt von der Produktseite aus zu bezahlen.',
                 'position' => $position++
             )
         );
@@ -255,7 +255,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Express-Button im Warenkorb',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit dem easyCredit-Ratenkauf direkt aus dem Warenkorb zu bezahlen.',
+                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit easyCredit direkt aus dem Warenkorb heraus zu bezahlen.',
                 'position' => $position++
             )
         );
@@ -267,7 +267,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Express-Button im Off-Canvas Warenkorb',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit dem easyCredit-Ratenkauf direkt aus dem Off-Canvas Warenkorb zu bezahlen.',
+                'description' => 'Steigern Sie ihre Conversion, indem Sie Kunden ermöglichen mit easyCredit direkt aus dem Off-Canvas Warenkorb zu bezahlen.',
                 'position' => $position++
             )
         );
@@ -290,7 +290,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Ratenrechner-Widget neben Produktpreis',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
+                'description' => 'Für den größten Erfolg mit easyCredit empfehlen wir, das Widget zu aktivieren.',
                 'position' => $position++
             )
         );
@@ -302,7 +302,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Ratenrechner-Widget im Warenkorb',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
+                'description' => 'Für den größten Erfolg mit easyCredit empfehlen wir, das Widget zu aktivieren.',
                 'position' => $position++
             )
         );
@@ -314,7 +314,7 @@ class EasyCredit_BackendFormBuilder
                 'label' => 'Zeige Ratenrechner-Widget im Off-Canvas Warenkorb',
                 'value' => true,
                 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-                'description' => 'Für den größten Erfolg mit dem easyCredit-Ratenkauf empfehlen wir, das Widget zu aktivieren.',
+                'description' => 'Für den größten Erfolg mit easyCredit empfehlen wir, das Widget zu aktivieren.',
                 'position' => $position++
             )
         );

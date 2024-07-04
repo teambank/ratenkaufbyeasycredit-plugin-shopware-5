@@ -23,7 +23,7 @@ class OrderRefunded extends OrderStatusChanged
                 $order = $eventArgs->getEntity();
                 $transactionId = $order->getTransactionId();
                 if (empty($transactionId)) {
-                    throw new \Exception('Die zugehörige easyCredit-Ratenkauf Transaktion-ID dieser Bestellung ist nicht vorhanden.');
+                    throw new \Exception('Die zugehörige easyCredit Transaktion-ID dieser Bestellung ist nicht vorhanden.');
                 }
 
                 $merchantClient = Shopware()->Container()->get('easyCreditMerchant');

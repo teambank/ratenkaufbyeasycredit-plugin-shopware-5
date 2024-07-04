@@ -1,5 +1,6 @@
 <?php
 use Shopware\Models\Order\Order;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
 use Shopware\Components\Model\QueryBuilder;
 use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
@@ -24,14 +25,14 @@ abstract class Shopware_Controllers_Backend_EasycreditMerchant_Abstract extends 
     private function prepareOrderQueryBuilder(QueryBuilder $builder)
     {
         $helper = new EasyCredit_Helper();
-        $paymentId = $helper->getPayment()->getId();
 
         $builder->innerJoin(
             'sOrder.payment',
             'payment',
             Join::WITH,
-            'payment.id = :paymentId'
-        )->setParameter('paymentId', $paymentId, \PDO::PARAM_INT);
+            $builder->expr()->in('payment.id', ':paymentIds')
+        );        
+        $builder->setParameter('paymentIds', $helper->getPaymentMethodIds(), Connection::PARAM_INT_ARRAY);
 
         $builder->leftJoin('sOrder.languageSubShop', 'languageSubShop')
             ->leftJoin('sOrder.customer', 'customer')
@@ -205,4 +206,3 @@ if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
 
     }
 }
-

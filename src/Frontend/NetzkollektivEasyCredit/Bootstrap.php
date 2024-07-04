@@ -1,4 +1,5 @@
 <?php
+
 use Shopware\Components\Model\ModelManager;
 use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
@@ -14,7 +15,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
-    extends Shopware_Components_Plugin_Bootstrap
+extends Shopware_Components_Plugin_Bootstrap
 {
 
     const PAYMENT_NAME = 'easycredit';
@@ -22,7 +23,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function getLabel()
     {
-        return 'easyCredit-Ratenkauf';
+        return 'easyCredit';
     }
 
     public function getVersion()
@@ -37,7 +38,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             'label' => $this->getLabel(),
             'supplier' => 'Teambank AG',
             'author' => 'Teambank AG',
-            'description' => 'Dieses Plugin ermöglicht die Zahlung mittels '.$this->getLabel(),
+            'description' => 'Dieses Plugin ermöglicht die Zahlung mittels ' . $this->getLabel(),
             'support' => 'service@easycredit.de',
             'link' => 'https://www.easycredit-ratenkauf.de/',
         );
@@ -55,6 +56,12 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
     public function install()
     {
+        if (!class_exists('EasyCredit_DbMigration')) {
+            require_once __DIR__ . '/Components/DbMigration.php';
+        }
+        $migration = new EasyCredit_DbMigration();
+        $migration->migrate();
+
 
         $this->_createEvents();
         $this->_createPaymentConfigForm();
@@ -64,24 +71,30 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         return array(
             'success' => true,
-            'invalidateCache' => array('config', 'backend', 'proxy', 'template','frontend', 'theme'),
+            'invalidateCache' => array('config', 'backend', 'proxy', 'template', 'frontend', 'theme'),
         );
     }
 
-   /**
+    /**
      * @param $version string
      * @return array
      */
     public function update($version)
     {
+        if (!class_exists('EasyCredit_DbMigration')) {
+            require_once __DIR__ . '/Components/DbMigration.php';
+        }
+        $migration = new EasyCredit_DbMigration();
+        $migration->migrate();
+
         $this->_createPaymentConfigForm();
+        $this->_createPayment();
         $this->_createMenuItem();
         $this->_createAttributes();
-        $this->_applyBrandRelaunch();
 
         return array(
             'success' => true,
-            'invalidateCache' => array('config', 'backend', 'proxy', 'template','frontend', 'theme'),
+            'invalidateCache' => array('config', 'backend', 'proxy', 'template', 'frontend', 'theme'),
         );
     }
 
@@ -103,8 +116,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
      */
     public function enable()
     {
-        $payment = $this->getPayment();
-        if ($payment !== null) {
+        foreach ($this->getPaymentMethods() as $payment) {
             $payment->setActive(true);
             $this->get('models')->flush($payment);
         }
@@ -115,22 +127,23 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    public function updateSpecialFieldTypes($type = 'easycreditIntro') {
-        $this->get('db')->query("UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easycreditMarketing','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
-          array(
-            $type
-          )
+    public function updateSpecialFieldTypes($type = 'easycreditIntro')
+    {
+        $this->get('db')->query(
+            "UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easycreditMarketing','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
+            array(
+                $type
+            )
         );
     }
 
     public function disable()
     {
-        $payment = $this->getPayment();
-        if ($payment !== null) {
+        foreach ($this->getPaymentMethods() as $payment) {
             $payment->setActive(false);
             $this->get('models')->flush($payment);
-            $this->updateSpecialFieldTypes('button');
         }
+        $this->updateSpecialFieldTypes('button');
 
         return array(
             'success' => true,
@@ -163,7 +176,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    public function addJsFiles() {
+    public function addJsFiles()
+    {
         $jsDir = $this->Path() . '/Views/frontend/_public/src/js/';
         return new ArrayCollection(array(
             $jsDir . 'jquery.easycredit-address-editor.js',
@@ -173,14 +187,16 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         ));
     }
 
-    public function addCssFiles() {
+    public function addCssFiles()
+    {
         return new ArrayCollection(array(
             $this->Path() . '/Views/frontend/_public/src/css/easycredit.css'
         ));
     }
 
-    public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args) {
-        $modelEventManager = Shopware()->Container()->get('models')->getConnection()->getEventManager();
+    public function onDispatchLoopStartup(\Enlight_Event_EventArgs $args)
+    {
+        $modelEventManager = $this->get('models')->getConnection()->getEventManager();
         $modelEventManager->addEventSubscriber(new Subscriber\OrderShipped());
         $modelEventManager->addEventSubscriber(new Subscriber\OrderRefunded());
 
@@ -189,8 +205,9 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $this->get('events')->addSubscriber(new Subscriber\BackendMerchant($this));
     }
 
-    protected function getClient () {
-        if (class_exists('\GuzzleHttp\Client') && method_exists('\GuzzleHttp\Client','sendRequest')) {
+    protected function getClient()
+    {
+        if (class_exists('\GuzzleHttp\Client') && method_exists('\GuzzleHttp\Client', 'sendRequest')) {
             $stack = HandlerStack::create();
 
             if (Shopware()->Config()->get('easycreditDebugLogging')) {
@@ -211,7 +228,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    public function getConfig() {
+    public function getConfig()
+    {
         $config = Shopware()->Config();
         return ApiV3\Configuration::getDefaultConfiguration()
             ->setHost('https://ratenkauf.easycredit.de')
@@ -243,13 +261,14 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
             $transactionApi,
             $installmentplanApi,
             new Api\Storage(),
-			new ApiV3\Integration\Util\AddressValidator(),
+            new ApiV3\Integration\Util\AddressValidator(),
             new ApiV3\Integration\Util\PrefixConverter(),
             Shopware()->Container()->get('pluginlogger')
         );
     }
 
-    public function getStorage() {
+    public function getStorage()
+    {
         return new Api\Storage();
     }
 
@@ -265,48 +284,68 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         );
     }
 
-    public function registerTemplateDir($viewDir = 'Views') {
+    public function registerTemplateDir($viewDir = 'Views')
+    {
         $template = $this->get('template');
-        $template->addTemplateDir($this->Path() . $viewDir.'/');
+        $template->addTemplateDir($this->Path() . $viewDir . '/');
     }
 
-    protected $paymentsCache = null;
-    public function getPayment()
+    protected $paymentMethodsCache = null;
+
+    public function getPaymentMethods()
     {
-        if (null === $this->paymentsCache) {
-            $this->paymentsCache = $this->Payments()->findOneBy(
-                array('name' => 'easycredit')
+        if (null === $this->paymentMethodsCache) {
+            $this->paymentMethodsCache = $this->Payments()->findBy(
+                ['class' => 'easycredit']
             );
         }
-        return $this->paymentsCache;
+        return $this->paymentMethodsCache;
     }
 
     protected function _createPayment()
     {
-        $this->createPayment(
-            array(
-                'name' => self::PAYMENT_NAME,
-                'description' => $this->getLabel(),
-                'action' => 'payment_easycredit',
-                'active' => 0,
-                'position' => 0,
-                'additionalDescription' => '',
-                'template' => 'easycredit.tpl',
-                'class' => 'easycredit',
-            )
-        );
+        $methods = [
+            [
+                'name' => self::PAYMENT_NAME . '_ratenkauf',
+                'description' => 'easyCredit-Ratenkauf'
+            ],
+            [
+                'name' => self::PAYMENT_NAME . '_rechnung',
+                'description' => 'easyCredit-Rechnung'
+            ]
+        ];
+
+        foreach ($methods as $options) {
+            $paymentRepository = $this->get('models')->getRepository(\Shopware\Models\Payment\Payment::class);
+            /** @var Payment|null $payment */
+            $payment = $paymentRepository->findOneBy([
+                'name' => $options['name'],
+            ]);
+
+            if (!$payment) {
+                $options = array_merge($options, [
+                    'action' => 'payment_easycredit',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' => '',
+                    'template' => 'easycredit.tpl',
+                    'class' => 'easycredit',
+                ]);
+            }
+            $this->createPayment($options);
+        }
     }
 
     protected function _createMenuItem()
     {
-        Shopware()->Db()->delete('s_core_menu',['controller = ?' => 'EasycreditMerchant']);
-        Shopware()->Db()->delete('s_core_snippets',['name = ?' => 'EasycreditMerchant']);
+        Shopware()->Db()->delete('s_core_menu', ['controller = ?' => 'EasycreditMerchant']);
+        Shopware()->Db()->delete('s_core_snippets', ['name = ?' => 'EasycreditMerchant']);
 
         $parent = $this->Menu()->findOneBy(array('label' => 'Zahlungen'));
 
         $this->createMenuItem(
             array(
-                'label' => 'easyCredit-Ratenkauf',
+                'label' => 'easyCredit',
                 'controller' => 'EasycreditMerchant',
                 'action' => 'Index',
                 'class' => 'easycredit--icon',
@@ -322,7 +361,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
 
         if (!class_exists('EasyCredit_BackendFormBuilder')) {
             // fix for SW <= 5.2
-            require_once __DIR__.'/Components/BackendFormBuilder.php';
+            require_once __DIR__ . '/Components/BackendFormBuilder.php';
         }
         $builder = new EasyCredit_BackendFormBuilder();
         $builder->build($pluginForm);
@@ -331,8 +370,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
     protected function _createAttributes()
     {
         /** @var ModelManager $em */
-        $em = Shopware()->Container()->get('models');
-    
+        $em = $this->get('models');
+
         if ($this->assertMinimumVersion('5.2.0')) {
             /** @var CrudService $service */
             $service = Shopware()->Container()->get('shopware_attribute.crud_service');
@@ -353,7 +392,7 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
                 null
             );
         }
-        
+
         $metaDataCache = $em->getConfiguration()->getMetadataCacheImpl();
         if ($metaDataCache !== null && method_exists($metaDataCache, 'deleteAll')) {
             $metaDataCache->deleteAll();
@@ -361,18 +400,8 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         $em->generateAttributeModels(['s_order_attributes']);
     }
 
-    public function _applyBrandRelaunch() {
-        Shopware()->Db()->query("
-            UPDATE s_core_plugins Set description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf') WHERE name = 'NetzkollektivEasyCredit';
-            UPDATE s_core_paymentmeans Set description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf') WHERE name = 'easycredit';
-            UPDATE s_core_config_forms Set
-                description = REPLACE(description, 'ratenkauf by easyCredit','easyCredit-Ratenkauf'),
-                label = REPLACE(label, 'ratenkauf by easyCredit','easyCredit-Ratenkauf')
-            WHERE name = 'NetzkollektivEasyCredit';
-        ");
-    }
-
-    public function getCheckout() {
+    public function getCheckout()
+    {
         return $this->get('easyCreditCheckout');
     }
 
@@ -389,25 +418,29 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return false;
     }
 
-    public function isInterestInBasket() {
+    public function isInterestInBasket()
+    {
         return $this->getInterestAmount() !== false;
     }
 
-    public function isValid() {
+    public function isValid()
+    {
         $quote = $this->getQuote();
         return $this->isInterestInBasket()
             && $this->getCheckout()->isAmountValid($quote)
             && $this->getCheckout()->verifyAddress($quote);
     }
 
-    public function clear() {
+    public function clear()
+    {
         $this->getCheckout()->clear();
         $this->removeInterest();
     }
 
     protected $quoteCache = null;
 
-    public function getQuote() {
+    public function getQuote()
+    {
         if ($this->quoteCache === null) {
             $quote = new Api\QuoteBuilder();
             $this->quoteCache = $quote->build();
@@ -415,20 +448,27 @@ class Shopware_Plugins_Frontend_NetzkollektivEasyCredit_Bootstrap
         return $this->quoteCache;
     }
 
-    public function isResponsive() {
+    public function isResponsive()
+    {
         return Shopware()->Shop()->getTemplate()->getVersion() >= 3;
     }
 
-    public function isSelected($paymentId = null) {
+    public function isSelected($paymentId = null)
+    {
         if ($paymentId == null) {
-            $helper = new \EasyCredit_Helper();
-            $user = $helper->getUser();
-            $paymentId = $user['additional']['payment']['id'];
+            $paymentId = (new \EasyCredit_Helper())->getSelectedPayment();
         }
-        return $paymentId == $this->getPayment()->getId();
+
+        foreach ($this->getPaymentMethods() as $payment) {
+            if ($payment->getId() === (int)$paymentId) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public function addInterest($refresh = true) {
+    public function addInterest($refresh = true)
+    {
         $interestAmount = Shopware()->Session()->offsetGet('EasyCredit')['interest_amount'];
         if ($interestAmount === null) {
             return;

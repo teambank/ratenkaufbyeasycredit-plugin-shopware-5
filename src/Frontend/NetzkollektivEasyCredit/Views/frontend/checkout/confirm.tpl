@@ -5,7 +5,14 @@
 
     {if $EasyCreditPaymentPlan}
     <p class="easycredit-info-description">
-        <easycredit-checkout payment-plan="{$EasyCreditPaymentPlan}" />
+        <easycredit-checkout 
+            {if $sPayment.name == 'easycredit_ratenkauf'}
+            payment-type="INSTALLMENT"
+            {else if $sPayment.name == 'easycredit_rechnung'}
+            payment-type="BILL"
+            {/if}    
+            payment-plan="{$EasyCreditPaymentPlan}"
+        ></easycredit-checkout>
    </p>
    {/if}
 {/block}

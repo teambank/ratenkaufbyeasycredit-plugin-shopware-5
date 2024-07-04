@@ -1,7 +1,6 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Integration;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
@@ -154,7 +153,9 @@ class QuoteBuilder {
     }
 
     public function build(): Transaction {
-        return new Transaction([
+        $transaction = new Transaction([
+            'paymentType' => $this->helper->getPaymentType($this->helper->getSelectedPayment()),
+            'paymentSwitchPossible' => count($this->helper->getActivePaymentMethods()) > 1, // Switch between installment & bill payment should be possible if both methods are enabled
             'financingTerm' => $this->getDuration(),
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
@@ -164,16 +165,22 @@ class QuoteBuilder {
                 'shippingAddress' => $this->isExpress() ? null : $this->getShippingAddress(),
                 'shoppingCartInformation' => $this->getItems(),
                 'withoutFlexprice' => (new \EasyCredit_FlexpriceService())->shouldDisableFlexprice()
-           ]),
+            ]),
             'shopsystem' => $this->getSystem(),
             'customer' => $this->getCustomer()->build(),
             'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
                 'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTime) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
                 'orderDoneWithLogin' => $this->getCustomer()->isLoggedIn(),
                 'numberOfOrders' => $this->getCustomer()->getOrderCount(),
-                'logisticsServiceProvider' => $this->getShippingMethod()      
+                'logisticsServiceProvider' => $this->getShippingMethod()
             ]),
             'redirectLinks' => $this->getRedirectLinks()
         ]);
+
+        $transaction = $this->helper->getContainer()
+            ->get('events')
+            ->filter('NetzkollektivEasyCredit_Api_QuoteBuilder_Transaction', $transaction, ['subject' => $this]);
+
+        return $transaction;
     }
 }

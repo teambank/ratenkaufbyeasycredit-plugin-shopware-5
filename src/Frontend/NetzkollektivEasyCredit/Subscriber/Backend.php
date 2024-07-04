@@ -52,8 +52,8 @@ class Backend implements SubscriberInterface
 
     public function preventShippingAddressChange(\Enlight_Event_EventArgs $args) {
         $_this = $args->get('subject');
-
         $postData = $_this->Request()->getParams();
+
         if (isset($postData['payment'][0]['name']) && $postData['payment'][0]['name'] != 'easycredit') {
             return;
         }
@@ -84,7 +84,7 @@ class Backend implements SubscriberInterface
                 $_this->View()->assign(array(
                     'success' => false,
                     'data' => $orderData[0],
-                    'message' => 'Die Lieferadresse kann bei mit easyCredit-Ratenkauf bezahlten Bestellungen nicht im Nachhinein geändert werden. Bitte stornieren Sie die Bestellung und Zahlung hierfür und legen Sie eine neue Bestellung an.'
+                    'message' => 'Die Lieferadresse kann bei mit easyCredit bezahlten Bestellungen nicht im Nachhinein geändert werden. Bitte stornieren Sie die Bestellung und Zahlung hierfür und legen Sie eine neue Bestellung an.'
                 ));
 
                 return true;
