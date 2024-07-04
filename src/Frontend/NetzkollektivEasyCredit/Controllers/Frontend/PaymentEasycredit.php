@@ -29,14 +29,16 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->em = Shopware()->Container()->get('models');
     }
 
-    protected function getModule($moduleName) {
+    protected function getModule($moduleName)
+    {
         return $this->container->get('modules')->getModule($moduleName);
     }
 
     public function getPaymentShortName()
     {
         if (($user = $this->getUser()) !== null
-            && !empty($user['additional']['payment']['name'])) {
+            && !empty($user['additional']['payment']['name'])
+        ) {
             return $user['additional']['payment']['name'];
         } else {
             return null;
@@ -51,7 +53,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return parent::createPaymentUniqueId();
     }
 
-    public function getOrderId($transactionId, $paymentUniqueId) {
+    public function getOrderId($transactionId, $paymentUniqueId)
+    {
         $sql = '
             SELECT id FROM s_order
             WHERE transactionID=? AND temporaryID=?
@@ -95,7 +98,6 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
                 'action' => 'finish',
                 'sUniqueID' => $paymentUniqueId
             ));
-
         } catch (\Exception $e) {
             $orderStatusId = $this->helper->getPlugin()->Config()->get('easycreditOrderErrorStatus');
             $this->order->setOrderStatus($orderId, $orderStatusId, true, $e->getMessage());
@@ -133,26 +135,33 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $customerService = new EasyCredit_CustomerService();
             $customer = $customerService->createCustomer($transaction);
             $customerService->loginCustomer($customer);
+
+            $this->helper->getPlugin()->getStorage()->set('express', false);
+            $checkout->finalizeExpress($this->helper->getPlugin()->getQuote());
         }
 
         $this->helper->getPlugin()->addInterest();
         $this->redirectCheckoutConfirm();
     }
 
-    public function createOrder($transaction) {
+    public function createOrder($transaction)
+    {
         $customerService = new EasyCredit_CustomerService();
         $customerService->createCustomer($transaction);
     }
 
-    public function cancelAction() {
+    public function cancelAction()
+    {
         $this->_redirToPaymentSelection();
     }
 
-    public function rejectAction() {
+    public function rejectAction()
+    {
         $this->_redirToPaymentSelection();
     }
 
-    public function expressAction() {
+    public function expressAction()
+    {
         $this->Front()->Plugins()->ViewRenderer()->setNoRender();
 
         $basket = $this->getModule('basket');
@@ -180,7 +189,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->helper->getPlugin()->getStorage()->set('express', 1);
     }
 
-    public function respondWithStatus($content, $code = 200) {
+    public function respondWithStatus($content, $code = 200)
+    {
         http_response_code($code);
         echo $content;
         exit; // NOSONAR
@@ -201,8 +211,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         return $checkoutController;
     }
 
-    protected function setPaymentClearedDate($transactionId) {
-        if (defined('\Shopware::VERSION') && version_compare(\Shopware::VERSION,'5.1.0') == -1) {
+    protected function setPaymentClearedDate($transactionId)
+    {
+        if (defined('\Shopware::VERSION') && version_compare(\Shopware::VERSION, '5.1.0') == -1) {
             return;
         }
 
@@ -218,10 +229,12 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         $this->container->get('db')->query($sql, array($transactionId));
     }
 
-    public function addInterestSurcharge() {
-        if (!isset($this->helper->getPluginSession()["interest_amount"])
+    public function addInterestSurcharge()
+    {
+        if (
+            !isset($this->helper->getPluginSession()["interest_amount"])
             || empty($this->helper->getPluginSession()["interest_amount"])
-           ) {
+        ) {
             return;
         }
 
@@ -255,7 +268,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         );
     }
 
-    public function saveOrderAttributes($orderId) {
+    public function saveOrderAttributes($orderId)
+    {
         $orderAttributeModel = $this->em->getRepository('Shopware\Models\Attribute\Order')->findOneBy(
             array('orderId' => $orderId)
         );
@@ -266,8 +280,9 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $this->em->flush();
         }
     }
- 
-    public function redirectCheckoutConfirm() {
+
+    public function redirectCheckoutConfirm()
+    {
         $this->redirect(
             array(
                 'controller' => 'checkout',
@@ -276,10 +291,11 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
         );
     }
 
-    protected function _redirToPaymentSelection() {
+    protected function _redirToPaymentSelection()
+    {
         $this->redirect(array(
-            'controller'=>'checkout',
-            'action'=>'shippingPayment'
+            'controller' => 'checkout',
+            'action' => 'shippingPayment'
         ));
     }
 }
