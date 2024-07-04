@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v2.1.8
+------
+
+* behebt ein Problem mit dem Express-Checkout, durch das die Adresse nicht verifiziert werden konnte
+* die asynchrone Authorisierung wurde entfernt, da die Transaktionen synchron autorisiert und geprüft werden
+
 v2.1.7
 ------
 

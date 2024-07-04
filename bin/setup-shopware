@@ -3,7 +3,7 @@
 set -eu
 
 echo "cloning Shopware $1"
-git clone --depth=1 -b $1 https://github.com/shopware/shopware.git /opt/shopware
+git clone --depth=1 -b $1 https://github.com/shopware5/shopware.git /opt/shopware
 cd /opt/shopware
 
 echo "

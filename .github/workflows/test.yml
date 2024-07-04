@@ -4,7 +4,7 @@ on:
   push:
     branches:
     - 'main'
-    - 'phpstan'
+    - '2.x'
 
 jobs:
   ci-current:
