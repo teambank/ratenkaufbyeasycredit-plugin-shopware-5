@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v2.1.9
+------
+
+* behebt ein Problem, durch das der Zahlungsstatus nicht gesetzt wurde
+
 v2.1.8
 ------
 

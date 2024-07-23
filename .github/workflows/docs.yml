@@ -1,0 +1,26 @@
+name: Docs
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Deploy docs
+      run: |
+         pip install sphinx-rtd-theme
+         THEME_PATH=$(python3 -c "import sphinx_rtd_theme, os; print(os.path.dirname(sphinx_rtd_theme.__file__))")
+
+         docker run --rm -v ${PWD}/docs:/docs -v ${THEME_PATH}:/docs/source/_themes/sphinx_rtd_theme sphinxdoc/sphinx make html
+
+         echo "${{ secrets.DOCS_DEPLOY_PRIVKEY }}" > ./privkey
+         chmod 0600 ./privkey
+
+         # option -s needed to use sftp subsystem in OpenSSH 8.9
+         scp -si ./privkey -o StrictHostKeyChecking=accept-new -r ${PWD}/docs/build/html/* ${{ secrets.DOCS_DEPLOY_DST }}
+
+      shell: bash
