@@ -89,8 +89,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             }
 
             $paymentStatusId = $this->helper->getPlugin()->Config()->get('easycreditPaymentStatus');
-
-            $this->savePaymentStatus($transactionId, $orderNumber, $paymentStatusId, false);
+            $this->savePaymentStatus($transactionId, $paymentUniqueId, $paymentStatusId, false);
             $this->setPaymentClearedDate($transactionId);
 
             $this->redirect(array(
