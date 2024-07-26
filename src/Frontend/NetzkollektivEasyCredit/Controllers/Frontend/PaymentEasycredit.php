@@ -165,9 +165,8 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
             $paymentType
         );
         if (!$paymentMethod->getActive()) {
-            throw new \Exception($paymentMethod->getDescription(). ' ist derzeit nicht verfügbar. Bitte wählen Sie eine andere Zahlungsart.');
+            throw new \Exception($paymentMethod->getDescription() . ' ist derzeit nicht verfügbar. Bitte wählen Sie eine andere Zahlungsart.');
         }
-        file_put_contents('/tmp/bla', 'setting paymentId '. $paymentMethod->getId().PHP_EOL,FILE_APPEND);
         $this->session->offsetSet('sPaymentID', $paymentMethod->getId());
         $this->getModule('admin')->sUpdatePayment($paymentMethod->getId());
     }

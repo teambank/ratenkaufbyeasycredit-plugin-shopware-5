@@ -5,11 +5,11 @@ on:
     branches:
     - 'main'
     - '2.x'
+    - 'e2e'
 
 jobs:
-  ci-current:
+  ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
     strategy:
       max-parallel: 15
       fail-fast: false
@@ -77,6 +77,10 @@ jobs:
         run: |
           chmod +x $GITHUB_WORKSPACE/bin/*
           $GITHUB_WORKSPACE/bin/setup-shopware ${{ matrix.shopware-version }}
+          cp $GITHUB_WORKSPACE/etc/router.php $SW_DIR/
+
+          # Set API credentials
+          mysql -h 127.0.0.1 -u root -proot shopware -e "update s_core_auth Set apiKey = 'dVHnNzuVi4wvTcwV36K12D0OFgqvVzTxsRvTmRqC';"
 
           cd $SW_DIR
       - name: Link plugin with shopware installation and install composer deps
@@ -89,6 +93,10 @@ jobs:
           cd $SW_DIR
           $GITHUB_WORKSPACE/bin/setup-plugin
 
+          php bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiKey ${{ secrets.EASYCREDITAPIKEY }}
+          php bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiPassword ${{ secrets.EASYCREDITAPIPASSWORD }}
+          php bin/console sw:plugin:config:set NetzkollektivEasyCredit easycreditApiSignature ${{ secrets.EASYCREDITAPISIGNATURE }}
+
           php bin/console sw:cache:clear
           php bin/console sw:generate:attributes
           php bin/console orm:generate:proxies
@@ -100,7 +108,33 @@ jobs:
 
           find . -maxdepth 1 -type l -delete
           php vendor/bin/phpstan -v analyze .
+      - name: Setup Playwright
+        run: |
+          npm install --global yarn
+          yarn install --frozen-lockfile
+          yarn playwright install --with-deps chromium
+      - name: Playwright E2E Tests
+        run: |
+          cd $GITHUB_WORKSPACE
+          VERSION=${{ matrix.shopware-version }} yarn playwright test -c tests/
+      - name: Save Logs for Debugging
+        if: always()
+        run: |
+          LOG_DIR=playwright-report/logs
+          mkdir $LOG_DIR
+          cp -r $SW_DIR/var/log/* $LOG_DIR/
+          for i in $LOG_DIR/*; do
+            echo "<a href=\"$(basename $i)\">$i</a><br />" >> $LOG_DIR/index.html
+          done;
+      - name: Deploy Error Reports
+        if: always()
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy playwright-report/ --project-name=easycredit-playwright-reports
       - name: Deactivate & uninstall Plugin
+        if: always()
         run: |
           cd $SW_DIR
           php bin/console sw:plugin:deactivate NetzkollektivEasyCredit

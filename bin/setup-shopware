@@ -2,9 +2,12 @@
 
 set -eu
 
+SW_DIR=/opt/shopware
+
 echo "cloning Shopware $1"
-git clone --depth=1 -b $1 https://github.com/shopware5/shopware.git /opt/shopware
-cd /opt/shopware
+git clone --depth=1 -b $1 https://github.com/shopware5/shopware.git $SW_DIR
+
+cd $SW_DIR
 
 echo "
 DB_USER=root
@@ -19,7 +22,7 @@ ELASTICSEARCH_HOST=elasticsearch
 " > .env
 
 EXIT_CODE=0
-dpkg --compare-versions `echo $1 | sed 's/v//'` 'gt' `echo 'v5.5.10' | sed 's/v//'` || EXIT_CODE=$?
+#dpkg --compare-versions `echo $1 | sed 's/v//'` 'gt' `echo 'v5.5.10' | sed 's/v//'` || EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]
   then
   make init

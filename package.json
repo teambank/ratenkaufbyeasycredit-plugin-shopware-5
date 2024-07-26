@@ -5,5 +5,11 @@
     "docs:deploy" : "export $(cat .env | xargs) && rsync -rvz --delete ${PWD}/docs/build/html/ ${DOCS_DEPLOY_DST}",
     "docs": "yarn docs:build:html; yarn docs:deploy",
     "release" : "./bin/release.sh"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.45.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.12"
   }
 }

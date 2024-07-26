@@ -4,6 +4,7 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
+use Shopware\Models\Payment\Payment;
 use Doctrine\Common\Collections\ArrayCollection;
 use Teambank\RatenkaufByEasyCreditApiV3 as ApiV3;
 use GuzzleHttp\HandlerStack;

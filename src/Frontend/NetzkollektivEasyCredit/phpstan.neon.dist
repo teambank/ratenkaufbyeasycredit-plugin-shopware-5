@@ -1,5 +1,4 @@
 parameters:
-  checkMissingIterableValueType: false
   reportUnmatchedIgnoredErrors: false
   level: 3
   scanDirectories:
@@ -18,6 +17,7 @@ parameters:
   excludePaths:
     - vendor
   ignoreErrors:
+    - identifier: missingType.iterableValue
     - # Legacy DI registration not recognized by phpstan
         message: '#is not registered in the container#'
         paths:

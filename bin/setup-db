@@ -1,0 +1,1 @@
+docker run --name shopware-mysql-test -e MYSQL_DATABASE=shopware -e MYSQL_ROOT_PASSWORD=root -p 127.0.0.1:3306:3306 -d mysql:5.7
