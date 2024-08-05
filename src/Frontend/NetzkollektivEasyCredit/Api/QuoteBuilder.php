@@ -1,12 +1,15 @@
 <?php
+
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
 use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
 use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
 
-class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
-    public function __construct() {
+class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout
+{
+    public function __construct()
+    {
         $this->init();
         $this->container = Shopware()->Container();
         $this->setView(new \Enlight_View_Default(
@@ -15,7 +18,8 @@ class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout {
     }
 }
 
-class QuoteBuilder {
+class QuoteBuilder
+{
 
     protected $basket;
     protected $user;
@@ -23,7 +27,8 @@ class QuoteBuilder {
     protected $storage;
     protected $helper;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->helper = new \EasyCredit_Helper();
         $this->basket = $this->helper->getBasket();
         $this->user = $this->helper->getUser();
@@ -31,22 +36,25 @@ class QuoteBuilder {
         $this->storage = new Storage();
     }
 
-    public function getId() {
+    public function getId()
+    {
         return \mb_substr(Shopware()->Session()->get('sessionId'), 0, 50);
     }
 
-    public function getShippingMethod() {
+    public function getShippingMethod()
+    {
         $dispatch = $this->helper->getSelectedDispatch();
         if (isset($dispatch['name'])) {
             $shippingMethod = strip_tags($dispatch['name']);
             if ($this->getIsClickAndCollect()) {
-                $shippingMethod = '[Selbstabholung] '.$shippingMethod;
+                $shippingMethod = '[Selbstabholung] ' . $shippingMethod;
             }
             return $shippingMethod;
         }
     }
 
-    public function getIsClickAndCollect() {
+    public function getIsClickAndCollect()
+    {
         $dispatch = $this->helper->getSelectedDispatch();
         return (
             isset($dispatch['id'])
@@ -56,23 +64,26 @@ class QuoteBuilder {
 
     protected $grandTotal;
 
-    public function getGrandTotal() {
+    public function getGrandTotal()
+    {
         if ($this->grandTotal === null) {
             /** @var \Shopware_Controllers_Frontend_Checkout $checkoutController */
             $checkoutController = new FakeCheckoutController();
             $checkoutController->setFront(Shopware()->Front());
-            
+
             $basket = $checkoutController->getBasket();
             $this->grandTotal = empty($basket['AmountWithTaxNumeric']) ? $basket['AmountNumeric'] : $basket['AmountWithTaxNumeric'];
         }
         return $this->grandTotal;
     }
 
-    public function getDuration() {
+    public function getDuration()
+    {
         return $this->storage->get('duration');
     }
 
-    public function getInvoiceAddress() {
+    public function getInvoiceAddress()
+    {
         $addressBuilder = new Quote\AddressBuilder();
         return $addressBuilder
             ->setAddressModel(new InvoiceAddress())
@@ -81,7 +92,8 @@ class QuoteBuilder {
                 $this->user['billingaddress']
             );
     }
-    public function getShippingAddress() {
+    public function getShippingAddress()
+    {
         $addressBuilder = new Quote\AddressBuilder();
         return $addressBuilder
             ->setAddressModel(new ShippingAddress())
@@ -91,11 +103,13 @@ class QuoteBuilder {
             );
     }
 
-    public function getCustomer() {
+    public function getCustomer()
+    {
         return new Quote\CustomerBuilder();
     }
 
-    public function getItems() {
+    public function getItems()
+    {
         return $this->_getItems(
             $this->basket['content']
         );
@@ -116,12 +130,14 @@ class QuoteBuilder {
         return $_items;
     }
 
-    public function getSystem() {
+    public function getSystem()
+    {
         $systemBuilder = new SystemBuilder();
         return $systemBuilder->build();
     }
 
-    protected function _getUrl($action) {
+    protected function _getUrl($action)
+    {
         return Shopware()->Front()->Router()->assemble(array(
             'controller' => 'payment_easycredit',
             'action'    => $action,
@@ -136,7 +152,8 @@ class QuoteBuilder {
         return md5(uniqid(mt_rand(), true));
     }
 
-    protected function getRedirectLinks() {
+    protected function getRedirectLinks()
+    {
         if (!$this->storage->get('sec_token')) {
             $this->storage->set('sec_token', $this->createPaymentUniqueId());
         }
@@ -148,13 +165,15 @@ class QuoteBuilder {
         ]);
     }
 
-    protected function isExpress() {
+    protected function isExpress()
+    {
         return $this->storage->get('express');
     }
 
-    public function build(): Transaction {
+    public function build(): Transaction
+    {
         $transaction = new Transaction([
-            'paymentType' => $this->helper->getPaymentType($this->helper->getSelectedPayment()),
+            'paymentType' => $this->helper->getPaymentType($this->helper->getSelectedPayment()) . '_PAYMENT',
             'paymentSwitchPossible' => count($this->helper->getActivePaymentMethods()) > 1, // Switch between installment & bill payment should be possible if both methods are enabled
             'financingTerm' => $this->getDuration(),
             'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([

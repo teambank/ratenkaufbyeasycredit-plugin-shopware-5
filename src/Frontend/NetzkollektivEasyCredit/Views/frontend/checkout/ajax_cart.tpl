@@ -13,7 +13,11 @@
     {block name='frontend_checkout_ajax_cart_easycredit_widget'}
         {if $EasyCreditWidgetOffCanvas}
         <div class="easycredit-widget-container">
-            <easycredit-widget webshop-id="{$EasyCreditApiKey}" amount="{$sBasket.AmountNumeric}"></easycredit-widget>
+            <easycredit-widget 
+                webshop-id="{$EasyCreditApiKey}" 
+                amount="{$sBasket.AmountNumeric}"
+                payment-types="{', '|implode:$EasyCreditActiveMethods}"
+            ></easycredit-widget>
         </div>
         {/if}
     {/block}

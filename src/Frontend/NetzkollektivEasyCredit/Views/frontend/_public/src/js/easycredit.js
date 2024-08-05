@@ -2,6 +2,7 @@
     var webshopId = $('meta[name=easycredit-api-key]').attr('content');
     var widgetActive = $('meta[name=easycredit-widget-active]').attr('content') === 'true';
     var disableFlexprice = $('meta[name=easycredit-disable-flexprice]').attr('content') === 'true';
+    var paymentTypes = $('meta[name=easycredit-payment-types]').attr('content');
 
     var onHydrated = function (selector, cb) {
         if (!document.querySelector(selector)) {
@@ -94,28 +95,34 @@
             target = productPrice;
         }
 
-        var amount = function () {
-            // if price is identified by meta tag
+        const amount = (() => {
+            // If price is identified by a meta tag
             if (price !== undefined && price !== null && !isNaN(price)) {
                 return price;
             }
 
-            price = $(productPrice).text();
+            const priceText = $(productPrice).text();
 
-            if (price === undefined) {
-                return NaN;
-            }
-
-            return getPriceAsFloat(price);
-        }();
+            return priceText === undefined ? NaN : getPriceAsFloat(priceText);
+        })();
 
         if (isNaN(amount)) {
             return;
         }
 
-        if ($(target).siblings('easycredit-widget').length == 0) {
-            var disableFlexpriceAttr = (disableFlexprice) ? 'disable-flexprice="true"' : '';
-            $(target).after('<easycredit-widget amount="'+amount+'" webshop-id="'+webshopId+'" '+disableFlexpriceAttr+'/>');
+        if (!$(target).siblings('easycredit-widget').length) {
+            const opts = {
+                amount,
+                'webshop-id': webshopId,
+                'payment-types': paymentTypes,
+                ...(disableFlexprice && { 'disable-flexprice': 'true' })
+            };
+
+            const attributes = Object.entries(opts)
+                .map(([key, value]) => `${key}="${value}"`)
+                .join(' ');
+
+            $(target).after(`<easycredit-widget ${attributes}/>`);
             return;
         }
         $(target).siblings('easycredit-widget').get(0).setAttribute('amount', amount);
