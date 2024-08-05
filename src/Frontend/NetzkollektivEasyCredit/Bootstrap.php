@@ -24,12 +24,12 @@ extends Shopware_Components_Plugin_Bootstrap
 
     public function getLabel()
     {
-        return 'easyCredit';
+        return 'easyCredit-Rechnung & Ratenkauf';
     }
 
     public function getVersion()
     {
-        return '2.1.9';
+        return '3.0.0';
     }
 
     public function getInfo()
@@ -131,7 +131,7 @@ extends Shopware_Components_Plugin_Bootstrap
     public function updateSpecialFieldTypes($type = 'easycreditIntro')
     {
         $this->get('db')->query(
-            "UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easycreditMarketing','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
+            "UPDATE s_core_config_elements Set type = ? WHERE name IN ('easyCreditIntro','easyCreditActivation','easycreditBehavior','easycreditCredentials','easyCreditClickAndCollectIntro','easyCreditClickAndCollectHeading','easycreditMarketing','easyCreditMarketingExpressHeading','easyCreditMarketingWidgetHeading','easyCreditMarketingModalHeading','easyCreditMarketingCardHeading','easyCreditMarketingFlashboxHeading','easyCreditMarketingBarHeading');",
             array(
                 $type
             )
@@ -326,7 +326,7 @@ extends Shopware_Components_Plugin_Bootstrap
             if (!$payment) {
                 $options = array_merge($options, [
                     'action' => 'payment_easycredit',
-                    'active' => 0,
+                    'active' => 1,
                     'position' => 0,
                     'additionalDescription' => '',
                     'template' => 'easycredit.tpl',

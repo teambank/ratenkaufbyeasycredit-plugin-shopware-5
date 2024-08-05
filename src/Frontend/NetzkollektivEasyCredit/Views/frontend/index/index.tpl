@@ -14,6 +14,10 @@
     <meta name="easycredit-disable-flexprice" content="true" />
     {/if}
 
+    {if $EasyCreditActiveMethods}
+    <meta name="easycredit-payment-types" content="{', '|implode:$EasyCreditActiveMethods}" />
+    {/if}
+
     <script type="module" src="https://invoice.easycredit-ratenkauf-webcomponents.pages.dev/easycredit-components/easycredit-components.esm.js"></script>
 
 {/block}

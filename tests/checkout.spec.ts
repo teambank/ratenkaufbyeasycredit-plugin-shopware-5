@@ -129,8 +129,7 @@ test.describe("amount change should invalidate payment", () => {
 
     await goThroughPaymentPage({
       page: page,
-      paymentType: PaymentTypes.INSTALLMENT,
-      express: true,
+      paymentType: PaymentTypes.INSTALLMENT
     });
 
     await checkAmountInvalidation(page);

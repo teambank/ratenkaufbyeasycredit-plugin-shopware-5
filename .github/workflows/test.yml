@@ -40,6 +40,8 @@ jobs:
             php-version: '8.1'
           - shopware-version: 'v5.7.17'
             php-version: '8.2'
+          - shopware-version: '5.7'
+            php-version: '8.3'
 
     name: Shopware ${{ matrix.shopware-version }} @ ${{ matrix.php-version }}
 
@@ -139,4 +141,3 @@ jobs:
           cd $SW_DIR
           php bin/console sw:plugin:deactivate NetzkollektivEasyCredit
           php bin/console sw:plugin:uninstall NetzkollektivEasyCredit
-          php bin/console sw:cache:clear

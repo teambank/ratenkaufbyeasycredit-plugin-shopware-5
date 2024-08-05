@@ -4,7 +4,10 @@
     {block name='frontend_checkout_cart_premium_easycredit_widget'}
         {if $EasyCreditWidgetCart}
         <div class="easycredit-widget-container">
-            <easycredit-widget webshop-id="{$EasyCreditApiKey}" amount="{$sBasket.AmountNumeric}" 
+            <easycredit-widget 
+                webshop-id="{$EasyCreditApiKey}" 
+                amount="{$sBasket.AmountNumeric}" 
+                payment-types="{', '|implode:$EasyCreditActiveMethods}"
                 {if $EasyCreditDisableFlexprice}disable-flexprice="true"{/if}
             ></easycredit-widget>
         </div>
