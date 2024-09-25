@@ -86,7 +86,7 @@ class EasyCredit_Helper
     public function getSelectedPayment()
     {
         if ($paymentId = $this->getContainer()->get('front')->Request()->getPost('payment')) {
-            return $paymentId;
+            return $paymentId; // redirect happens before save, so we need the post var for payment type determination
         }
 
         if ($paymentId = $this->getSession()->offsetGet('sPaymentID')) {

@@ -303,6 +303,13 @@ class Frontend implements SubscriberInterface
             return;
         }
 
+        if (
+            $this->helper->getPlugin()->isSelected($paymentId)
+            && $paymentId !== Shopware()->Session()->offsetGet('sPaymentID')
+        ) {
+            $this->helper->getPlugin()->clear();
+        }
+
         if (!$params = $request->getParam('easycredit')) {
             return;
         }

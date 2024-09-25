@@ -429,7 +429,8 @@ extends Shopware_Components_Plugin_Bootstrap
         $quote = $this->getQuote();
         return $this->isInterestInBasket()
             && $this->getCheckout()->isAmountValid($quote)
-            && $this->getCheckout()->verifyAddress($quote);
+            && $this->getCheckout()->verifyAddress($quote)
+            && $this->getStorage()->get('payment_type') === $quote->getPaymentType();
     }
 
     public function clear()
