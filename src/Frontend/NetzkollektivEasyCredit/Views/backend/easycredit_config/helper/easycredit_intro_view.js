@@ -10,9 +10,57 @@ Ext.define('Netzkollektiv.EasyCredit.ClickAndCollect', {
   },
   listeners: {
     afterrender: function () {
-      this.initTabs();
-      this.initSmoothScrolling();
-    }
+      if (this.elementName === 'easycreditMarketing') {
+        this.initTabs();
+      }
+
+      if (
+        this.elementName === 'easyCreditIntro' ||
+        this.elementName === 'easyCreditActivation'
+      ) {
+        this.checkStatusAction()
+        .then((data) => {
+
+          if ( this.el.query('.easycredit-intro.intro-2024.bill').length > 0 ) {
+            const apiKey = this.el.dom.closest('table').querySelector('input[type=text]').value
+            this.fetchWebshopInfo(apiKey)
+            .then((data) => {
+              var elBill = this.el.query('.easycredit-intro.intro-2024.bill');
+
+              if ( data.billPaymentActive === true ) {
+                var elRemove = this.el.query('#easycredit-activate-invoice-button-inactive');
+              } else {
+                var elRemove = this.el.query('#easycredit-activate-invoice-button-active');
+                elBill.length > 0 ? elBill[0].classList.add('easycredit_rechnung-not-allowed') : null;
+              }
+
+              elRemove.length > 0 ? elRemove[0].remove() : null;
+            })
+            .catch(error => {
+              var elBill = this.el.query('.easycredit-intro.intro-2024.bill');
+              elBill.length > 0 ? elBill[0].classList.add('easycredit_rechnung-not-allowed') : null;
+
+              var elRemove = this.el.query('#easycredit-activate-invoice-button-active');
+              elRemove.length > 0 ? elRemove[0].remove() : null;
+            });
+          }
+
+          if ( !data.methods.easycredit_ratenkauf ) {
+            var elActivation = this.el.query('.easycredit-intro.intro-2024.activation');
+            elActivation.length > 0 ? elActivation[0].classList.add('easycredit_ratenkauf-not-active') : null;
+          }
+          if ( !data.methods.easycredit_rechnung ) {
+            var elBill = this.el.query('.easycredit-intro.intro-2024.bill');
+            elBill.length > 0 ? elBill[0].classList.add('easycredit_rechnung-not-active') : null;
+
+            var elActivation = this.el.query('.easycredit-intro.intro-2024.activation');
+            elActivation.length > 0 ? elActivation[0].classList.add('easycredit_rechnung-not-active') : null;
+          }
+
+        })
+        .catch(error => {});
+      }
+    },
   },
 
   getTabs: function() {
@@ -66,37 +114,41 @@ Ext.define('Netzkollektiv.EasyCredit.ClickAndCollect', {
     });
   },
 
-  getSmoothLinks: function() {
-    var links = this.el.query('a[href^="#"]');
+  fetchWebshopInfo: function(apiKey) {
+    return new Promise((resolve, reject) => {
+      const url = 'https://ratenkauf.easycredit.de/api/payment/v3/webshop/' + apiKey;
 
-    return links;
+      return fetch(url).then((response) => {
+          if (!response.ok) { 
+              return Promise.reject(response); 
+          }
+          return response.json();
+      }).then((data) => {
+          resolve(data);
+      }).catch((error) => {
+          console.error('Error fetching webshop info:', error);
+          reject(error);
+      });
+    });
   },
 
-  initSmoothScrolling: function() {
-    // Enable smooth scrolling for anchor links (handle links with @href started with '#' only)
-    links = this.getSmoothLinks();
+  checkStatusAction: function() {
+    return new Promise((resolve, reject) => {
 
-    links.forEach(a => {
-      var el = Ext.get(a);
-
-      el.on( 'click', function (e, t) {
-        // target element id
-        var id = t.getAttribute('href');
-
-        // target element
-        var elements = Ext.dom.Query.select(id);
-        if (elements.length === 0) {
-            return;
+      Ext.Ajax.request({
+        url: '{url controller=PaymentEasycredit action=getStatus}',
+        success: function(response) {
+          var data = Ext.decode(response.responseText);
+            if (data.success) {
+                resolve(data);
+            }
+        },
+        failure: function() {
+            Ext.Msg.alert('Error', 'Request failed');
+            reject('Request failed');
         }
+      });
 
-        // prevent standard hash navigation (avoid blinking in IE)
-        e.preventDefault();
-
-        // animated top scrolling
-        elements[0].scrollIntoView({
-          behavior: 'smooth'
-        });
-      }, false );
     });
   }
 });

@@ -87,6 +87,18 @@ class EasyCredit_BackendFormBuilder
 
         $form->setElement(
             'button',//'easycreditIntro',
+            'easyCreditActivation',
+            array(
+                'label' => 'Aktivierung',
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'helpText' => file_get_contents(dirname(__FILE__).'/../Views/backend/easycredit_config/activation.html'),
+                'handler' => "function(btn) { Ext.Msg.alert('Aktivierung', btn.helpText); }",
+                'position' => $position++
+            )
+        );
+
+        $form->setElement(
+            'button',//'easycreditIntro',
             'easycreditBehavior',
             array(
                 'label' => 'Verhalten',

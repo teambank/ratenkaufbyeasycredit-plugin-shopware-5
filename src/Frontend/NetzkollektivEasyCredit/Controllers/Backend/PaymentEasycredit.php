@@ -36,6 +36,20 @@ abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends S
         }
         $this->View()->assign(array('status' => true, 'valid' => $valid, 'errorMessage' => $message));
     }
+
+    public function getStatusAction()
+    {
+        $paymentMethods = (new \EasyCredit_Helper())->getPlugin()->getPaymentMethods();
+
+        $data = [
+            'success' => true,
+        ];
+        foreach ($paymentMethods as $method) {
+            $data['methods'][$method->getName()] = $method->getActive();
+        }
+
+        $this->View()->assign($data);
+    }
 }
 
 if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
@@ -49,7 +63,8 @@ if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
         public function getWhitelistedCSRFActions()
         {
             return array(
-                'verifyCredentials'
+                'verifyCredentials',
+                'getStatus'
             );
         }
     }
@@ -58,4 +73,3 @@ if (interface_exists('\Shopware\Components\CSRFWhitelistAware')) {
 
     }
 }
-

@@ -37,11 +37,42 @@ $border-radius-xs: 8px;
 
 $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
 
+.x-panel .x-panel-body,
+.x-window .x-window-body {
+    // scroll-behavior: smooth;
+    // scroll-padding: 30px;
+}
+
+/* Adjust height values for ExtJS Layouts due to dynamically shown elements (like "Easycredit-Rechnung" banner) */
+.x-fieldset + .x-panel:has(.easycredit-intro.intro-2024) {
+    height: auto !important;
+
+    &.x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body,
+    &.x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body > .x-panel,
+    &.x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body > .x-panel > .x-panel-body {
+        height: auto !important;
+    }
+}
+.x-panel:has(.easycredit-intro.intro-2024)[id^='plugin-form-panel-'] {
+    div:has(.x-form-layout-table)[id^='base-element-fieldset-'] {
+        overflow: scroll;
+    }
+}
+
 .base-element-easycreditintro {
     --grid-column-gap: 48px;
     --grid-column-gap-m: 36px;
     --grid-template-columns: 3fr 2fr;
     --grid-template-columns-50-50: 1fr 1fr;
+
+    /* Adjust height values for ExtJS Layouts due to dynamically shown elements (like "Easycredit-Rechnung" banner) */
+    &:has(.easycredit-intro.intro-2024) {
+        height: auto !important;
+
+        &.base-element-easycreditintro > .x-panel-body {
+            height: auto !important;
+        }
+    }
 
     .x-panel-body {
         padding: 2px 25px 2px 2px;
@@ -143,8 +174,7 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
         &:not(.btn-link) {
             &:hover,
             &:active,
-            &:focus,
-            &:visited {
+            &:focus {
                 background-color: darken($color-ec-secondary, 5%) !important;
                 color: $color-white !important;
 
@@ -219,6 +249,10 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
 
         a {
             color: $color-ec-secondary;
+        }
+
+        strong {
+            font-weight: bold;
         }
 
         &__tabs {
@@ -384,7 +418,9 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
         }
 
         p {
-            margin-bottom: 25px;
+            &:not(:last-child) {
+                margin-bottom: 25px;
+            }
         }
 
         ul {
@@ -405,10 +441,26 @@ $transition-timing: cubic-bezier(0.73, 0.32, 0.14, 0.99);
     .faq {
     }
     .bill {
+        display: none;
         margin-top: 0;
+        margin-bottom: 0;
 
         .easycredit-intro__image {
             background-image: url('../../images/card-easycredit-rechnung-image.png');
+        }
+
+        &.easycredit_rechnung-not-allowed,
+        &.easycredit_rechnung-not-active {
+            display: block;
+        }
+    }
+    .activation {
+        display: none;
+        margin-bottom: 0;
+
+        &.easycredit_ratenkauf-not-active,
+        &.easycredit_rechnung-not-active {
+            display: block;
         }
     }
 

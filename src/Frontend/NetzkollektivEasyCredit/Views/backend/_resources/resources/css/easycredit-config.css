@@ -2,11 +2,24 @@
 /* Colors - eC */
 /* Colors - SW5 */
 /* Colors - Typo (SW5) */
+/* Adjust height values for ExtJS Layouts due to dynamically shown elements (like "Easycredit-Rechnung" banner) */
+.x-fieldset + .x-panel:has(.easycredit-intro.intro-2024) {
+  height: auto !important;
+}
+.x-fieldset + .x-panel:has(.easycredit-intro.intro-2024).x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body, .x-fieldset + .x-panel:has(.easycredit-intro.intro-2024).x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body > .x-panel, .x-fieldset + .x-panel:has(.easycredit-intro.intro-2024).x-panel:has(.easycredit-intro.intro-2024) > .x-panel-body > .x-panel > .x-panel-body {
+  height: auto !important;
+}
+
+.x-panel:has(.easycredit-intro.intro-2024)[id^=plugin-form-panel-] div:has(.x-form-layout-table)[id^=base-element-fieldset-] {
+  overflow: scroll;
+}
+
 .base-element-easycreditintro {
   --grid-column-gap: 48px;
   --grid-column-gap-m: 36px;
   --grid-template-columns: 3fr 2fr;
   --grid-template-columns-50-50: 1fr 1fr;
+  /* Adjust height values for ExtJS Layouts due to dynamically shown elements (like "Easycredit-Rechnung" banner) */
   /* Headings */
   /* Typo */
   /* Links */
@@ -23,6 +36,12 @@
   /* - Card */
   /* - Flashbox */
   /* - Bar */
+}
+.base-element-easycreditintro:has(.easycredit-intro.intro-2024) {
+  height: auto !important;
+}
+.base-element-easycreditintro:has(.easycredit-intro.intro-2024).base-element-easycreditintro > .x-panel-body {
+  height: auto !important;
 }
 .base-element-easycreditintro .x-panel-body {
   padding: 2px 25px 2px 2px;
@@ -105,11 +124,11 @@
   padding-right: 0;
   color: #0066B3 !important;
 }
-.base-element-easycreditintro .btn:not(.btn-link):hover, .base-element-easycreditintro .btn:not(.btn-link):active, .base-element-easycreditintro .btn:not(.btn-link):focus, .base-element-easycreditintro .btn:not(.btn-link):visited {
+.base-element-easycreditintro .btn:not(.btn-link):hover, .base-element-easycreditintro .btn:not(.btn-link):active, .base-element-easycreditintro .btn:not(.btn-link):focus {
   background-color: #00579a !important;
   color: #fff !important;
 }
-.base-element-easycreditintro .btn:not(.btn-link):hover.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):active.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):focus.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):visited.btn-primary {
+.base-element-easycreditintro .btn:not(.btn-link):hover.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):active.btn-primary, .base-element-easycreditintro .btn:not(.btn-link):focus.btn-primary {
   background-color: #ef620d !important;
 }
 .base-element-easycreditintro .btn:not(.btn-link):active, .base-element-easycreditintro .btn:not(.btn-link):focus {
@@ -164,6 +183,9 @@
 }
 .base-element-easycreditintro .easycredit-intro a {
   color: #0066B3;
+}
+.base-element-easycreditintro .easycredit-intro strong {
+  font-weight: bold;
 }
 .base-element-easycreditintro .easycredit-intro__tabs {
   display: flex;
@@ -291,7 +313,7 @@
   font-weight: 600;
   color: #002C5A;
 }
-.base-element-easycreditintro .intro-2024 p {
+.base-element-easycreditintro .intro-2024 p:not(:last-child) {
   margin-bottom: 25px;
 }
 .base-element-easycreditintro .intro-2024 ul li {
@@ -305,10 +327,22 @@
   background-image: url("../../images/card-intro-image.png");
 }
 .base-element-easycreditintro .bill {
+  display: none;
   margin-top: 0;
+  margin-bottom: 0;
 }
 .base-element-easycreditintro .bill .easycredit-intro__image {
   background-image: url("../../images/card-easycredit-rechnung-image.png");
+}
+.base-element-easycreditintro .bill.easycredit_rechnung-not-allowed, .base-element-easycreditintro .bill.easycredit_rechnung-not-active {
+  display: block;
+}
+.base-element-easycreditintro .activation {
+  display: none;
+  margin-bottom: 0;
+}
+.base-element-easycreditintro .activation.easycredit_ratenkauf-not-active, .base-element-easycreditintro .activation.easycredit_rechnung-not-active {
+  display: block;
 }
 .base-element-easycreditintro .intro {
   margin-top: 10px;
