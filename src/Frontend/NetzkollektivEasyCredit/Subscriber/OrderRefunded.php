@@ -6,9 +6,9 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Order\Order;
-use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\RefundRequest;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ConstraintViolation;
+use Teambank\EasyCreditApiV3\ApiException;
+use Teambank\EasyCreditApiV3\Model\RefundRequest;
+use Teambank\EasyCreditApiV3\Model\ConstraintViolation;
 
 class OrderRefunded extends OrderStatusChanged
 {

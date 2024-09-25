@@ -35,7 +35,7 @@ class ItemBuilder
             if (!isset($this->product[$key]) || $this->product[$key] === '') {
                 continue;
             }
-            $skus[] = new \Teambank\RatenkaufByEasyCreditApiV3\Model\ArticleNumberItem([
+            $skus[] = new \Teambank\EasyCreditApiV3\Model\ArticleNumberItem([
                 'numberType' => $key,
                 'number' => $this->product[$key]
             ]);
@@ -44,7 +44,7 @@ class ItemBuilder
     }
 
     public function build() {
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\ShoppingCartInformationItem([
+        return new \Teambank\EasyCreditApiV3\Model\ShoppingCartInformationItem([
             'productName' => $this->product['articlename'],
             'productUrl' => $url = Shopware()->Front()->Router()->assemble([
                 'module' => 'frontend',

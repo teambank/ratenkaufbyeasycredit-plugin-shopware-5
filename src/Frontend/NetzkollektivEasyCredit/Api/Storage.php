@@ -1,7 +1,7 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
-class Storage implements \Teambank\RatenkaufByEasyCreditApiV3\Integration\StorageInterface
+class Storage implements \Teambank\EasyCreditApiV3\Integration\StorageInterface
 {
 
     public function set($key,$value) {

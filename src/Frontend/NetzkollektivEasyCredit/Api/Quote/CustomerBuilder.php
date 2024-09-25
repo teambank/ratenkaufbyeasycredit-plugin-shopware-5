@@ -1,7 +1,7 @@
 <?php
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api\Quote;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\Util\PrefixConverter;
+use Teambank\EasyCreditApiV3\Integration\Util\PrefixConverter;
 use Shopware\Models\Customer\Repository as CustomerRepository;
 
 class CustomerBuilder
@@ -83,12 +83,12 @@ class CustomerBuilder
     }
 
     public function build() {
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\Customer(array_filter([
+        return new \Teambank\EasyCreditApiV3\Model\Customer(array_filter([
             'gender' => $this->getPrefix(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
             'birthDate' => $this->getDob(),
-            'contact' => $this->getEmail() ? new \Teambank\RatenkaufByEasyCreditApiV3\Model\Contact([
+            'contact' => $this->getEmail() ? new \Teambank\EasyCreditApiV3\Model\Contact([
                 'email' => $this->getEmail()
             ]) : null,
             'companyName' => $this->getCompany() ? $this->getCompany() : null

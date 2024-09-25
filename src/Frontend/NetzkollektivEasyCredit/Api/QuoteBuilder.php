@@ -2,9 +2,9 @@
 
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Api;
 
-use Teambank\RatenkaufByEasyCreditApiV3\Model\Transaction;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\ShippingAddress;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\InvoiceAddress;
+use Teambank\EasyCreditApiV3\Model\Transaction;
+use Teambank\EasyCreditApiV3\Model\ShippingAddress;
+use Teambank\EasyCreditApiV3\Model\InvoiceAddress;
 
 class FakeCheckoutController extends \Shopware_Controllers_Frontend_Checkout
 {
@@ -158,7 +158,7 @@ class QuoteBuilder
             $this->storage->set('sec_token', $this->createPaymentUniqueId());
         }
 
-        return new \Teambank\RatenkaufByEasyCreditApiV3\Model\RedirectLinks([
+        return new \Teambank\EasyCreditApiV3\Model\RedirectLinks([
             'urlSuccess' => $this->_getUrl('return'),
             'urlCancellation' => $this->_getUrl('cancel'),
             'urlDenial' => $this->_getUrl('reject')
@@ -176,7 +176,7 @@ class QuoteBuilder
             'paymentType' => $this->helper->getPaymentType($this->helper->getSelectedPayment()) . '_PAYMENT',
             'paymentSwitchPossible' => count($this->helper->getActivePaymentMethods()) > 1, // Switch between installment & bill payment should be possible if both methods are enabled
             'financingTerm' => $this->getDuration(),
-            'orderDetails' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\OrderDetails([
+            'orderDetails' => new \Teambank\EasyCreditApiV3\Model\OrderDetails([
                 'orderValue' => $this->getGrandTotal(),
                 'orderId' => $this->getId(),
                 'numberOfProductsInShoppingCart' => 1,
@@ -187,7 +187,7 @@ class QuoteBuilder
             ]),
             'shopsystem' => $this->getSystem(),
             'customer' => $this->getCustomer()->build(),
-            'customerRelationship' => new \Teambank\RatenkaufByEasyCreditApiV3\Model\CustomerRelationship([
+            'customerRelationship' => new \Teambank\EasyCreditApiV3\Model\CustomerRelationship([
                 'customerSince' => ($this->getCustomer()->getCreatedAt() instanceof \DateTime) ? $this->getCustomer()->getCreatedAt()->format('Y-m-d') : null,
                 'orderDoneWithLogin' => $this->getCustomer()->isLoggedIn(),
                 'numberOfOrders' => $this->getCustomer()->getOrderCount(),

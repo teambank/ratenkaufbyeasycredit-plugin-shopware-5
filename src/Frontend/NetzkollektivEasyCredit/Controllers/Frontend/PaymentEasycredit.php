@@ -79,7 +79,7 @@ class Shopware_Controllers_Frontend_PaymentEasycredit extends Shopware_Controlle
 
             $tx = $checkout->loadTransaction();
 
-            if ($tx->getStatus() !== \Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
+            if ($tx->getStatus() !== \Teambank\EasyCreditApiV3\Model\TransactionInformation::STATUS_AUTHORIZED) {
                 throw new \Exception('The transaction could not be authorized.');
             }
 

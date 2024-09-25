@@ -3,9 +3,9 @@
 namespace Shopware\Plugins\NetzkollektivEasyCredit\Subscriber;
 
 use Shopware\Plugins\NetzkollektivEasyCredit\Api;
-use Teambank\RatenkaufByEasyCreditApiV3\ApiException;
-use Teambank\RatenkaufByEasyCreditApiV3\Model\PaymentConstraintViolation;
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\AddressValidationException;
+use Teambank\EasyCreditApiV3\ApiException;
+use Teambank\EasyCreditApiV3\Model\PaymentConstraintViolation;
+use Teambank\EasyCreditApiV3\Integration\AddressValidationException;
 
 use GuzzleHttp\Exception\ConnectException;
 use Enlight\Event\SubscriberInterface;

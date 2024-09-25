@@ -1,5 +1,5 @@
 <?php
-use Teambank\RatenkaufByEasyCreditApiV3\Integration\Checkout;
+use Teambank\EasyCreditApiV3\Integration\Checkout;
 
 abstract class Shopware_Controllers_Backend_PaymentEasycredit_Abstract extends Shopware_Controllers_Backend_ExtJs {
     public function verifyCredentialsAction() {

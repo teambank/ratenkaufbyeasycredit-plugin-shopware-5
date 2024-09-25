@@ -1,5 +1,5 @@
 <?php
-use Teambank\RatenkaufByEasyCreditApiV3\Model\TransactionInformation;
+use Teambank\EasyCreditApiV3\Model\TransactionInformation;
 
 use Symfony\Component\Form\FormFactoryInterface;
 use Shopware\Models\Customer\Customer;
