@@ -18,7 +18,7 @@
     <meta name="easycredit-payment-types" content="{', '|implode:$EasyCreditActiveMethods}" />
     {/if}
 
-    <script type="module" src="https://invoice.easycredit-ratenkauf-webcomponents.pages.dev/easycredit-components/easycredit-components.esm.js"></script>
+    <script type="module" src="https://ratenkauf.easycredit.de/api/resource/webcomponents/v3/easycredit-components/easycredit-components.esm.js"></script>
 
 {/block}
 
