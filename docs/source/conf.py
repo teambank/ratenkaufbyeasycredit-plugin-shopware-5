@@ -19,14 +19,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'easyCredit-Ratenkauf für Shopware 5.x'
-copyright = u'2023, NETZKOLLEKTIV GmbH'
+project = u'easyCredit-Rechnung & Ratenkauf für Shopware 5.x'
+copyright = u'2024, NETZKOLLEKTIV GmbH'
 author = u'Teambank AG'
 
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'2.1.9'
+release = u'3.0.0'
 
 # -- General configuration ---------------------------------------------------
 

@@ -1,4 +1,4 @@
-# easyCredit-Ratenkauf Plugin for Shopware 5 - Installment Payment Plugin
+# easyCredit-Rechnung & Ratenkauf Plugin for Shopware 5 - Installment & Bill Payment Plugin
 
 easyCredit-Ratenkauf is the easiest and fastest installment payment solution of Germany. Join today to get the simplest way of partial payment for your POS and E-Commerce. easyCredit-Ratenkauf gives you the opportunity to offer installments as an additional payment method in your German WooCommerce store.
 
@@ -6,19 +6,24 @@ Traditional financing solutions are often connected with complicated application
 
 # Getting started
 Are you interested in using easyCredit-Ratenkauf? Contact us now:
-* [sales.ratenkauf@easycredit.de](https://store.shopware.com/en/easyc36021249341f/ratenkauf-by-easycredit.html#)
+* [sales.ratenkauf@easycredit.de](mailto:sales.ratenkauf@easycredit.de)
 * +49 (0)911 5390 2726
 
 or register at [easycredit-ratenkauf.de](https://www.easycredit-ratenkauf.de/registrierung.htm) and we will contact you.
 
 **Please note that a valid contract is required to use the plug-in.**
 
-# Installation
+# Installation from extension store
+
+The plugin is available for installation in the Shopware store:
+https://store.shopware.com/en/easyc57291971034f/easycredit-ratenkauf-for-shopware-5.html
+
+# Installation from repository
 
 ```
 cd my-shopware-dir
 
-git clone https://github.com/teambank/ratenkaufbyeasycredit-plugin-shopware-5.git sw-easycredit
+git clone https://github.com/teambank/easycredit-plugin-shopware-5.git sw-easycredit
 cp -r sw-easycredit/src/Frontend/NetzkollektivEasyCredit engine/Shopware/Plugins/Local/Frontend/
 
 ./bin/console sw:plugin:refresh
@@ -31,7 +36,7 @@ cp -r sw-easycredit/src/Frontend/NetzkollektivEasyCredit engine/Shopware/Plugins
 This extension aims to be as compatible as possible with current, future versions of Shopware 5. This version is regularly tested with Shopware versions:
 
 * >= v5.2.x 
-* <= v5.7.17
+* <= v5.7.19
 
 Earlier versions of Shopware 5 may work, but are not actively tested anymore.
 

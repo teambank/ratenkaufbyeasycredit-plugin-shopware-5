@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v3.0.0
+------
+
+* easyCredit-Rechnung wurde als weitere Zahlungsart integriert
+
 v2.1.9
 ------
 
