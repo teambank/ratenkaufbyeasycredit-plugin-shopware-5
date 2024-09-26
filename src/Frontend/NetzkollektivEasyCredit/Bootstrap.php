@@ -326,7 +326,7 @@ extends Shopware_Components_Plugin_Bootstrap
             if (!$payment) {
                 $options = array_merge($options, [
                     'action' => 'payment_easycredit',
-                    'active' => 1,
+                    'active' => $options['name'] === self::PAYMENT_NAME . '_ratenkauf' ? 1 : 0,
                     'position' => 0,
                     'additionalDescription' => '',
                     'template' => 'easycredit.tpl',
